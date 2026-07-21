@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/home/giovanni/Projects/vk_engine/external -I/home/giovanni/Projects/vk_engine/src -I/home/giovanni/Projects/vk_engine/external/tinyobjloader
 
-CXX_FLAGS = -O3 -DNDEBUG -std=gnu++17
+CXX_FLAGS = -g -std=gnu++17
 

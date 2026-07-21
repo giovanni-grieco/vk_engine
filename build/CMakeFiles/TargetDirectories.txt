@@ -1,0 +1,4 @@
+/home/giovanni/Projects/vk_engine/build/CMakeFiles/Engine.dir
+/home/giovanni/Projects/vk_engine/build/CMakeFiles/Shaders.dir
+/home/giovanni/Projects/vk_engine/build/CMakeFiles/edit_cache.dir
+/home/giovanni/Projects/vk_engine/build/CMakeFiles/rebuild_cache.dir

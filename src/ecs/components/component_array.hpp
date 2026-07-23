@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "entity/entity.hpp"
+#include "ecs/entity/entity.hpp"
 #include <iostream>
 
 namespace engine
@@ -11,6 +11,9 @@ namespace engine
     class ComponentArray
     {
     public:
+
+        ComponentArray() : entityToIndex(MAX_ENTITIES, -1) {};
+
         T& getComponent(const Entity entity)
         {
             int position = findComponentIndex(entity);
@@ -21,16 +24,16 @@ namespace engine
         {
             components.push_back(component);
             entities.push_back(entity);
+            entityToIndex[entity] = components.size() - 1;
         }
 
         T removeComponent(Entity entity)
         {
             int position = findComponentIndex(entity);
-            std::cout << "Removing component for entity " << entity << " at position " << position << "\n";
             T deletedComponent = components[position];
             Entity deletedEntity = entities[position];
+            entityToIndex[deletedEntity] = -1;
 
-            deletedComponent.dump();
 
             T lastComponent = components[components.size() - 1];
             Entity lastEntity = entities[entities.size() - 1];
@@ -38,6 +41,8 @@ namespace engine
             components[position] = lastComponent;
 
             entities[position] = lastEntity;
+
+            entityToIndex[lastEntity] = position;
 
             components.pop_back();
 
@@ -63,11 +68,6 @@ namespace engine
             std::cout << "Entities: ";
             for (auto e : entities)
                 std::cout << e << " ";
-            for (auto c : components)
-            {
-                std::cout << "\n\t";
-                c.dump();
-            }
             std::cout << "\n";
             std::cout <<"=====================\n";
         }
@@ -75,26 +75,12 @@ namespace engine
     private:
         std::vector<T> components{};    // List of components
         std::vector<Entity> entities{}; // List of entities which are using this component
+        std::vector<int> entityToIndex{}; // List of indices of the components for each entity
 
         int findComponentIndex(const Entity entity) const
         {
-            int i;
-            bool found = false;
-            for (i = 0; i < entities.size() && !found; i++)
-            {
-                if (entities[i] == entity)
-                {
-                    found = true;
-                }
-            }
-            if (found)
-            {
-                return i-1;
-            }
-            else
-            {
-                throw std::out_of_range("Component not found for entity " + std::to_string(entity));
-            }
+            int index = entityToIndex[entity];
+            return index;
         }
     };
 }

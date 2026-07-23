@@ -1,5 +1,5 @@
-#include "components/component_array.hpp"
-#include "components/transform.hpp"
+#include "ecs/components/component_array.hpp"
+#include "ecs/components/transform.hpp"
 
 using namespace engine;
 using namespace std;
@@ -21,11 +21,14 @@ int main(){
     ca.addComponent(e2, transform2);
     ca.addComponent(e3, transform3);
     ca.addComponent(e4, transform4);
-    ca.dump();
 
-    Transform deleted = ca.removeComponent(e4);
+    Entity toBeRemoved = e2;
+    cout << "Removing entity: " << toBeRemoved << "\n";
+
+    Transform deleted = ca.removeComponent(toBeRemoved);
 
     ca.dump();
+    cout << "Transform of removed entity: \n";
     deleted.dump();
 
 }

@@ -18,6 +18,14 @@ sudo dnf install glm-devel
 sudo dnf install glslc
 ```
 
+# MacOS setup
+Download the VulkanSDK which will install glslc, MoltenVK and various libraries.
+
+Install glm and glfw via Brew
+```
+brew install glm glfw
+```
+
 # Resources
 [Vulkan Tutorial](https://vulkan-tutorial.com/)
 

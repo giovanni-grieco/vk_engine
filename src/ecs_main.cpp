@@ -18,14 +18,12 @@ void setup(EntityManager& em, ComponentManager& cm)
 }
 
 int main()
-{
-    EntityManager em {};
-    ComponentManager cm {};
-
-    setup(em, cm);
-
-    auto entity = em.getActiveEntities().at(0);
-
-    cm.getComponent<Transform>(entity).dump();
-
+{   
+    Entity e1 = 1;
+    ComponentManager& cm = ComponentManager::getInstance();
+    
+    ComponentManager& cm1 = cm;
+    
+    ComponentManager::getInstance().registerComponent<Transform>();
+    
 }

@@ -1,4 +1,6 @@
 #include "translator_system.hpp"
+#include "ecs/component_manager.hpp"
+#include "ecs/components/transform.hpp"
 
 namespace engine{
     void Translator::start(){
@@ -6,6 +8,8 @@ namespace engine{
     }
 
     void Translator::update(){
-        // Implementazione del metodo update per il sistema di traduzione
+        for (Transform& transform : ComponentManager::getInstance().getComponentArray<Transform>().getComponents()){
+            transform.position.x = transform.position.x + 0.1;
+        }
     }
 }

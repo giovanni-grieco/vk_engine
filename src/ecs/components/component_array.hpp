@@ -68,12 +68,12 @@ namespace engine
             return entityToIndex[entity] != -1;
         }
 
-        const std::vector<T>& getComponents() const
+        std::vector<T>& getComponents()
         {
             return components;
         }
 
-        const std::vector<Entity>& getEntities() const
+        std::vector<Entity>& getEntities()
         {
             return entities;
         }

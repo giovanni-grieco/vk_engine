@@ -7,19 +7,24 @@
 #include <unordered_map>
 #include <typeindex>
 #include <stdexcept>
-
-
-// Ha la responsabilità di "aggiungere" e "rimuovere" componenti alle entità.
-// Quindi detiene tutti i "ComponentArray" in cui sono contenute le struct relative ai componenti e alle loro entità.
-
-// Quando un'entità viene distrutta, il ComponentManager deve rimuovere tutti i componenti associati a quell'entità.
-// Questa "notifica" arriverà dall'entity manager, che chiamerà un metodo del ComponentManager per rimuovere i componenti associati all'entità distrutta.
+#include <iostream>
 
 namespace engine
 {
     class ComponentManager
     {
     public:
+
+        static ComponentManager& getInstance(){
+            if (instance == nullptr){
+                instance = std::unique_ptr<ComponentManager>(new ComponentManager());
+                std::cout<<"Component Manager Created!\n";
+            }else{
+                std::cout<<"Instance already exists!\n";
+            }
+            return *instance;
+        }
+
         template <typename T>
         void registerComponent(){
             //controlliamo se non esista già il tipo di componente
@@ -79,9 +84,6 @@ namespace engine
             return componentArray.getEntities();
         }
 
-    private:
-        std::unordered_map<std::type_index, std::unique_ptr<IComponentArray>> componentArrays;
-
         template<typename T>
         ComponentArray<T>& getComponentArray(){
             auto key = std::type_index(typeid(T));
@@ -101,6 +103,20 @@ namespace engine
             }
             throw std::runtime_error("Component type not registered.");
         }
+
+    private:
+        static std::unique_ptr<ComponentManager> instance;
+
+        ComponentManager() = default;
+
+        // Prevent copying — unique_ptr members are non-copyable
+        ComponentManager(const ComponentManager&) = delete;
+        ComponentManager& operator=(const ComponentManager&) = delete;
+
+
+        std::unordered_map<std::type_index, std::unique_ptr<IComponentArray>> componentArrays;
+
+
 
     };
 }

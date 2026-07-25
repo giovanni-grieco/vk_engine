@@ -3,7 +3,7 @@
 #include "system.hpp"
 
 namespace engine{
-    class Translator : System{
+    class Translator : public System{
         void start() override;
         void update() override;
     };

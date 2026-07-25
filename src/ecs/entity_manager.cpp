@@ -3,8 +3,19 @@
 
 namespace engine
 {
+    std::unique_ptr<EntityManager> EntityManager::instance = nullptr;
 
     unsigned int EntityManager::nextEntityId = 0;
+
+    EntityManager& EntityManager::getInstance(){
+        if(instance==nullptr){
+            instance=std::unique_ptr<EntityManager>(new EntityManager());
+            std::cout<<"Entity Manager Instance Created!\n";
+        }else{
+            std::cout<<"Entity Manager Instance already existing.\n";
+        }
+        return *instance;
+    }
 
     Entity EntityManager::createEntity()
     {

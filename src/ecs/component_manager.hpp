@@ -20,7 +20,7 @@ namespace engine
                 instance = std::unique_ptr<ComponentManager>(new ComponentManager());
                 std::cout<<"Component Manager Created!\n";
             }else{
-                std::cout<<"Instance already exists!\n";
+                std::cout<<"Component Manager Instance already existing.\n";
             }
             return *instance;
         }

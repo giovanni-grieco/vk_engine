@@ -19,11 +19,16 @@ void setup(EntityManager& em, ComponentManager& cm)
 
 int main()
 {   
+    std::cout<<"vk_engine started!\n" << "-----------------\n";
     Entity e1 = 1;
     ComponentManager& cm = ComponentManager::getInstance();
     
     ComponentManager& cm1 = cm;
-    
+
     ComponentManager::getInstance().registerComponent<Transform>();
-    
+
+    EntityManager& em = EntityManager::getInstance();
+
+    EntityManager::getInstance();
+    std::cout<< "-----------------\n"<<"vk_engine closing!\n";
 }

@@ -7,12 +7,18 @@
 namespace engine
 {
 
+    class IComponentArray
+    {
+    public:
+        virtual ~IComponentArray() = default;
+    };
+
     template <typename T>
-    class ComponentArray
+    class ComponentArray :  public IComponentArray
     {
     public:
 
-        ComponentArray() : entityToIndex(MAX_ENTITIES, -1) {};
+        ComponentArray<T>() : entityToIndex(MAX_ENTITIES, -1) {};
 
         T& getComponent(const Entity entity)
         {
@@ -23,6 +29,13 @@ namespace engine
         void addComponent(const Entity entity, const T &component)
         {
             components.push_back(component);
+            entities.push_back(entity);
+            entityToIndex[entity] = components.size() - 1;
+        }
+
+        void addComponent(const Entity entity, T&& component)
+        {
+            components.push_back(std::move(component));
             entities.push_back(entity);
             entityToIndex[entity] = components.size() - 1;
         }
@@ -51,12 +64,16 @@ namespace engine
             return deletedComponent;
         }
 
-        const std::vector<T>& rawData() const
+        bool hasComponent(Entity entity) const {
+            return entityToIndex[entity] != -1;
+        }
+
+        const std::vector<T>& getComponents() const
         {
             return components;
         }
 
-        const std::vector<Entity>& rawEntities() const
+        const std::vector<Entity>& getEntities() const
         {
             return entities;
         }

@@ -1,34 +1,31 @@
 #include "ecs/components/component_array.hpp"
 #include "ecs/components/transform.hpp"
+#include "ecs/component_manager.hpp"
+#include "ecs/entity_manager.hpp"
+
+#include <memory>
 
 using namespace engine;
-using namespace std;
 
-int main(){
-    ComponentArray<Transform> ca {};
+void setup(EntityManager& em, ComponentManager& cm)
+{
+    auto e = em.createEntity();
 
-    Transform transform1 = {1.0f, 2.0f, 3.0f, 0.0f, 0.0f, 0.0f};
-    Transform transform2 = {4.0f, 5.0f, 6.0f, 0.0f, 0.0f, 0.0f};
-    Transform transform3 = {7.0f, 8.0f, 9.0f, 0.0f, 0.0f, 0.0f};
-    Transform transform4 = {10.0f, 11.0f, 12.0f, 0.0f, 0.0f, 0.0f};
+    Transform t {{1.5f, 1.5f, 0.f},{}};
 
-    Entity e1 = 1;
-    Entity e2 = 2;
-    Entity e3 = 3;
-    Entity e4 = 4;
+    cm.registerComponent<Transform>();
+    cm.addComponent<Transform>(e, t);
+}
 
-    ca.addComponent(e1, transform1);
-    ca.addComponent(e2, transform2);
-    ca.addComponent(e3, transform3);
-    ca.addComponent(e4, transform4);
+int main()
+{
+    EntityManager em {};
+    ComponentManager cm {};
 
-    Entity toBeRemoved = e2;
-    cout << "Removing entity: " << toBeRemoved << "\n";
+    setup(em, cm);
 
-    Transform deleted = ca.removeComponent(toBeRemoved);
+    auto entity = em.getActiveEntities().at(0);
 
-    ca.dump();
-    cout << "Transform of removed entity: \n";
-    deleted.dump();
+    cm.getComponent<Transform>(entity).dump();
 
 }

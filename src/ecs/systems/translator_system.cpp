@@ -3,13 +3,18 @@
 #include "ecs/components/transform.hpp"
 
 namespace engine{
+
+    Translator::Translator(float speed){
+        this->speed = speed;
+    }
+
     void Translator::start(){
         // Implementazione del metodo start per il sistema di traduzione
     }
 
     void Translator::update(){
         for (Transform& transform : ComponentManager::getInstance().getComponentArray<Transform>().getComponents()){
-            transform.position.x = transform.position.x + 0.1;
+            transform.position.x = transform.position.x + speed;
         }
     }
 }

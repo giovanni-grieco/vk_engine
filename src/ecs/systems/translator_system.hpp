@@ -4,7 +4,12 @@
 
 namespace engine{
     class Translator : public System{
-        void start() override;
-        void update() override;
+        public:
+            Translator(float speed);
+
+            void start() override;
+            void update() override;
+            
+            float speed;
     };
 }

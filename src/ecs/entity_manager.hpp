@@ -10,6 +10,8 @@ namespace engine{
         public:
             static EntityManager& getInstance();
 
+            EntityManager()=default;
+
             Entity createEntity();
             void destroyEntity(Entity entity);
             const std::vector<Entity>& getActiveEntities() const;
@@ -17,8 +19,6 @@ namespace engine{
         private:
             static std::unique_ptr<EntityManager> instance;
             static unsigned int nextEntityId;
-
-            EntityManager()=default;
 
             EntityManager(const EntityManager&)=delete;
             EntityManager& operator=(const EntityManager&)=delete;

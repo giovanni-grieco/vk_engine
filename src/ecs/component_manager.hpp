@@ -8,6 +8,7 @@
 #include <typeindex>
 #include <stdexcept>
 #include <iostream>
+#include <memory>
 
 namespace engine
 {
@@ -17,13 +18,12 @@ namespace engine
 
         static ComponentManager& getInstance(){
             if (instance == nullptr){
-                instance = std::unique_ptr<ComponentManager>(new ComponentManager());
-                std::cout<<"Component Manager Created!\n";
-            }else{
-                std::cout<<"Component Manager Instance already existing.\n";
+                instance = std::unique_ptr<ComponentManager>(std::make_unique<ComponentManager>());
             }
             return *instance;
         }
+
+        ComponentManager() = default;
 
         template <typename T>
         void registerComponent(){
@@ -106,8 +106,6 @@ namespace engine
 
     private:
         static std::unique_ptr<ComponentManager> instance;
-
-        ComponentManager() = default;
 
         // Prevent copying — unique_ptr members are non-copyable
         ComponentManager(const ComponentManager&) = delete;

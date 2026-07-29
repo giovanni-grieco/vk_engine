@@ -9,10 +9,7 @@ namespace engine
 
     EntityManager& EntityManager::getInstance(){
         if(instance==nullptr){
-            instance=std::unique_ptr<EntityManager>(new EntityManager());
-            std::cout<<"Entity Manager Instance Created!\n";
-        }else{
-            std::cout<<"Entity Manager Instance already existing.\n";
+            instance=std::unique_ptr<EntityManager>(std::make_unique<EntityManager>());
         }
         return *instance;
     }

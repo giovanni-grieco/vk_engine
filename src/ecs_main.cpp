@@ -2,33 +2,40 @@
 #include "ecs/components/transform.hpp"
 #include "ecs/component_manager.hpp"
 #include "ecs/entity_manager.hpp"
+#include "ecs/system_manager.hpp"
+#include "ecs/systems/translator_system.hpp"
+#include "ecs/systems/debugger_system.hpp"
 
 #include <memory>
 
 using namespace engine;
 
-void setup(EntityManager& em, ComponentManager& cm)
-{
-    auto e = em.createEntity();
-
-    Transform t {{1.5f, 1.5f, 0.f},{}};
-
-    cm.registerComponent<Transform>();
-    cm.addComponent<Transform>(e, t);
-}
-
 int main()
 {   
     std::cout<<"vk_engine started!\n" << "-----------------\n";
-    Entity e1 = 1;
-    ComponentManager& cm = ComponentManager::getInstance();
+
+    EntityManager& entityManager = EntityManager::getInstance();
+    ComponentManager& componentManager = ComponentManager::getInstance();
+    SystemManager& systemManager = SystemManager::getInstance();
+
+    componentManager.registerComponent<Transform>();
+
+    systemManager.registerSystem(std::make_unique<Debugger>(true));
+    systemManager.registerSystem(std::make_unique<Translator>(0.143f));
+
+    Entity e = entityManager.createEntity();
     
-    ComponentManager& cm1 = cm;
+    Transform t {{50.f, 50.f, 50.f}, {0.f, 0.f, 0.f}};
 
-    ComponentManager::getInstance().registerComponent<Transform>();
+    componentManager.addComponent<Transform>(e, t);
 
-    EntityManager& em = EntityManager::getInstance();
+    systemManager.start();
 
-    EntityManager::getInstance();
+    for(int i = 0; i<5; i++){
+        systemManager.update();
+    }
+
+    t.dump();
+
     std::cout<< "-----------------\n"<<"vk_engine closing!\n";
 }

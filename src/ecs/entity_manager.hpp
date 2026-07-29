@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ecs/entity/entity.hpp"
+#include "ecs/component_manager.hpp"
 
 #include <vector>
 #include <memory>
@@ -14,6 +15,8 @@ namespace engine{
 
             Entity createEntity();
             void destroyEntity(Entity entity);
+            void destroyEntity(Entity entity, ComponentManager& cm);
+            bool exists(Entity entity);
             const std::vector<Entity>& getActiveEntities() const;
 
         private:
@@ -24,7 +27,8 @@ namespace engine{
             EntityManager& operator=(const EntityManager&)=delete;
 
             std::vector<Entity> entities{};
-            std::vector<int> entityToIndex{MAX_ENTITIES, -1};
+            std::vector<int> entityToIndex = std::vector<int>(MAX_ENTITIES, -1);
+            std::vector<Entity> freeIds{};
 
     };
 }

@@ -65,9 +65,16 @@ if (NOT TINYOBJ_PATH)
   set(TINYOBJ_PATH external/tinyobjloader)
 endif()
 
+# ECS library — shared between main app and tests
+file(GLOB_RECURSE ECS_SOURCES ${PROJECT_SOURCE_DIR}/src/ecs/*.cpp)
+add_library(${PROJECT_NAME}_ecs STATIC ${ECS_SOURCES})
+target_include_directories(${PROJECT_NAME}_ecs PUBLIC ${PROJECT_SOURCE_DIR}/src)
+target_compile_features(${PROJECT_NAME}_ecs PUBLIC cxx_std_17)
+
 file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
+target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_ecs)
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
@@ -108,6 +115,35 @@ elseif (UNIX)
     target_link_libraries(${PROJECT_NAME} glfw ${Vulkan_LIBRARIES})
 endif()
 
+
+############## TESTING #######################
+option(BUILD_TESTS "Build unit tests" ON)
+
+if(BUILD_TESTS)
+    include(FetchContent)
+    FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/release-1.12.1.tar.gz
+    )
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+
+    enable_testing()
+
+    file(GLOB_RECURSE TEST_SOURCES ${PROJECT_SOURCE_DIR}/test/*.cpp)
+    add_executable(${PROJECT_NAME}_tests ${TEST_SOURCES})
+    target_include_directories(${PROJECT_NAME}_tests PUBLIC
+        ${PROJECT_SOURCE_DIR}/src
+        ${TINYOBJ_PATH}
+    )
+    target_link_libraries(${PROJECT_NAME}_tests
+        ${PROJECT_NAME}_ecs
+        gtest
+        gtest_main
+        pthread
+    )
+    add_test(NAME ${PROJECT_NAME}_tests COMMAND ${PROJECT_NAME}_tests)
+endif()
 
 ############## Build SHADERS #######################
 

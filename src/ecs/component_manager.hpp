@@ -60,6 +60,12 @@ namespace engine
                 componentArray.addComponent(entity, std::move(component));
         }
 
+        /*template <typename T>
+        void addComponent(Entity entity, T component){
+            ComponentArray<T>& componentArray = getComponentArray<T>();
+            componentArray.addComponent(entity, component);
+        }*/
+
         template <typename T>
         void removeComponent(Entity entity){
             ComponentArray<T>& componentArray = getComponentArray<T>();
@@ -82,6 +88,14 @@ namespace engine
         const std::vector<Entity>& getEntitiesWithComponent() const{
             const ComponentArray<T>& componentArray = getComponentArrayConst<T>();
             return componentArray.getEntities();
+        }
+
+        void removeEntity(Entity entity)
+        {
+            for (auto& [type, array] : componentArrays)
+            {
+                array->removeEntity(entity);
+            }
         }
 
         template<typename T>

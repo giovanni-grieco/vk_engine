@@ -20,8 +20,12 @@ int main()
 
     componentManager.registerComponent<Transform>();
 
-    systemManager.registerSystem(std::make_unique<Debugger>(true));
-    systemManager.registerSystem(std::make_unique<Translator>(0.143f));
+    bool debuggerEnableFlag = true;
+
+    float translatorSpeed = 0.1473;
+
+    systemManager.registerSystem(std::make_unique<Debugger>(debuggerEnableFlag));
+    systemManager.registerSystem(std::make_unique<Translator>(translatorSpeed));
 
     Entity e = entityManager.createEntity();
     
@@ -35,7 +39,13 @@ int main()
         systemManager.update();
     }
 
-    t.dump();
+    //entityManager.destroyEntity(e);
+
+    for(int i = 0; i<5; i++){
+        systemManager.update();
+    }
+
+
 
     std::cout<< "-----------------\n"<<"vk_engine closing!\n";
 }

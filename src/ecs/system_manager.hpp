@@ -1,6 +1,8 @@
 #pragma once
 
 #include "ecs/systems/system.hpp"
+#include "ecs/component_manager.hpp"
+#include "ecs/entity_manager.hpp"
 
 #include <memory>
 #include <vector>

@@ -11,6 +11,7 @@ namespace engine
     {
     public:
         virtual ~IComponentArray() = default;
+        virtual void removeEntity(Entity entity) = 0;
     };
 
     template <typename T>
@@ -23,11 +24,17 @@ namespace engine
         T& getComponent(const Entity entity)
         {
             int position = findComponentIndex(entity);
-            return components[position];
+            if (position == -1)
+                throw std::runtime_error("Entity does not have this component.");
+            return components[static_cast<size_t>(position)];
         }
 
         void addComponent(const Entity entity, const T &component)
         {
+            if (entityToIndex[entity] != -1) {
+                std::cerr << "Warning: Entity already has this component — skipping add.\n";
+                return;
+            }
             std::cout<< "Add Component v1 called\n";
             components.push_back(component);
             entities.push_back(entity);
@@ -36,15 +43,21 @@ namespace engine
 
         void addComponent(const Entity entity, T&& component)
         {
+            if (entityToIndex[entity] != -1) {
+                std::cerr << "Warning: Entity already has this component — skipping add.\n";
+                return;
+            }
             std::cout<< "Add Component v2 called\n";
             components.push_back(std::move(component));
             entities.push_back(entity);
             entityToIndex[entity] = components.size() - 1;
         }
 
-        T removeComponent(Entity entity)
+        void removeComponent(Entity entity)
         {
             int position = findComponentIndex(entity);
+            if (position == -1)
+                throw std::runtime_error("Entity does not have this component.");
             T deletedComponent = components[position];
             Entity deletedEntity = entities[position];
             entityToIndex[deletedEntity] = -1;
@@ -62,8 +75,28 @@ namespace engine
             components.pop_back();
 
             entities.pop_back();
-
+            dump();
             return deletedComponent;
+        }
+
+        void removeEntity(Entity entity) override
+        {   
+            int position = findComponentIndex(entity);
+            if (position == -1) return;
+
+            entityToIndex[entity] = -1;
+
+            Entity lastEntity = entities.back();
+            
+            if (position != static_cast<int>(components.size()) - 1)
+            {
+                components[position] = std::move(components.back());
+                entities[position] = lastEntity;
+                entityToIndex[lastEntity] = position;
+            }
+            components.pop_back();
+            entities.pop_back();
+
         }
 
         bool hasComponent(Entity entity) const {
@@ -83,7 +116,7 @@ namespace engine
         void dump() const
         {
             std::cout << "ComponentArray dump:\n";
-            std::cout << "Components (" << components.size() << ")\n";
+            std::cout << "Components size: " << components.size() << "\n";
             std::cout << "Entities: ";
             for (auto e : entities)
                 std::cout << e << " ";

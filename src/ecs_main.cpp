@@ -1,10 +1,11 @@
-#include "ecs/components/component_array.hpp"
 #include "ecs/components/transform.hpp"
+#include "ecs/components/car.hpp"
 #include "ecs/component_manager.hpp"
 #include "ecs/entity_manager.hpp"
 #include "ecs/system_manager.hpp"
 #include "ecs/systems/translator_system.hpp"
 #include "ecs/systems/debugger_system.hpp"
+#include "ecs/systems/car_system.hpp"
 
 #include <memory>
 
@@ -19,6 +20,7 @@ int main()
     SystemManager& systemManager = SystemManager::getInstance();
 
     componentManager.registerComponent<Transform>();
+    componentManager.registerComponent<Car>();
 
     bool debuggerEnableFlag = true;
 
@@ -26,9 +28,12 @@ int main()
 
     systemManager.registerSystem(std::make_unique<Debugger>(debuggerEnableFlag));
     systemManager.registerSystem(std::make_unique<Translator>(translatorSpeed));
+    systemManager.registerSystem(std::make_unique<CarSystem>());
 
     Entity e = entityManager.createEntity();
-    
+    std::cout<<"e: "<<e<<"\n";
+    Entity e1 = entityManager.createEntity();
+    std::cout<<"e1: "<<e1<<"\n";
     Transform t {{50.f, 50.f, 50.f}, {0.f, 0.f, 0.f}};
 
     componentManager.addComponent<Transform>(e, t);
@@ -39,7 +44,11 @@ int main()
         systemManager.update();
     }
 
-    //entityManager.destroyEntity(e);
+    entityManager.destroyEntity(e);
+    Entity e2 = entityManager.createEntity();
+    Car car {"Ford", "Mustang", 1977};
+    componentManager.addComponent<Car>(e2, car);
+    std::cout<<"e2: "<<e2<<"\n";
 
     for(int i = 0; i<5; i++){
         systemManager.update();

@@ -84,10 +84,11 @@ namespace engine
             return componentArray.hasComponent(entity);
         }
 
-        template <typename T>
+
+        template <typename T> //readonly array of entities. We don't want sideways modification!
         const std::vector<Entity>& getEntitiesWithComponent() const{
             const ComponentArray<T>& componentArray = getComponentArrayConst<T>();
-            return componentArray.getEntities();
+            return componentArray.getEntitiesConst();
         }
 
         void removeEntity(Entity entity)

@@ -113,6 +113,10 @@ namespace engine
             return entities;
         }
 
+        const std::vector<Entity>& getEntitiesConst() const{
+            return entities;
+        }
+
         void dump() const
         {
             std::cout << "ComponentArray dump:\n";

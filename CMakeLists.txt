@@ -20,66 +20,99 @@ endif()
 
 project(${NAME} VERSION 0.23.0)
 
-# 1. Set VULKAN_SDK_PATH in .env.cmake to target specific vulkan version
+# =============================================
+# 1. Vulkan Discovery
+# =============================================
+# Set VULKAN_SDK_PATH in .env.cmake to target specific vulkan version
 if (DEFINED VULKAN_SDK_PATH)
-  set(Vulkan_INCLUDE_DIRS "${VULKAN_SDK_PATH}/Include") # 1.1 Make sure this include path is correct
-  set(Vulkan_LIBRARIES "${VULKAN_SDK_PATH}/Lib") # 1.2 Make sure lib path is correct
+  set(Vulkan_INCLUDE_DIRS "${VULKAN_SDK_PATH}/Include")
+  set(Vulkan_LIBRARIES "${VULKAN_SDK_PATH}/Lib")
   set(Vulkan_FOUND "True")
 else()
-  find_package(Vulkan REQUIRED) # throws error if could not find Vulkan
+  find_package(Vulkan REQUIRED)
   message(STATUS "Found Vulkan: $ENV{VULKAN_SDK}")
 endif()
 if (NOT Vulkan_FOUND)
-	message(FATAL_ERROR "Could not find Vulkan library!")
+    message(FATAL_ERROR "Could not find Vulkan library!")
 else()
-	message(STATUS "Using vulkan lib at: ${Vulkan_LIBRARIES}")
+    message(STATUS "Using vulkan lib at: ${Vulkan_LIBRARIES}")
 endif()
 
+# =============================================
+# 2. GLM Discovery (header-only, no linking needed)
+# =============================================
+if (DEFINED GLM_PATH)
+  message(STATUS "Using GLM from .env: ${GLM_PATH}")
+  set(GLM_INCLUDE_DIRS "${GLM_PATH}")
+else()
+  find_package(glm REQUIRED)
+  message(STATUS "Found GLM via find_package")
+endif()
 
-# 2. Set GLFW_PATH in .env.cmake to target specific glfw
+# =============================================
+# 3. GLFW Discovery
+# =============================================
 if (DEFINED GLFW_PATH)
-  message(STATUS "Using GLFW path specified in .env")
+  message(STATUS "Using GLFW from .env: ${GLFW_PATH}")
   set(GLFW_INCLUDE_DIRS "${GLFW_PATH}/include")
   if (MSVC)
-    set(GLFW_LIB "${GLFW_PATH}/lib-vc2019") # 2.1 Update lib-vc2019 to use same version as your visual studio
+    set(GLFW_LIB_DIR  "${GLFW_PATH}/lib-vc2019")
+    set(GLFW_LIB_NAME glfw3)
   elseif (CMAKE_GENERATOR STREQUAL "MinGW Makefiles")
     message(STATUS "USING MINGW")
-    set(GLFW_LIB "${GLFW_PATH}/lib-mingw-w64") # 2.1 make sure matches glfw mingw subdirectory
+    set(GLFW_LIB_DIR  "${GLFW_PATH}/lib-mingw-w64")
+    set(GLFW_LIB_NAME glfw3)
+  elseif (UNIX)
+    set(GLFW_LIB_DIR  "${GLFW_PATH}/lib")
+    set(GLFW_LIB_NAME glfw3)
   endif()
 else()
   find_package(glfw3 3.3 REQUIRED)
-  set(GLFW_LIB glfw)
-  message(STATUS "Found GLFW")
+  set(GLFW_LIB_NAME glfw)
+  message(STATUS "Found GLFW via find_package")
 endif()
-if (NOT GLFW_LIB)
-	message(FATAL_ERROR "Could not find glfw library!")
+if (NOT GLFW_LIB_NAME)
+    message(FATAL_ERROR "Could not find glfw library!")
 else()
-	message(STATUS "Using glfw lib at: ${GLFW_LIB}")
+    message(STATUS "Using glfw lib: ${GLFW_LIB_NAME}")
 endif()
 
 include_directories(external)
 
-# If TINYOBJ_PATH not specified in .env.cmake, try fetching from git repo
+# =============================================
+# 4. TinyOBJLoader
+# =============================================
+# If TINYOBJ_PATH not specified in .env.cmake, use bundled external copy
 if (NOT TINYOBJ_PATH)
   message(STATUS "TINYOBJ_PATH not specified in .env.cmake, using external/tinyobjloader")
   set(TINYOBJ_PATH external/tinyobjloader)
 endif()
 
-# ECS library — shared between main app and tests
-file(GLOB_RECURSE ECS_SOURCES ${PROJECT_SOURCE_DIR}/src/ecs/*.cpp)
-add_library(${PROJECT_NAME}_ecs STATIC ${ECS_SOURCES})
-target_include_directories(${PROJECT_NAME}_ecs PUBLIC ${PROJECT_SOURCE_DIR}/src)
-target_compile_features(${PROJECT_NAME}_ecs PUBLIC cxx_std_17)
-
+# =============================================
+# 5. Target Setup
+# =============================================
 file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_ecs)
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/build")
 
+# =============================================
+# 6. Common Include Directories (all platforms)
+# =============================================
+target_include_directories(${PROJECT_NAME} PUBLIC
+  ${PROJECT_SOURCE_DIR}/src
+  ${Vulkan_INCLUDE_DIRS}
+  ${TINYOBJ_PATH}
+  ${GLFW_INCLUDE_DIRS}
+  ${GLM_INCLUDE_DIRS}
+)
+
+# =============================================
+# 7. Platform-Specific Linking
+# =============================================
 if (WIN32)
   message(STATUS "CREATING BUILD FOR WINDOWS")
 
@@ -92,62 +125,27 @@ if (WIN32)
     )
   endif()
 
-  target_include_directories(${PROJECT_NAME} PUBLIC
-    ${PROJECT_SOURCE_DIR}/src
-    ${Vulkan_INCLUDE_DIRS}
-    ${TINYOBJ_PATH}
-    ${GLFW_INCLUDE_DIRS}
-    ${GLM_PATH}
-    )
-
   target_link_directories(${PROJECT_NAME} PUBLIC
     ${Vulkan_LIBRARIES}
-    ${GLFW_LIB}
+    ${GLFW_LIB_DIR}
   )
 
-  target_link_libraries(${PROJECT_NAME} glfw3 vulkan-1)
+  target_link_libraries(${PROJECT_NAME} ${GLFW_LIB_NAME} vulkan-1)
+
 elseif (UNIX)
-    message(STATUS "CREATING BUILD FOR UNIX")
-    target_include_directories(${PROJECT_NAME} PUBLIC
-      ${PROJECT_SOURCE_DIR}/src
-      ${TINYOBJ_PATH}
-    )
-    target_link_libraries(${PROJECT_NAME} glfw ${Vulkan_LIBRARIES})
+  message(STATUS "CREATING BUILD FOR UNIX")
+
+  if (GLFW_LIB_DIR)
+    target_link_directories(${PROJECT_NAME} PUBLIC ${GLFW_LIB_DIR})
+  endif()
+
+  target_link_libraries(${PROJECT_NAME} ${GLFW_LIB_NAME} ${Vulkan_LIBRARIES})
+
 endif()
 
-
-############## TESTING #######################
-option(BUILD_TESTS "Build unit tests" ON)
-
-if(BUILD_TESTS)
-    include(FetchContent)
-    FetchContent_Declare(
-        googletest
-        URL https://github.com/google/googletest/archive/release-1.12.1.tar.gz
-    )
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googletest)
-
-    enable_testing()
-
-    file(GLOB_RECURSE TEST_SOURCES ${PROJECT_SOURCE_DIR}/test/*.cpp)
-    add_executable(${PROJECT_NAME}_tests ${TEST_SOURCES})
-    target_include_directories(${PROJECT_NAME}_tests PUBLIC
-        ${PROJECT_SOURCE_DIR}/src
-        ${TINYOBJ_PATH}
-    )
-    target_link_libraries(${PROJECT_NAME}_tests
-        ${PROJECT_NAME}_ecs
-        gtest
-        gtest_main
-        pthread
-    )
-    add_test(NAME ${PROJECT_NAME}_tests COMMAND ${PROJECT_NAME}_tests)
-endif()
-
-############## Build SHADERS #######################
-
-# Find all vertex and fragment sources within shaders directory
+# =============================================
+# 8. Build Shaders
+# =============================================
 # taken from VBlancos vulkan tutorial
 # https://github.com/vblanco20-1/vulkan-guide/blob/all-chapters/CMakeLists.txt
 find_program(GLSL_VALIDATOR glslangValidator HINTS 

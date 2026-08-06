@@ -1,6 +1,5 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
@@ -8,6 +7,8 @@
 #include <string.h>
 #include <vector>
 #include <map>
+
+#include "vulkan/queue_family.hpp"
 
 using namespace std;
 
@@ -28,8 +29,11 @@ private:
 
     string applicationName = "Hello Triangle";
 
-    const std::vector<const char *> validationLayers = {
-        "VK_LAYER_KHRONOS_validation"};
+    const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
+
+    GLFWwindow *window;
+    VkInstance instance;
+    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 
 #ifdef NDEBUG
     const bool enableValidationLayers = false;
@@ -37,26 +41,10 @@ private:
     const bool enableValidationLayers = true;
 #endif
 
-    GLFWwindow *window;
-    VkInstance instance;
-
-    void initWindow()
-    {
-        glfwInit();
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        window = glfwCreateWindow(WIDTH, HEIGHT, applicationName.c_str(), nullptr, nullptr);
-    }
-
-    void initVulkan()
-    {
-        createInstance();
-    }
-
     void createInstance()
     {
-        cout <<"Enable validation layers: \t " <<enableValidationLayers << "\n";
-        cout <<"Check validation layer support:  "<< checkValidationLayerSupport() << "\n";
+        cout << "Enable validation layers: \t " << enableValidationLayers << "\n";
+        cout << "Check validation layer support:  " << checkValidationLayerSupport() << "\n";
         if (enableValidationLayers && !checkValidationLayerSupport())
         {
             throw std::runtime_error("validation layers requested, but not available!");
@@ -73,13 +61,15 @@ private:
         createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         createInfo.pApplicationInfo = &appInfo;
 
-        if(enableValidationLayers){
+        if (enableValidationLayers)
+        {
             createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
             createInfo.ppEnabledLayerNames = validationLayers.data();
-        }else{
+        }
+        else
+        {
             createInfo.enabledLayerCount = 0;
         }
-
 
         uint32_t glfwExtensionCount = 0;
         const char **glfwExtensions;
@@ -114,19 +104,48 @@ private:
         checkExtensionSupport(glfwExtensionCount, extensionCount, glfwExtensions, extensions);
     }
 
-    void mainLoop()
+    void pickPhysicalDevice()
     {
-        while (!glfwWindowShouldClose(window))
+        uint32_t deviceCount = 0;
+        vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+        if (deviceCount == 0)
         {
-            glfwPollEvents();
+            throw std::runtime_error("failed to find GPUs with Vulkan support!");
+        }
+        std::vector<VkPhysicalDevice> devices(deviceCount);
+        vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+
+        for (const auto &device : devices)
+        {
+            if (isDeviceSuitable(device))
+            {
+                physicalDevice = device;
+                break;
+            }
+        }
+
+        if (physicalDevice == VK_NULL_HANDLE)
+        {
+            throw std::runtime_error("failed to find suitable GPU!");
         }
     }
 
-    void cleanup()
+    bool isDeviceSuitable(VkPhysicalDevice device)
     {
-        vkDestroyInstance(instance, nullptr);
-        glfwDestroyWindow(window);
-        glfwTerminate();
+        // TODO
+        VkPhysicalDeviceProperties deviceProperties;
+        vkGetPhysicalDeviceProperties(device, &deviceProperties);
+
+        bool result = findQueueFamilies(device);
+        if (!result)
+        {
+            std::cout << "GPU " << deviceProperties.deviceName << " is not suitable!\n";
+        }
+        else
+        {
+            std::cout << "GPU " << deviceProperties.deviceName << " is suitable!\n";
+        }
+        return result;
     }
 
     void checkExtensionSupport(uint32_t glfwExtensionCount, uint32_t vkExtensionCount, const char **glfwExtensions, vector<VkExtensionProperties> &vkExtensions)
@@ -194,10 +213,37 @@ private:
         return true;
     }
 
-    
+    void initWindow()
+    {
+        glfwInit();
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        window = glfwCreateWindow(WIDTH, HEIGHT, applicationName.c_str(), nullptr, nullptr);
+    }
+
+    void initVulkan()
+    {
+        createInstance();
+        pickPhysicalDevice();
+    }
+
+    void mainLoop()
+    {
+        while (!glfwWindowShouldClose(window))
+        {
+            glfwPollEvents();
+        }
+    }
+
+    void cleanup()
+    {
+        vkDestroyInstance(instance, nullptr);
+        glfwDestroyWindow(window);
+        glfwTerminate();
+    }
 };
 
-/*int main()
+int main()
 {
     HelloTriangleApplication app;
 
@@ -212,4 +258,4 @@ private:
     }
 
     return EXIT_SUCCESS;
-}*/
+}

@@ -1,4 +1,4 @@
-sudo dnf install cmake
+sudo dnf install cmake make gcc gcc-c++
 
 sudo dnf install vulkan-tools
 sudo dnf install vulkan-loader-devel

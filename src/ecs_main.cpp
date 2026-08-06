@@ -11,6 +11,7 @@
 
 using namespace engine;
 
+/*
 int main()
 {   
     std::cout<<"vk_engine started!\n" << "-----------------\n";
@@ -57,4 +58,4 @@ int main()
 
 
     std::cout<< "-----------------\n"<<"vk_engine closing!\n";
-}
+}*/

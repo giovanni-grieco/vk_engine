@@ -8,7 +8,7 @@
 #include <vector>
 #include <map>
 
-#include "window.hpp"
+#include "platform/window.hpp"
 
 #include "vulkan/queue_family.hpp"
 
@@ -143,7 +143,7 @@ private:
         VkPhysicalDeviceProperties deviceProperties;
         vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
-        bool result = findQueueFamilies(device).isComplete();
+        bool result = engine::findQueueFamilies(device).isComplete();
         if (!result)
         {
             std::cout << "GPU " << deviceProperties.deviceName << " is not suitable!\n";
@@ -221,7 +221,7 @@ private:
     }
 
     void createLogicalDevice(){
-        QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+        engine::QueueFamilyIndices indices = engine::findQueueFamilies(physicalDevice);
 
         VkDeviceQueueCreateInfo queueCreateInfo{};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -253,7 +253,7 @@ private:
     }
 
     void acquireGraphicsQueue(){
-        QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+        engine::QueueFamilyIndices indices = engine::findQueueFamilies(physicalDevice);
         vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
     }
 

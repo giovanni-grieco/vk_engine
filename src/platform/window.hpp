@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include <string>
+#include <vector>
 
 namespace engine
 {
@@ -12,5 +13,7 @@ namespace engine
             GLFWwindow *window;
             Window(int width, int height, const std::string& title);
             ~Window();
-    };
+
+            std::vector<const char *> getRequiredExtensions();
+        };
 }

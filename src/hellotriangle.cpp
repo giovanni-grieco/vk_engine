@@ -78,17 +78,15 @@ private:
             createInfo.enabledLayerCount = 0;
         }
 
-        uint32_t glfwExtensionCount = 0;
-        const char **glfwExtensions;
-        glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+        vector<const char *> requiredExtensions = window.getRequiredExtensions();
 
-        for (int i = 0; i < glfwExtensionCount; i++)
+        for (int i = 0; i < requiredExtensions.size(); i++)
         {
-            cout << "\t" << glfwExtensions[i] << "\n";
+            cout << "\t" << requiredExtensions[i] << "\n";
         }
 
-        createInfo.enabledExtensionCount = glfwExtensionCount;
-        createInfo.ppEnabledExtensionNames = glfwExtensions;
+        createInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
+        createInfo.ppEnabledExtensionNames = requiredExtensions.data();
 
         createInfo.enabledLayerCount = 0;
         VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
@@ -108,7 +106,7 @@ private:
             std::cout << "\t" << extension.extensionName << "\n";
         }
 
-        checkExtensionSupport(glfwExtensionCount, extensionCount, glfwExtensions, extensions);
+        checkExtensionSupport(requiredExtensions.size(), extensionCount, requiredExtensions.data(), extensions);
     }
 
     void pickPhysicalDevice()

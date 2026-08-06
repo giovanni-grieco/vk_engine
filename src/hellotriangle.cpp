@@ -8,6 +8,8 @@
 #include <vector>
 #include <map>
 
+#include "window.hpp"
+
 #include "vulkan/queue_family.hpp"
 
 using namespace std;
@@ -15,9 +17,11 @@ using namespace std;
 class HelloTriangleApplication
 {
 public:
+
+    HelloTriangleApplication() : window(WIDTH, HEIGHT, applicationName) {}
+
     void run()
     {
-        initWindow();
         initVulkan();
         mainLoop();
         cleanup();
@@ -31,9 +35,12 @@ private:
 
     const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
-    GLFWwindow *window;
+    engine::Window window;
     VkInstance instance;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    VkDevice device;
+    VkQueue graphicsQueue;
+
 
 #ifdef NDEBUG
     const bool enableValidationLayers = false;
@@ -136,7 +143,7 @@ private:
         VkPhysicalDeviceProperties deviceProperties;
         vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
-        bool result = findQueueFamilies(device);
+        bool result = findQueueFamilies(device).isComplete();
         if (!result)
         {
             std::cout << "GPU " << deviceProperties.deviceName << " is not suitable!\n";
@@ -213,23 +220,54 @@ private:
         return true;
     }
 
-    void initWindow()
-    {
-        glfwInit();
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        window = glfwCreateWindow(WIDTH, HEIGHT, applicationName.c_str(), nullptr, nullptr);
+    void createLogicalDevice(){
+        QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+
+        VkDeviceQueueCreateInfo queueCreateInfo{};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
+        queueCreateInfo.queueCount = 1;
+        float queuePriority = 1.0f;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+
+        VkPhysicalDeviceFeatures deviceFeatures{};
+
+        VkDeviceCreateInfo createInfo{};
+        createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        createInfo.pQueueCreateInfos = &queueCreateInfo;
+        createInfo.queueCreateInfoCount = 1;
+
+        createInfo.pEnabledFeatures = &deviceFeatures;
+
+        createInfo.enabledExtensionCount = 0;
+        if(enableValidationLayers){
+            createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+            createInfo.ppEnabledLayerNames = validationLayers.data();
+        } else {
+            createInfo.enabledLayerCount = 0;
+        }
+
+        if(vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS){
+            throw std::runtime_error("failed to create logical device!");
+        }
+    }
+
+    void acquireGraphicsQueue(){
+        QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+        vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
     }
 
     void initVulkan()
     {
         createInstance();
         pickPhysicalDevice();
+        createLogicalDevice();
+        acquireGraphicsQueue();
     }
 
     void mainLoop()
     {
-        while (!glfwWindowShouldClose(window))
+        while (!glfwWindowShouldClose(window.window))
         {
             glfwPollEvents();
         }
@@ -237,9 +275,8 @@ private:
 
     void cleanup()
     {
+        vkDestroyDevice(device, nullptr);
         vkDestroyInstance(instance, nullptr);
-        glfwDestroyWindow(window);
-        glfwTerminate();
     }
 };
 

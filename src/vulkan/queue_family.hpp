@@ -12,7 +12,7 @@ struct QueueFamilyIndices
     }
 };
 
-bool findQueueFamilies(VkPhysicalDevice device)
+QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device)
 {
     QueueFamilyIndices indices;
 
@@ -35,5 +35,5 @@ bool findQueueFamilies(VkPhysicalDevice device)
         i++;
     }
 
-    return indices.isComplete();
+    return indices;
 }

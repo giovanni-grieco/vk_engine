@@ -1,7 +1,7 @@
 #pragma once
 
 #include "vk_instance.hpp"
-#include "queue_family.hpp"
+#include "vk_queue_indices.hpp"
 
 #include <vulkan/vulkan.h>
 #include <vector>

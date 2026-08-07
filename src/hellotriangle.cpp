@@ -13,7 +13,7 @@
 #include "vulkan/vk_instance.hpp"
 #include "vulkan/vk_device.hpp"
 #include "vulkan/vk_surface.hpp"
-#include "vulkan/queue_family.hpp"
+#include "vulkan/vk_queues.hpp"
 
 using namespace std;
 
@@ -24,17 +24,14 @@ public:
     window(WIDTH, HEIGHT, applicationName) , 
     instance(applicationName, window, enableValidationLayers, validationLayers), 
     surface(instance.instance, window),
-    device(instance.instance, surface.surface, enableValidationLayers, validationLayers) {}
+    device(instance.instance, surface.surface, enableValidationLayers, validationLayers),
+    queues(device, surface) {}
 
     void run()
     {
-        initVulkan();
         mainLoop();
     }
 
-    ~HelloTriangleApplication() {
-        
-    }
 
 private:
     const uint32_t WIDTH = 800;
@@ -56,22 +53,8 @@ private:
     engine::VulkanInstance instance;
     engine::VulkanSurface surface;
     engine::VulkanDevice device;
-    VkQueue graphicsQueue;
-    VkQueue presentQueue;
+    engine::VulkanQueues queues;
 
-
-
-    void acquireQueues()
-    {
-        engine::QueueFamilyIndices indices = engine::findQueueFamilies(device.physicalDevice, surface.surface);
-        vkGetDeviceQueue(device.device, indices.graphicsFamily.value(), 0, &graphicsQueue);
-        vkGetDeviceQueue(device.device, indices.presentFamily.value(), 0, &presentQueue);
-    }
-
-    void initVulkan()
-    {
-        acquireQueues();
-    }
 
     void mainLoop()
     {

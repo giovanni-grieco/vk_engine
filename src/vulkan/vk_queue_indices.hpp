@@ -4,9 +4,7 @@
 #include <vector>
 #include <optional>
 
-namespace engine
-{
-
+namespace engine{
     struct QueueFamilyIndices
     {
         std::optional<uint32_t> graphicsFamily;
@@ -17,7 +15,7 @@ namespace engine
             return graphicsFamily.has_value() && presentFamily.has_value();
         }
     };
-            
+
     inline QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface)
     {
         QueueFamilyIndices indices;

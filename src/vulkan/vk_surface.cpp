@@ -4,12 +4,12 @@
 
 namespace engine{
     
-    VulkanSurface::VulkanSurface(VkInstance instance, Window& window){
-        if (glfwCreateWindowSurface(instance, window.window, nullptr, &surface) != VK_SUCCESS)
+    VulkanSurface::VulkanSurface(VulkanInstance& instance, Window& window){
+        if (glfwCreateWindowSurface(instance.instance, window.window, nullptr, &surface) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create window surface!");
         }
-        this->instance = instance;
+        this->instance = instance.instance;
     }
 
     VulkanSurface::~VulkanSurface(){

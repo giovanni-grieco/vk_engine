@@ -2,11 +2,11 @@
 
 namespace engine{
 
-    VulkanDevice::VulkanDevice(VkInstance instance, VkSurfaceKHR surface, bool enableValidationLayers, const std::vector<const char *> &validationLayers){
+    VulkanDevice::VulkanDevice(VulkanInstance& instance, VulkanSurface& surface, bool enableValidationLayers, const std::vector<const char *> &validationLayers){
         
-        pickPhysicalDevice(instance, surface);
+        pickPhysicalDevice(instance.instance, surface.surface);
         
-        engine::QueueFamilyIndices indices = engine::findQueueFamilies(physicalDevice, surface);
+        engine::QueueFamilyIndices indices = engine::findQueueFamilies(physicalDevice, surface.surface);
 
         std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
         std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};

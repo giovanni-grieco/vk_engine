@@ -23,8 +23,8 @@ public:
     HelloTriangleApplication() : 
     window(WIDTH, HEIGHT, applicationName) , 
     instance(applicationName, window, enableValidationLayers, validationLayers), 
-    surface(instance.instance, window),
-    device(instance.instance, surface.surface, enableValidationLayers, validationLayers),
+    surface(instance, window),
+    device(instance, surface, enableValidationLayers, validationLayers),
     queues(device, surface) {}
 
     void run()

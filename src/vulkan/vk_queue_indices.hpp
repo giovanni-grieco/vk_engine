@@ -45,6 +45,11 @@ namespace engine{
             i++;
         }
 
+        if (!indices.isComplete())
+        {
+            throw std::runtime_error("Failed to find queue families!");
+        }
+
         return indices;
     }
 }

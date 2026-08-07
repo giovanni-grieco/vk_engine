@@ -1,21 +1,8 @@
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-#include <iostream>
-#include <stdexcept>
-#include <cstdlib>
-#include <string>
-#include <string.h>
-#include <vector>
-#include <map>
-#include <set>
-
 #include "platform/window.hpp"
 #include "vulkan/vk_instance.hpp"
 #include "vulkan/vk_device.hpp"
 #include "vulkan/vk_surface.hpp"
 #include "vulkan/vk_queues.hpp"
-
-using namespace std;
 
 class HelloTriangleApplication
 {
@@ -37,7 +24,7 @@ private:
     const uint32_t WIDTH = 800;
     const uint32_t HEIGHT = 600;
 
-    string applicationName = "Hello Triangle";
+    const std::string applicationName = "Hello Triangle";
 
 #ifdef NDEBUG
     const bool enableValidationLayers = false;

@@ -32,7 +32,7 @@ namespace engine{
             else
                 supportString = " is NOT SUPPORTED";
 
-            std::cout << vkExtensions[index].extensionName << supportString << "\n";
+            std::cout << glfwExtensions[index] << supportString << "\n";
         }
 
         std::cout << "------------------\n";
@@ -69,6 +69,7 @@ namespace engine{
 
         std::vector<const char *> requiredExtensions = window.getRequiredExtensions();
 
+        std::cout << "Required extensions:"<<requiredExtensions.size() << "\n";
         for (int i = 0; i < requiredExtensions.size(); i++)
         {
             std::cout << "\t" << requiredExtensions[i] << "\n";
@@ -95,7 +96,7 @@ namespace engine{
             std::cout << "\t" << extension.extensionName << "\n";
         }
 
-        checkExtensionSupport(requiredExtensions.size(), extensionCount, requiredExtensions.data(), extensions);
+        checkExtensionSupport(static_cast<uint32_t>(requiredExtensions.size()), extensionCount, requiredExtensions.data(), extensions);
     }
 
     VulkanInstance::~VulkanInstance(){

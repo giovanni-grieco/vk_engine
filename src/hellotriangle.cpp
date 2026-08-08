@@ -11,7 +11,7 @@ public:
     window(WIDTH, HEIGHT, applicationName) , 
     instance(applicationName, window, enableValidationLayers, validationLayers), 
     surface(instance, window),
-    device(instance, surface, enableValidationLayers, validationLayers),
+    device(instance, surface, deviceExtensions, enableValidationLayers, validationLayers),
     queues(device, surface) {}
 
     void run()

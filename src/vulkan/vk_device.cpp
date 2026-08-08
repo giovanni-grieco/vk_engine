@@ -1,10 +1,12 @@
 #include "vk_device.hpp"
 
+#include "vk_swap_chain_support_details.hpp"
+
 namespace engine{
 
-    VulkanDevice::VulkanDevice(VulkanInstance& instance, VulkanSurface& surface, bool enableValidationLayers, const std::vector<const char *> &validationLayers){
+    VulkanDevice::VulkanDevice(VulkanInstance& instance, VulkanSurface& surface, const std::vector<const char *>& deviceExtensions, bool enableValidationLayers, const std::vector<const char *> &validationLayers){
         
-        pickPhysicalDevice(instance.instance, surface.surface);
+        pickPhysicalDevice(instance.instance, surface.surface, deviceExtensions);
         
         engine::QueueFamilyIndices indices = engine::findQueueFamilies(physicalDevice, surface.surface);
 
@@ -31,7 +33,9 @@ namespace engine{
 
         createInfo.pEnabledFeatures = &deviceFeatures;
 
-        createInfo.enabledExtensionCount = 0;
+        createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+        createInfo.ppEnabledExtensionNames = deviceExtensions.data();
+
         if (enableValidationLayers)
         {
             createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
@@ -54,13 +58,40 @@ namespace engine{
         }
     }
 
-    bool isDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
+    bool checkDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions)
+    {
+        uint32_t deviceExtensionCount;
+        vkEnumerateDeviceExtensionProperties(device, nullptr, &deviceExtensionCount, nullptr);
+        std::vector<VkExtensionProperties> availableDeviceExtensions(deviceExtensionCount);
+        vkEnumerateDeviceExtensionProperties(device, nullptr, &deviceExtensionCount, availableDeviceExtensions.data());
+
+        std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+        std::cout << "Checking:\n";
+        for (const auto& availableExtension : availableDeviceExtensions){
+            if(requiredExtensions.find(availableExtension.extensionName) != requiredExtensions.end()){
+                std::cout << "\t" << availableExtension.extensionName << " is supported!\n";
+            }
+            requiredExtensions.erase(availableExtension.extensionName);
+        }
+
+        return requiredExtensions.empty();
+    }
+
+    bool checkSwapChainSupportDetails(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface){
+        SwapChainSupportDetails swapChainSupportDetails = querySwapChainSupport(physicalDevice, surface);
+        //both of them must not be empty
+        return !(swapChainSupportDetails.formats.empty() && swapChainSupportDetails.presentModes.empty());
+    }
+
+    bool isDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, const std::vector<const char *>& deviceExtensions)
     {
         // TODO
         VkPhysicalDeviceProperties deviceProperties;
         vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
 
-        bool result = engine::findQueueFamilies(physicalDevice, surface).isComplete();
+        bool result = engine::findQueueFamilies(physicalDevice, surface).isComplete() 
+        && checkDeviceExtensionSupport(physicalDevice, deviceExtensions)
+        && checkSwapChainSupportDetails(physicalDevice, surface);
         if (!result)
         {
             std::cout << "GPU " << deviceProperties.deviceName << " is not suitable!\n";
@@ -72,7 +103,7 @@ namespace engine{
         return result;
     }
 
-    void VulkanDevice::pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface)
+    void VulkanDevice::pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface, const std::vector<const char *>& deviceExtensions)
     {
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
@@ -85,7 +116,7 @@ namespace engine{
 
         for (const auto &phyDev : devices)
         {
-            if (isDeviceSuitable(phyDev, surface))
+            if (isDeviceSuitable(phyDev, surface, deviceExtensions))
             {
                 physicalDevice = phyDev;
                 break;

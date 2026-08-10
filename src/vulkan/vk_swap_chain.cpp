@@ -101,7 +101,8 @@ namespace engine
             imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
             imageViewCreateInfo.subresourceRange.layerCount = 1;
 
-            if (vkCreateImageView(device.device, &imageViewCreateInfo, nullptr, &imageViews[i]) != VK_SUCCESS){
+            if (vkCreateImageView(device.device, &imageViewCreateInfo, nullptr, &imageViews[i]) != VK_SUCCESS)
+            {
                 throw std::runtime_error("Failed to create image view");
             }
         }
@@ -111,10 +112,11 @@ namespace engine
     {
         if (swapChain != VK_NULL_HANDLE && device != VK_NULL_HANDLE)
         {
-            for (auto imageView : imageViews){
+            for (auto imageView : imageViews)
+            {
                 vkDestroyImageView(device, imageView, nullptr);
             }
-            
+
             vkDestroySwapchainKHR(device, swapChain, nullptr);
         }
     }

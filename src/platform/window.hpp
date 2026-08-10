@@ -8,6 +8,12 @@
 
 namespace engine
 {
+
+    struct BufferSize{
+        int width;
+        int height;
+    };
+    
     class Window{
         public:
             GLFWwindow *window;
@@ -15,5 +21,7 @@ namespace engine
             ~Window();
 
             std::vector<const char *> getRequiredExtensions();
-        };
+            BufferSize getBufferSize();
+
+    };
 }

@@ -22,4 +22,13 @@ namespace engine{
         std::vector<const char *> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
         return extensions;
     }
+
+    BufferSize Window::getBufferSize(){
+        BufferSize result;
+        int tempWidth, tempHeight;
+        glfwGetFramebufferSize(this->window, &tempWidth, &tempHeight);
+        result.width=tempWidth;
+        result.height=tempHeight;
+        return result;
+    }
 }

@@ -10,14 +10,11 @@
 namespace engine
 {
 
-    class VulkanQueues{
-        public:
-            VkQueue graphicsQueue = VK_NULL_HANDLE;
-            VkQueue presentQueue = VK_NULL_HANDLE;
-            VulkanQueues(VulkanDevice& device, VulkanSurface& surface){
-                QueueFamilyIndices indices = findQueueFamilies(device.physicalDevice, surface.surface);
-                vkGetDeviceQueue(device.device, indices.graphicsFamily.value(), 0, &graphicsQueue);
-                vkGetDeviceQueue(device.device, indices.presentFamily.value(), 0, &presentQueue);
-            }
+    class VulkanQueues
+    {
+    public:
+        VkQueue graphicsQueue = VK_NULL_HANDLE;
+        VkQueue presentQueue = VK_NULL_HANDLE;
+        VulkanQueues(VulkanDevice &device, VulkanSurface &surface);
     };
 }

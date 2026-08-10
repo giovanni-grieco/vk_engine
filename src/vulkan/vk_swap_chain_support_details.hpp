@@ -2,13 +2,18 @@
 
 #include <vulkan/vulkan.h>
 #include <vector>
+#include "platform/window.hpp"
 
 namespace engine{
-    struct SwapChainSupportDetails{
+    struct VulkanSwapChainSupportDetails{
         VkSurfaceCapabilitiesKHR capabilities;
         std::vector<VkSurfaceFormatKHR> formats;
         std::vector<VkPresentModeKHR> presentModes;
+
+        VkSurfaceFormatKHR chooseSwapSurfaceFormat();
+        VkPresentModeKHR choosePresentMode();
+        VkExtent2D chooseSwapExtent(Window& window);
     };
 
-    SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
+    VulkanSwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
 }

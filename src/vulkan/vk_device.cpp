@@ -8,7 +8,7 @@ namespace engine{
         
         pickPhysicalDevice(instance.instance, surface.surface, deviceExtensions);
         
-        engine::QueueFamilyIndices indices = engine::findQueueFamilies(physicalDevice, surface.surface);
+        engine::VulkanQueueFamilyIndices indices = engine::findQueueFamilies(physicalDevice, surface.surface);
 
         std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
         std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
@@ -78,7 +78,7 @@ namespace engine{
     }
 
     bool checkSwapChainSupportDetails(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface){
-        SwapChainSupportDetails swapChainSupportDetails = querySwapChainSupport(physicalDevice, surface);
+        VulkanSwapChainSupportDetails swapChainSupportDetails = querySwapChainSupport(physicalDevice, surface);
         //both of them must not be empty
         return !(swapChainSupportDetails.formats.empty() && swapChainSupportDetails.presentModes.empty());
     }

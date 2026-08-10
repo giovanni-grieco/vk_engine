@@ -3,22 +3,22 @@
 #include "vulkan/vk_device.hpp"
 #include "vulkan/vk_surface.hpp"
 #include "vulkan/vk_queues.hpp"
+#include "vulkan/vk_swap_chain.hpp"
 
 class HelloTriangleApplication
 {
 public:
-    HelloTriangleApplication() : 
-    window(WIDTH, HEIGHT, applicationName) , 
-    instance(applicationName, window, enableValidationLayers, validationLayers), 
-    surface(instance, window),
-    device(instance, surface, deviceExtensions, enableValidationLayers, validationLayers),
-    queues(device, surface) {}
+    HelloTriangleApplication() : window(WIDTH, HEIGHT, applicationName),
+                                 instance(applicationName, window, enableValidationLayers, validationLayers),
+                                 surface(instance, window),
+                                 device(instance, surface, deviceExtensions, enableValidationLayers, validationLayers),
+                                 queues(device, surface),
+                                 swapChain(device, surface, window) {}
 
     void run()
     {
         mainLoop();
     }
-
 
 private:
     const uint32_t WIDTH = 800;
@@ -41,7 +41,7 @@ private:
     engine::VulkanSurface surface;
     engine::VulkanDevice device;
     engine::VulkanQueues queues;
-
+    engine::VulkanSwapChain swapChain;
 
     void mainLoop()
     {
@@ -50,7 +50,6 @@ private:
             glfwPollEvents();
         }
     }
-
 };
 
 int main()

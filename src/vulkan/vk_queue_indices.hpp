@@ -6,7 +6,7 @@
 
 
 namespace engine{
-    struct QueueFamilyIndices
+    struct VulkanQueueFamilyIndices
     {
         std::optional<uint32_t> graphicsFamily;
         std::optional<uint32_t> presentFamily;
@@ -17,5 +17,5 @@ namespace engine{
         }
     };
 
-    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface);
+    VulkanQueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface);
 }

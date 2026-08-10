@@ -4,6 +4,7 @@
 
 namespace engine
 {
+
     VulkanSwapChain::VulkanSwapChain(VulkanDevice &device, VulkanSurface &surface, Window &window)
     {
         VulkanSwapChainSupportDetails swapChainSupportDetails = querySwapChainSupport(device.physicalDevice, surface.surface);
@@ -77,12 +78,43 @@ namespace engine
         {
             throw std::runtime_error("failed to acquire swapchain images");
         }
+
+        imageViews.resize(images.size());
+
+        for (size_t i = 0; i < images.size(); i++)
+        {
+            VkImageViewCreateInfo imageViewCreateInfo{};
+            imageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            imageViewCreateInfo.image = images[i];
+
+            imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            imageViewCreateInfo.format = surfaceFormat.format;
+
+            imageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+            imageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+            imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+            imageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+            imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+            imageViewCreateInfo.subresourceRange.levelCount = 1;
+            imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+            imageViewCreateInfo.subresourceRange.layerCount = 1;
+
+            if (vkCreateImageView(device.device, &imageViewCreateInfo, nullptr, &imageViews[i]) != VK_SUCCESS){
+                throw std::runtime_error("Failed to create image view");
+            }
+        }
     }
 
     VulkanSwapChain::~VulkanSwapChain()
     {
         if (swapChain != VK_NULL_HANDLE && device != VK_NULL_HANDLE)
         {
+            for (auto imageView : imageViews){
+                vkDestroyImageView(device, imageView, nullptr);
+            }
+            
             vkDestroySwapchainKHR(device, swapChain, nullptr);
         }
     }

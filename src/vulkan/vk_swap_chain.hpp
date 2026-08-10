@@ -14,6 +14,7 @@ namespace engine
         VkDevice device;
         VkSwapchainKHR swapChain;
         std::vector<VkImage> images;
+        std::vector<VkImageView> imageViews;
         VkFormat format;
         VkExtent2D extent;
         VulkanSwapChain(VulkanDevice &device, VulkanSurface &surface, Window &window);

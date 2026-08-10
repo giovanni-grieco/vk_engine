@@ -4,7 +4,7 @@
 
 namespace engine
 {
-    VulkanSwapChain::VulkanSwapChain(VulkanDevice& device, VulkanSurface& surface, Window &window)
+    VulkanSwapChain::VulkanSwapChain(VulkanDevice &device, VulkanSurface &surface, Window &window)
     {
         VulkanSwapChainSupportDetails swapChainSupportDetails = querySwapChainSupport(device.physicalDevice, surface.surface);
 
@@ -56,12 +56,27 @@ namespace engine
 
         createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-
-        if (vkCreateSwapchainKHR(device.device, &createInfo, nullptr, &swapChain) != VK_SUCCESS){
+        if (vkCreateSwapchainKHR(device.device, &createInfo, nullptr, &swapChain) != VK_SUCCESS)
+        {
             throw std::runtime_error("failed to create swapchain");
         }
 
         this->device = device.device;
+        this->extent = extent;
+        this->format = surfaceFormat.format;
+
+        uint32_t imagesCount = 0;
+        VkResult result = vkGetSwapchainImagesKHR(device.device, swapChain, &imagesCount, nullptr);
+        if (result != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to acquire swapchain images count");
+        }
+        images.resize(imagesCount);
+        vkGetSwapchainImagesKHR(device.device, swapChain, &imagesCount, images.data());
+        if (result != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to acquire swapchain images");
+        }
     }
 
     VulkanSwapChain::~VulkanSwapChain()

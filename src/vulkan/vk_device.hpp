@@ -16,7 +16,7 @@ namespace engine{
         public:
             VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
             VkDevice device = VK_NULL_HANDLE;
-            VulkanDevice(VulkanInstance& instance, VulkanSurface& surface, const std::vector<const char *>& deviceExtensions, bool enableValidationLayers, const std::vector<const char *>& validationLayers);
+            VulkanDevice(VulkanInstance& instance, VulkanSurface& surface, const std::vector<const char *>& deviceExtensions);
             ~VulkanDevice();
         private:
             void pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface, const std::vector<const char *>& deviceExtensions);

@@ -4,7 +4,7 @@
 
 namespace engine{
 
-    VulkanDevice::VulkanDevice(VulkanInstance& instance, VulkanSurface& surface, const std::vector<const char *>& deviceExtensions, bool enableValidationLayers, const std::vector<const char *> &validationLayers){
+    VulkanDevice::VulkanDevice(VulkanInstance& instance, VulkanSurface& surface, const std::vector<const char *>& deviceExtensions){
         
         pickPhysicalDevice(instance.instance, surface.surface, deviceExtensions);
         
@@ -35,16 +35,8 @@ namespace engine{
 
         createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
         createInfo.ppEnabledExtensionNames = deviceExtensions.data();
-
-        if (enableValidationLayers)
-        {
-            createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-            createInfo.ppEnabledLayerNames = validationLayers.data();
-        }
-        else
-        {
-            createInfo.enabledLayerCount = 0;
-        }
+   
+        createInfo.enabledLayerCount=0;
 
         if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS)
         {

@@ -77,8 +77,7 @@ namespace engine{
 
         createInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
         createInfo.ppEnabledExtensionNames = requiredExtensions.data();
-
-        createInfo.enabledLayerCount = 0;
+        
         VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
         if (result != VK_SUCCESS)
         {

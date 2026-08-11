@@ -4,6 +4,10 @@
 #include "vulkan/vk_surface.hpp"
 #include "vulkan/vk_queues.hpp"
 #include "vulkan/vk_swap_chain.hpp"
+#include "vulkan/vk_render_pass.hpp"
+#include "vulkan/vk_pipeline_layout.hpp"
+#include "vulkan/vk_pipeline.hpp"
+#include "vulkan/vk_shader.hpp"
 
 class HelloTriangleApplication
 {
@@ -11,9 +15,13 @@ public:
     HelloTriangleApplication() : window(WIDTH, HEIGHT, applicationName),
                                  instance(applicationName, window, enableValidationLayers, validationLayers),
                                  surface(instance, window),
-                                 device(instance, surface, deviceExtensions, enableValidationLayers, validationLayers),
+                                 device(instance, surface, deviceExtensions),
                                  queues(device, surface),
-                                 swapChain(device, surface, window) {}
+                                 swapChain(device, surface, window),
+                                 renderPass(device, swapChain),
+                                 pipelineLayout(device),
+                                 pipeline(device, swapChain, pipelineLayout, renderPass, shadersFilePaths, shaderTypes) 
+                                 {}
 
     void run()
     {
@@ -36,15 +44,23 @@ private:
 
     const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
+    std::vector<std::string> shadersFilePaths = {"shaders/triangle.vert.spv", "shaders/triangle.frag.spv"};
+    std::vector<engine::VulkanShaderType> shaderTypes = {engine::VulkanShaderType::VERTEX, engine::VulkanShaderType::FRAGMENT};
+   
+
     engine::Window window;
     engine::VulkanInstance instance;
     engine::VulkanSurface surface;
     engine::VulkanDevice device;
     engine::VulkanQueues queues;
     engine::VulkanSwapChain swapChain;
+    engine::VulkanRenderPass renderPass;
+    engine::VulkanPipelineLayout pipelineLayout;
+    engine::VulkanPipeline pipeline;
 
     void mainLoop()
     {
+        //throw std::runtime_error("Failed to run main loop");
         while (!glfwWindowShouldClose(window.window))
         {
             glfwPollEvents();

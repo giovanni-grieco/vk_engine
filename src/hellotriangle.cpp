@@ -8,6 +8,7 @@
 #include "vulkan/vk_pipeline_layout.hpp"
 #include "vulkan/vk_pipeline.hpp"
 #include "vulkan/vk_shader.hpp"
+#include "vulkan/vk_framebuffers.hpp"
 
 class HelloTriangleApplication
 {
@@ -20,7 +21,8 @@ public:
                                  swapChain(device, surface, window),
                                  renderPass(device, swapChain),
                                  pipelineLayout(device),
-                                 pipeline(device, swapChain, pipelineLayout, renderPass, shadersFilePaths, shaderTypes) 
+                                 pipeline(device, swapChain, pipelineLayout, renderPass, shadersFilePaths, shaderTypes),
+                                 frameBuffers(device, swapChain, renderPass) 
                                  {}
 
     void run()
@@ -57,6 +59,7 @@ private:
     engine::VulkanRenderPass renderPass;
     engine::VulkanPipelineLayout pipelineLayout;
     engine::VulkanPipeline pipeline;
+    engine::VulkanFramebuffers frameBuffers;
 
     void mainLoop()
     {

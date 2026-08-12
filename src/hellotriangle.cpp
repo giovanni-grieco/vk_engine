@@ -9,6 +9,8 @@
 #include "vulkan/vk_pipeline.hpp"
 #include "vulkan/vk_shader.hpp"
 #include "vulkan/vk_framebuffers.hpp"
+#include "vulkan/vk_command_pool.hpp"
+#include "vulkan/vk_command_buffer.hpp"
 
 class HelloTriangleApplication
 {
@@ -22,7 +24,9 @@ public:
                                  renderPass(device, swapChain),
                                  pipelineLayout(device),
                                  pipeline(device, swapChain, pipelineLayout, renderPass, shadersFilePaths, shaderTypes),
-                                 frameBuffers(device, swapChain, renderPass) 
+                                 frameBuffers(device, swapChain, renderPass),
+                                 commandPool(device, surface),
+                                 commandBuffer(device, commandPool)
                                  {}
 
     void run()
@@ -60,6 +64,12 @@ private:
     engine::VulkanPipelineLayout pipelineLayout;
     engine::VulkanPipeline pipeline;
     engine::VulkanFramebuffers frameBuffers;
+    engine::VulkanCommandPool commandPool;
+    engine::VulkanCommandBuffer commandBuffer;
+
+    void drawFrame(){
+
+    }
 
     void mainLoop()
     {
@@ -67,6 +77,7 @@ private:
         while (!glfwWindowShouldClose(window.window))
         {
             glfwPollEvents();
+            drawFrame();
         }
     }
 };

@@ -83,7 +83,7 @@ namespace engine
         presentInfo.pImageIndices = &imageIndex;
         presentInfo.pResults = nullptr; // Optional
 
-        vkQueuePresentKHR(queues.presentQueue, &presentInfo);
+        result = vkQueuePresentKHR(queues.presentQueue, &presentInfo);
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window.frameBufferResizeFlag)
         {

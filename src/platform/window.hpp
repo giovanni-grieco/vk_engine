@@ -17,11 +17,12 @@ namespace engine
     class Window{
         public:
             GLFWwindow *window;
+            bool frameBufferResizeFlag = false;
             Window(int width, int height, const std::string& title);
             ~Window();
 
             std::vector<const char *> getRequiredExtensions();
             BufferSize getBufferSize();
-
+            static void frameBufferResizeCallback(GLFWwindow* window, int width, int height);
     };
 }

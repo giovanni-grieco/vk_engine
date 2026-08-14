@@ -46,7 +46,7 @@ namespace engine
                       std::vector<engine::VulkanShaderType> shaderTypes,
                       Window &window);
 
-        void drawFrame();
+        void drawFrame(Window& window);
         void waitForIdle();
 
         void recreateSwapChain(Window& window);

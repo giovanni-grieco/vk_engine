@@ -21,6 +21,7 @@ namespace engine
     }
 
     void VulkanSwapChain::init(VulkanDevice &device, VulkanSurface &surface, Window &window){
+        std::cout<<"Swap Chain init() called\n";
         VulkanSwapChainSupportDetails swapChainSupportDetails = querySwapChainSupport(device.physicalDevice, surface.surface);
 
         VkPresentModeKHR presentMode = swapChainSupportDetails.choosePresentMode();
@@ -123,7 +124,7 @@ namespace engine
     }
 
     void VulkanSwapChain::destroy(){
-        std::cout<<"Swap Chain destructor called\n";
+        std::cout<<"Swap Chain destroy() called\n";
         if (swapChain != VK_NULL_HANDLE && device != VK_NULL_HANDLE)
         {
             for (auto imageView : imageViews)

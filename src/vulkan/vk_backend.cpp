@@ -23,15 +23,29 @@ namespace engine
           commandBuffer(MAX_FRAMES_IN_FLIGHT, device, commandPool),
           sync(MAX_FRAMES_IN_FLIGHT, swapChain.images.size(), device)
     {
+        // std::cout << "La finestra passata è la stessa dell'oggetto corrente: "<< ((&this->window) == &window) << "\n";
     }
 
-    void VulkanBackend::drawFrame(){
+    void VulkanBackend::drawFrame(Window &window)
+    {
         vkWaitForFences(device.device, 1, &sync.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
-        vkResetFences(device.device, 1, &sync.inFlightFences[currentFrame]);
+    
 
         uint32_t imageIndex;
-        vkAcquireNextImageKHR(device.device, swapChain.swapChain, UINT64_MAX, sync.imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
-        
+        VkResult result = vkAcquireNextImageKHR(device.device, swapChain.swapChain, UINT64_MAX, sync.imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            recreateSwapChain(window);
+            std::cout << "Swap chain recreated!\n";
+            return;
+        }
+        else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+        {
+            throw std::runtime_error("failed to recreated swapchain");
+        }
+        vkResetFences(device.device, 1, &sync.inFlightFences[currentFrame]);
+
         vkResetCommandBuffer(commandBuffer.commandBuffers[currentFrame], 0);
         commandBuffer.recordCommandBuffer(imageIndex, currentFrame, pipeline, swapChain, renderPass, frameBuffers);
 
@@ -70,14 +84,28 @@ namespace engine
         presentInfo.pResults = nullptr; // Optional
 
         vkQueuePresentKHR(queues.presentQueue, &presentInfo);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window.frameBufferResizeFlag)
+        {
+            window.frameBufferResizeFlag = false;
+            
+            recreateSwapChain(window);
+        }
+        else if (result != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to present swap chain image!");
+        }
         currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
-    void VulkanBackend::waitForIdle(){
+    void VulkanBackend::waitForIdle()
+    {
         vkDeviceWaitIdle(device.device);
     }
 
-    void VulkanBackend::recreateSwapChain(Window& window){
+    void VulkanBackend::recreateSwapChain(Window &window)
+    {
+
         waitForIdle();
 
         swapChain.recreate(device, surface, window);

@@ -44,7 +44,7 @@ private:
         while (!glfwWindowShouldClose(window.window))
         {
             glfwPollEvents();
-            vulkanBackend.drawFrame();
+            vulkanBackend.drawFrame(window);
         }
 
         vulkanBackend.waitForIdle();

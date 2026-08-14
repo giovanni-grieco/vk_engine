@@ -48,5 +48,7 @@ namespace engine
 
         void drawFrame();
         void waitForIdle();
+
+        void recreateSwapChain(Window& window);
     };
 }

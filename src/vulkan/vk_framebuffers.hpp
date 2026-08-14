@@ -13,5 +13,9 @@ namespace engine{
             std::vector<VkFramebuffer> frameBuffers;
             VulkanFramebuffers(VulkanDevice& device, VulkanSwapChain& swapChain, VulkanRenderPass& renderPass);
             ~VulkanFramebuffers();
+            void recreate(VulkanDevice& device, VulkanSwapChain& swapChain, VulkanRenderPass& renderPass);
+        private:
+            void init(VulkanDevice& device, VulkanSwapChain& swapChain, VulkanRenderPass& renderPass);
+            void destroy();
     };
 }

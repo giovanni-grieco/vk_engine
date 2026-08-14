@@ -7,6 +7,20 @@ namespace engine
 
     VulkanSwapChain::VulkanSwapChain(VulkanDevice &device, VulkanSurface &surface, Window &window)
     {
+        init(device, surface, window);
+    }
+
+    VulkanSwapChain::~VulkanSwapChain()
+    {
+        destroy();
+    }
+
+    void VulkanSwapChain::recreate(VulkanDevice &device, VulkanSurface &surface, Window &window){
+        destroy();
+        init(device, surface, window);
+    }
+
+    void VulkanSwapChain::init(VulkanDevice &device, VulkanSurface &surface, Window &window){
         VulkanSwapChainSupportDetails swapChainSupportDetails = querySwapChainSupport(device.physicalDevice, surface.surface);
 
         VkPresentModeKHR presentMode = swapChainSupportDetails.choosePresentMode();
@@ -108,14 +122,8 @@ namespace engine
         }
     }
 
-    void VulkanSwapChain::recreateSwapChain(VulkanSurface& surface, Window& window){
-        vkDeviceWaitIdle(device);
-
-        
-    }
-
-    VulkanSwapChain::~VulkanSwapChain()
-    {
+    void VulkanSwapChain::destroy(){
+        std::cout<<"Swap Chain destructor called\n";
         if (swapChain != VK_NULL_HANDLE && device != VK_NULL_HANDLE)
         {
             for (auto imageView : imageViews)
@@ -126,4 +134,5 @@ namespace engine
             vkDestroySwapchainKHR(device, swapChain, nullptr);
         }
     }
+
 }

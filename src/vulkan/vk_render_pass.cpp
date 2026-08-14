@@ -6,7 +6,7 @@ namespace engine
     {
         this->device = device.device;
 
-        VkAttachmentDescription colorAttachment;
+        VkAttachmentDescription colorAttachment{};
         colorAttachment.format = swapChain.format;
         colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
         colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;

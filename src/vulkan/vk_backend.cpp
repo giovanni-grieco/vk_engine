@@ -76,4 +76,11 @@ namespace engine
     void VulkanBackend::waitForIdle(){
         vkDeviceWaitIdle(device.device);
     }
+
+    void VulkanBackend::recreateSwapChain(Window& window){
+        waitForIdle();
+
+        swapChain.recreate(device, surface, window);
+        frameBuffers.recreate(device, swapChain, renderPass);
+    }
 }

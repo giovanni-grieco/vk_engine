@@ -2,6 +2,19 @@
 
 namespace engine{
     VulkanFramebuffers::VulkanFramebuffers(VulkanDevice& device, VulkanSwapChain& swapChain, VulkanRenderPass& renderPass){
+        init(device, swapChain, renderPass);
+    }
+
+    VulkanFramebuffers::~VulkanFramebuffers(){
+        destroy();
+    }
+
+    void VulkanFramebuffers::recreate(VulkanDevice& device, VulkanSwapChain& swapChain, VulkanRenderPass& renderPass){
+        destroy();
+        init(device, swapChain, renderPass);
+    }
+
+    void VulkanFramebuffers::init(VulkanDevice& device, VulkanSwapChain& swapChain, VulkanRenderPass& renderPass){
         this->device = device.device;
         frameBuffers.resize(swapChain.imageViews.size());
 
@@ -25,7 +38,7 @@ namespace engine{
         }
     }
 
-    VulkanFramebuffers::~VulkanFramebuffers(){
+    void VulkanFramebuffers::destroy(){
         for (auto framebuffer: frameBuffers){
             vkDestroyFramebuffer(device, framebuffer, nullptr);
         }

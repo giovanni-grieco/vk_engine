@@ -11,6 +11,7 @@
 #include "vulkan/vk_framebuffers.hpp"
 #include "vulkan/vk_command_pool.hpp"
 #include "vulkan/vk_command_buffer.hpp"
+#include "vulkan/vk_sync.hpp"
 
 class HelloTriangleApplication
 {
@@ -26,8 +27,10 @@ public:
                                  pipeline(device, swapChain, pipelineLayout, renderPass, shadersFilePaths, shaderTypes),
                                  frameBuffers(device, swapChain, renderPass),
                                  commandPool(device, surface),
-                                 commandBuffer(device, commandPool)
-                                 {}
+                                 commandBuffer(device, commandPool),
+                                 sync(device)
+    {
+    }
 
     void run()
     {
@@ -52,7 +55,6 @@ private:
 
     std::vector<std::string> shadersFilePaths = {"shaders/triangle.vert.spv", "shaders/triangle.frag.spv"};
     std::vector<engine::VulkanShaderType> shaderTypes = {engine::VulkanShaderType::VERTEX, engine::VulkanShaderType::FRAGMENT};
-   
 
     engine::Window window;
     engine::VulkanInstance instance;
@@ -66,19 +68,66 @@ private:
     engine::VulkanFramebuffers frameBuffers;
     engine::VulkanCommandPool commandPool;
     engine::VulkanCommandBuffer commandBuffer;
+    engine::VulkanSyncObjects sync;
 
-    void drawFrame(){
+    void drawFrame()
+    {
+        vkWaitForFences(device.device, 1, &sync.inFlight, VK_TRUE, UINT64_MAX);
+        vkResetFences(device.device, 1, &sync.inFlight);
 
+        uint32_t imageIndex;
+        vkAcquireNextImageKHR(device.device, swapChain.swapChain, UINT64_MAX, sync.imageAvailable, VK_NULL_HANDLE, &imageIndex);
+        
+        vkResetCommandBuffer(commandBuffer.commandBuffer, 0);
+        commandBuffer.recordCommandBuffer(imageIndex, pipeline, swapChain, renderPass, frameBuffers);
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore waitSemaphores[] = {sync.imageAvailable};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &commandBuffer.commandBuffer;
+
+        VkSemaphore signalSemaphores[] = {sync.renderFinished};
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        if (vkQueueSubmit(queues.graphicsQueue, 1, &submitInfo, sync.inFlight) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to submit draw command buffer");
+        }
+
+        VkPresentInfoKHR presentInfo{};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = signalSemaphores;
+
+        VkSwapchainKHR swapChains[] = {swapChain.swapChain};
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = swapChains;
+        presentInfo.pImageIndices = &imageIndex;
+        presentInfo.pResults = nullptr; // Optional
+
+        vkQueuePresentKHR(queues.presentQueue, &presentInfo);
     }
 
     void mainLoop()
     {
-        //throw std::runtime_error("Failed to run main loop");
+        // throw std::runtime_error("Failed to run main loop");
         while (!glfwWindowShouldClose(window.window))
         {
             glfwPollEvents();
             drawFrame();
         }
+
+        vkDeviceWaitIdle(device.device);
     }
 };
 

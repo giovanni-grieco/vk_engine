@@ -28,7 +28,7 @@ public:
                                  frameBuffers(device, swapChain, renderPass),
                                  commandPool(device, surface),
                                  commandBuffer(MAX_FRAMES_IN_FLIGHT, device, commandPool),
-                                 sync(MAX_FRAMES_IN_FLIGHT, device)
+                                 sync(MAX_FRAMES_IN_FLIGHT, swapChain.images.size(), device)
     {
     }
 
@@ -98,7 +98,7 @@ private:
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &commandBuffer.commandBuffers[currentFrame];
 
-        VkSemaphore signalSemaphores[] = {sync.renderFinishedSemaphores[currentFrame]};
+        VkSemaphore signalSemaphores[] = {sync.renderFinishedSemaphores[imageIndex]};
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 

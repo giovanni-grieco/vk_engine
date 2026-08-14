@@ -12,7 +12,7 @@ namespace engine{
             std::vector<VkSemaphore> renderFinishedSemaphores;
             std::vector<VkFence> inFlightFences;
 
-            VulkanSyncObjects(int amount, VulkanDevice& device);
+            VulkanSyncObjects(size_t framesInFlight, size_t swapchainImageCount, VulkanDevice& device);
             ~VulkanSyncObjects();
     };
 }

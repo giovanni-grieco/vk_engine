@@ -3,12 +3,15 @@
 namespace engine
 {
 
-    VulkanSyncObjects::VulkanSyncObjects(int amount, VulkanDevice &device)
+    VulkanSyncObjects::VulkanSyncObjects(size_t framesInFlight, size_t swapchainImageCount, VulkanDevice &device)
     {
         this->device = device.device;
-        this->imageAvailableSemaphores.resize(amount);
-        this->inFlightFences.resize(amount);
-        this->renderFinishedSemaphores.resize(amount);
+        this->imageAvailableSemaphores.resize(framesInFlight);
+        this->inFlightFences.resize(framesInFlight);
+        // One render-finished semaphore per swapchain image: a semaphore used in a
+        // present operation can only be reused once that image has been re-acquired.
+        this->renderFinishedSemaphores.resize(swapchainImageCount);
+
         VkSemaphoreCreateInfo semaphoreInfo{};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -16,14 +19,20 @@ namespace engine
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        for (size_t i = 0; i < amount; i++)
+        for (size_t i = 0; i < framesInFlight; i++)
         {
-
             if (vkCreateSemaphore(device.device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
-                vkCreateSemaphore(device.device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
                 vkCreateFence(device.device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
             {
-                throw std::runtime_error("failed to create semaphores!");
+                throw std::runtime_error("failed to create semaphores/fences!");
+            }
+        }
+
+        for (size_t i = 0; i < renderFinishedSemaphores.size(); i++)
+        {
+            if (vkCreateSemaphore(device.device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS)
+            {
+                throw std::runtime_error("failed to create render finished semaphores!");
             }
         }
     }

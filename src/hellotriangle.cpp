@@ -27,8 +27,8 @@ public:
                                  pipeline(device, swapChain, pipelineLayout, renderPass, shadersFilePaths, shaderTypes),
                                  frameBuffers(device, swapChain, renderPass),
                                  commandPool(device, surface),
-                                 commandBuffer(device, commandPool),
-                                 sync(device)
+                                 commandBuffer(MAX_FRAMES_IN_FLIGHT, device, commandPool),
+                                 sync(MAX_FRAMES_IN_FLIGHT, device)
     {
     }
 
@@ -53,6 +53,9 @@ private:
 
     const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
+    const int MAX_FRAMES_IN_FLIGHT = 2;
+    uint32_t currentFrame = 0;
+
     std::vector<std::string> shadersFilePaths = {"shaders/triangle.vert.spv", "shaders/triangle.frag.spv"};
     std::vector<engine::VulkanShaderType> shaderTypes = {engine::VulkanShaderType::VERTEX, engine::VulkanShaderType::FRAGMENT};
 
@@ -72,19 +75,20 @@ private:
 
     void drawFrame()
     {
-        vkWaitForFences(device.device, 1, &sync.inFlight, VK_TRUE, UINT64_MAX);
-        vkResetFences(device.device, 1, &sync.inFlight);
+
+        vkWaitForFences(device.device, 1, &sync.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+        vkResetFences(device.device, 1, &sync.inFlightFences[currentFrame]);
 
         uint32_t imageIndex;
-        vkAcquireNextImageKHR(device.device, swapChain.swapChain, UINT64_MAX, sync.imageAvailable, VK_NULL_HANDLE, &imageIndex);
+        vkAcquireNextImageKHR(device.device, swapChain.swapChain, UINT64_MAX, sync.imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
         
-        vkResetCommandBuffer(commandBuffer.commandBuffer, 0);
-        commandBuffer.recordCommandBuffer(imageIndex, pipeline, swapChain, renderPass, frameBuffers);
+        vkResetCommandBuffer(commandBuffer.commandBuffers[currentFrame], 0);
+        commandBuffer.recordCommandBuffer(imageIndex, currentFrame, pipeline, swapChain, renderPass, frameBuffers);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        VkSemaphore waitSemaphores[] = {sync.imageAvailable};
+        VkSemaphore waitSemaphores[] = {sync.imageAvailableSemaphores[currentFrame]};
         VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 
         submitInfo.waitSemaphoreCount = 1;
@@ -92,13 +96,13 @@ private:
         submitInfo.pWaitDstStageMask = waitStages;
 
         submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &commandBuffer.commandBuffer;
+        submitInfo.pCommandBuffers = &commandBuffer.commandBuffers[currentFrame];
 
-        VkSemaphore signalSemaphores[] = {sync.renderFinished};
+        VkSemaphore signalSemaphores[] = {sync.renderFinishedSemaphores[currentFrame]};
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        if (vkQueueSubmit(queues.graphicsQueue, 1, &submitInfo, sync.inFlight) != VK_SUCCESS)
+        if (vkQueueSubmit(queues.graphicsQueue, 1, &submitInfo, sync.inFlightFences[currentFrame]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to submit draw command buffer");
         }
@@ -116,6 +120,7 @@ private:
         presentInfo.pResults = nullptr; // Optional
 
         vkQueuePresentKHR(queues.presentQueue, &presentInfo);
+        currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
     void mainLoop()

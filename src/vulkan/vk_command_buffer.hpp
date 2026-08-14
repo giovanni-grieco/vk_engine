@@ -8,13 +8,15 @@
 #include "vk_swap_chain.hpp"
 #include "vk_pipeline.hpp"
 
+#include <vector>
+
 namespace engine{
     class VulkanCommandBuffer{
         public:
-            VkCommandBuffer commandBuffer;
-            VulkanCommandBuffer(VulkanDevice& device, VulkanCommandPool& commandPool);
+            std::vector<VkCommandBuffer> commandBuffers;
+            VulkanCommandBuffer(int bufferAmount, VulkanDevice& device, VulkanCommandPool& commandPool);
 
-            void recordCommandBuffer(uint32_t imageIndex, VulkanPipeline& pipeline, VulkanSwapChain& swapChain, VulkanRenderPass& renderPass, VulkanFramebuffers& frameBuffers);
+            void recordCommandBuffer(uint32_t imageIndex, uint32_t currentFrame, VulkanPipeline& pipeline, VulkanSwapChain& swapChain, VulkanRenderPass& renderPass, VulkanFramebuffers& frameBuffers);
     };
 
 }

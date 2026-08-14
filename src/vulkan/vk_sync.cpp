@@ -3,9 +3,12 @@
 namespace engine
 {
 
-    VulkanSyncObjects::VulkanSyncObjects(VulkanDevice &device)
+    VulkanSyncObjects::VulkanSyncObjects(int amount, VulkanDevice &device)
     {
         this->device = device.device;
+        this->imageAvailableSemaphores.resize(amount);
+        this->inFlightFences.resize(amount);
+        this->renderFinishedSemaphores.resize(amount);
         VkSemaphoreCreateInfo semaphoreInfo{};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -13,18 +16,28 @@ namespace engine
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        if (vkCreateSemaphore(device.device, &semaphoreInfo, nullptr, &imageAvailable) != VK_SUCCESS ||
-            vkCreateSemaphore(device.device, &semaphoreInfo, nullptr, &renderFinished) != VK_SUCCESS ||
-            vkCreateFence(device.device, &fenceInfo, nullptr, &inFlight) != VK_SUCCESS)
+        for (size_t i = 0; i < amount; i++)
         {
-            throw std::runtime_error("failed to create semaphores!");
+
+            if (vkCreateSemaphore(device.device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
+                vkCreateSemaphore(device.device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
+                vkCreateFence(device.device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
+            {
+                throw std::runtime_error("failed to create semaphores!");
+            }
         }
     }
 
     VulkanSyncObjects::~VulkanSyncObjects()
     {
-        vkDestroySemaphore(device, imageAvailable, nullptr);
-        vkDestroySemaphore(device, renderFinished, nullptr);
-        vkDestroyFence(device, inFlight, nullptr);
+        for (size_t i = 0; i<imageAvailableSemaphores.size(); i++){
+            vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
+        }
+        for (size_t i = 0; i<renderFinishedSemaphores.size(); i++){
+            vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
+        }
+        for (size_t i = 0; i<inFlightFences.size(); i++){
+            vkDestroyFence(device, inFlightFences[i], nullptr);
+        }
     }
 }

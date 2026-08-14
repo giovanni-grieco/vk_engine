@@ -108,6 +108,12 @@ namespace engine
         }
     }
 
+    void VulkanSwapChain::recreateSwapChain(VulkanSurface& surface, Window& window){
+        vkDeviceWaitIdle(device);
+
+        
+    }
+
     VulkanSwapChain::~VulkanSwapChain()
     {
         if (swapChain != VK_NULL_HANDLE && device != VK_NULL_HANDLE)

@@ -136,7 +136,7 @@ private:
     }
 };
 
-/*int main()
+int main()
 {
     HelloTriangleApplication app;
 
@@ -151,4 +151,4 @@ private:
     }
 
     return EXIT_SUCCESS;
-}*/
+}

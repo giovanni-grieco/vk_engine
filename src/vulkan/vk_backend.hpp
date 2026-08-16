@@ -21,42 +21,47 @@ namespace engine
 {
     class VulkanBackend
     {
-    public:
-        
-        const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
+        public:
+            const uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 
-        uint32_t currentFrame = 0;
+            uint32_t currentFrame = 0;
 
-        VulkanInstance instance;
-        VulkanSurface surface;
-        VulkanDevice device;
-        VulkanQueues queues;
-        VulkanSwapChain swapChain;
-        VulkanRenderPass renderPass;
-        VulkanPipelineLayout pipelineLayout;
-        VulkanPipeline pipeline;
-        VulkanFramebuffers frameBuffers;
-        VulkanCommandPool commandPool;
-        VulkanCommandBuffer commandBuffer;
-        VulkanSyncObjects sync;
-        VulkanBuffer vertexBuffer;
-        VulkanBackend(std::string applicationName,
-                      bool enableValidationLayers,
-                      const std::vector<const char *> validationLayers,
-                      const std::vector<const char *> deviceExtensions,
-                      std::vector<std::string> shadersFilePaths,
-                      std::vector<engine::VulkanShaderType> shaderTypes,
-                      Window &window);
+            VulkanInstance instance;
+            VulkanSurface surface;
+            VulkanDevice device;
+            VulkanQueues queues;
+            VulkanSwapChain swapChain;
+            VulkanRenderPass renderPass;
+            VulkanPipelineLayout pipelineLayout;
+            VulkanPipeline pipeline;
+            VulkanFramebuffers frameBuffers;
+            VulkanCommandPool commandPool;
+            VulkanCommandBuffer commandBuffer;
+            VulkanSyncObjects sync;
+            VulkanBuffer vertexBuffer1;
+            VulkanBuffer vertexBuffer2;
+            VulkanBuffer vertexBuffer3;
+            VulkanBackend(std::string applicationName,
+                        bool enableValidationLayers,
+                        const std::vector<const char *> validationLayers,
+                        const std::vector<const char *> deviceExtensions,
+                        std::vector<std::string> shadersFilePaths,
+                        std::vector<engine::VulkanShaderType> shaderTypes,
+                        Window &window);
 
-        VulkanBackend(const VulkanBackend& other) = delete;
-        VulkanBackend& operator=(const VulkanBackend& other) = delete;
+            VulkanBackend(const VulkanBackend &other) = delete;
+            VulkanBackend &operator=(const VulkanBackend &other) = delete;
 
-        VulkanBackend(VulkanBackend&& other) = delete;
-        VulkanBackend& operator=(VulkanBackend&& other) = delete;
+            VulkanBackend(VulkanBackend &&other) = delete;
+            VulkanBackend &operator=(VulkanBackend &&other) = delete;
 
-        void drawFrame(Window& window);
-        void waitForIdle();
+            void drawFrame(Window &window);
+            void waitForIdle();
 
-        void recreateSwapChain(Window& window);
+            void recreateSwapChain(Window &window);
+
+        private:
+            int frameCount = 0;
+            const int frameSwitch = 3;
     };
 }

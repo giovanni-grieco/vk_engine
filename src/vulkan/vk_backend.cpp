@@ -24,7 +24,9 @@ namespace engine
           commandPool(device, surface),
           commandBuffer(MAX_FRAMES_IN_FLIGHT, device, commandPool),
           sync(MAX_FRAMES_IN_FLIGHT, swapChain.images.size(), device),
-          vertexBuffer(device, BufferType::VERTEX, sizeof(Vertex)*vertices.size(), (void*)vertices.data())
+          vertexBuffer1(device, BufferType::VERTEX, sizeof(Vertex) * triangle1.size(), (void *)triangle1.data()),
+          vertexBuffer2(device, BufferType::VERTEX, sizeof(Vertex) * triangle2.size(), (void *)triangle2.data()),
+          vertexBuffer3(device, BufferType::VERTEX, sizeof(Vertex) * triangle3.size(), (void *)triangle3.data())
     {
         // std::cout << "La finestra passata è la stessa dell'oggetto corrente: "<< ((&this->window) == &window) << "\n";
     }
@@ -32,7 +34,6 @@ namespace engine
     void VulkanBackend::drawFrame(Window &window)
     {
         vkWaitForFences(device.device, 1, &sync.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
-    
 
         uint32_t imageIndex;
         VkResult result = vkAcquireNextImageKHR(device.device, swapChain.swapChain, UINT64_MAX, sync.imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
@@ -50,7 +51,15 @@ namespace engine
         vkResetFences(device.device, 1, &sync.inFlightFences[currentFrame]);
 
         vkResetCommandBuffer(commandBuffer.commandBuffers[currentFrame], 0);
-        commandBuffer.recordCommandBuffer(imageIndex, currentFrame, pipeline, swapChain, renderPass, frameBuffers, vertexBuffer, vertices.size());
+
+        if (frameCount <= frameSwitch)
+            commandBuffer.recordCommandBuffer(imageIndex, currentFrame, pipeline, swapChain, renderPass, frameBuffers, vertexBuffer1, triangle1.size());
+        else if (frameCount > frameSwitch && frameCount <= frameSwitch * 2)
+            commandBuffer.recordCommandBuffer(imageIndex, currentFrame, pipeline, swapChain, renderPass, frameBuffers, vertexBuffer2, triangle2.size());
+        else if (frameCount > frameSwitch * 2)
+            commandBuffer.recordCommandBuffer(imageIndex, currentFrame, pipeline, swapChain, renderPass, frameBuffers, vertexBuffer3, triangle3.size());
+
+        frameCount = (frameCount + 1) % (frameSwitch * 3);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -91,7 +100,7 @@ namespace engine
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window.frameBufferResizeFlag)
         {
             window.frameBufferResizeFlag = false;
-            
+
             recreateSwapChain(window);
         }
         else if (result != VK_SUCCESS)

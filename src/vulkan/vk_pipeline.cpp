@@ -164,6 +164,8 @@ namespace engine
 
     VulkanPipeline::~VulkanPipeline()
     {
-        vkDestroyPipeline(this->device, this->pipeline, nullptr);
+        if(device!=VK_NULL_HANDLE && pipeline!=VK_NULL_HANDLE){
+            vkDestroyPipeline(this->device, this->pipeline, nullptr);
+        }
     }
 }

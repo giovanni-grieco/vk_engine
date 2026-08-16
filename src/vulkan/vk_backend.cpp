@@ -1,5 +1,7 @@
 #include "vk_backend.hpp"
 
+#include "geometry/vertex.hpp"
+
 namespace engine
 {
     VulkanBackend::VulkanBackend(
@@ -21,7 +23,8 @@ namespace engine
           frameBuffers(device, swapChain, renderPass),
           commandPool(device, surface),
           commandBuffer(MAX_FRAMES_IN_FLIGHT, device, commandPool),
-          sync(MAX_FRAMES_IN_FLIGHT, swapChain.images.size(), device)
+          sync(MAX_FRAMES_IN_FLIGHT, swapChain.images.size(), device),
+          vertexBuffer(device, BufferType::VERTEX, sizeof(Vertex)*vertices.size(), (void*)vertices.data())
     {
         // std::cout << "La finestra passata è la stessa dell'oggetto corrente: "<< ((&this->window) == &window) << "\n";
     }
@@ -47,7 +50,7 @@ namespace engine
         vkResetFences(device.device, 1, &sync.inFlightFences[currentFrame]);
 
         vkResetCommandBuffer(commandBuffer.commandBuffers[currentFrame], 0);
-        commandBuffer.recordCommandBuffer(imageIndex, currentFrame, pipeline, swapChain, renderPass, frameBuffers);
+        commandBuffer.recordCommandBuffer(imageIndex, currentFrame, pipeline, swapChain, renderPass, frameBuffers, vertexBuffer, vertices.size());
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

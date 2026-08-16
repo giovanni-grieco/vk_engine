@@ -13,7 +13,7 @@ namespace engine{
     }
 
     VulkanSurface::~VulkanSurface(){
-        if (surface != VK_NULL_HANDLE) {
+        if (instance!=VK_NULL_HANDLE && surface != VK_NULL_HANDLE) {
             vkDestroySurfaceKHR(instance, surface, nullptr);
         }
     }

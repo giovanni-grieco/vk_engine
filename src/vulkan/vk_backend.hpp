@@ -15,6 +15,7 @@
 #include "vk_command_pool.hpp"
 #include "vk_command_buffer.hpp"
 #include "vk_sync.hpp"
+#include "vk_buffer.hpp"
 
 namespace engine
 {
@@ -38,6 +39,7 @@ namespace engine
         VulkanCommandPool commandPool;
         VulkanCommandBuffer commandBuffer;
         VulkanSyncObjects sync;
+        VulkanBuffer vertexBuffer;
         VulkanBackend(std::string applicationName,
                       bool enableValidationLayers,
                       const std::vector<const char *> validationLayers,
@@ -45,6 +47,12 @@ namespace engine
                       std::vector<std::string> shadersFilePaths,
                       std::vector<engine::VulkanShaderType> shaderTypes,
                       Window &window);
+
+        VulkanBackend(const VulkanBackend& other) = delete;
+        VulkanBackend& operator=(const VulkanBackend& other) = delete;
+
+        VulkanBackend(VulkanBackend&& other) = delete;
+        VulkanBackend& operator=(VulkanBackend&& other) = delete;
 
         void drawFrame(Window& window);
         void waitForIdle();

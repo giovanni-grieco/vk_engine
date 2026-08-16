@@ -1,0 +1,29 @@
+class T{
+    T();
+    ~T();
+
+    //Copy constructor
+    T(const T& other){
+        //no need to check for this != &other because in the case of "constructing" it can never be that T b = std::move(a) because b just came into existance;
+    }
+
+    //Move constructor
+    T(T&& other){
+        //no need to check for this != &other because in the case of "constructing" it can never be that T b = std::move(a) because b just came into existance;
+    }
+
+    //Copy assignment
+    T& operator=(const T& other){
+        if(this != &other){
+
+        }
+    }
+
+    //Move assignment
+    T& operator=(T&& other){
+        //check if this != other
+        if(this != &other){
+
+        }
+    }
+}

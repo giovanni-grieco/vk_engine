@@ -13,5 +13,14 @@ namespace engine{
 
             VulkanCommandPool(VulkanDevice& device, VulkanSurface& surface);
             ~VulkanCommandPool();
+
+            VulkanCommandPool(const VulkanCommandPool& other) = delete;
+            VulkanCommandPool& operator=(const VulkanCommandPool& other) = delete;
+
+            VulkanCommandPool(VulkanCommandPool&& other) noexcept;
+            VulkanCommandPool& operator=(VulkanCommandPool&& other) noexcept;
+            
+        private:
+            void destroy();
     };
 }

@@ -50,6 +50,7 @@ namespace engine
 
     VulkanRenderPass::~VulkanRenderPass()
     {
-        vkDestroyRenderPass(device, renderPass, nullptr);
+        if(device!=VK_NULL_HANDLE && renderPass != VK_NULL_HANDLE)
+            vkDestroyRenderPass(device, renderPass, nullptr);
     }
 }

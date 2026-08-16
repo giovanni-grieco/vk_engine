@@ -1,5 +1,7 @@
 #include "vk_command_buffer.hpp"
 
+#include "geometry/vertex.hpp"
+
 namespace engine
 {
     VulkanCommandBuffer::VulkanCommandBuffer(int bufferAmount, VulkanDevice &device, VulkanCommandPool &commandPool)
@@ -18,7 +20,16 @@ namespace engine
         }
     }
 
-    void VulkanCommandBuffer::recordCommandBuffer(uint32_t imageIndex, uint32_t currentFrame, VulkanPipeline &pipeline, VulkanSwapChain &swapChain, VulkanRenderPass &renderPass, VulkanFramebuffers &frameBuffers)
+    void VulkanCommandBuffer::recordCommandBuffer(
+        uint32_t imageIndex, 
+        uint32_t currentFrame, 
+        VulkanPipeline &pipeline, 
+        VulkanSwapChain &swapChain, 
+        VulkanRenderPass &renderPass, 
+        VulkanFramebuffers &frameBuffers, 
+        VulkanBuffer &vertexBuffer,
+        uint32_t vertexCount
+    )
     {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -46,6 +57,10 @@ namespace engine
 
         vkCmdBindPipeline(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
 
+        VkBuffer vertexBuffers[] = {vertexBuffer.buffer};
+        VkDeviceSize offsets[] = {0};
+        vkCmdBindVertexBuffers(commandBuffers[currentFrame], 0, 1, vertexBuffers, offsets);
+
         VkViewport viewport{};
         viewport.x = 0.0f;
         viewport.y = 0.0f;
@@ -60,7 +75,7 @@ namespace engine
         scissor.extent = swapChain.extent;
         vkCmdSetScissor(commandBuffers[currentFrame], 0, 1, &scissor);
 
-        vkCmdDraw(commandBuffers[currentFrame], 3, 1, 0, 0);
+        vkCmdDraw(commandBuffers[currentFrame], vertexCount, 1, 0, 0);
 
         vkCmdEndRenderPass(commandBuffers[currentFrame]);
 

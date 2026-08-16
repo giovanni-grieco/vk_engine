@@ -5,7 +5,7 @@
 #include "vulkan/vk_device.hpp"
 
 namespace engine{
-    enum VulkanShaderType{
+    enum class VulkanShaderType{
         VERTEX,
         FRAGMENT
     };

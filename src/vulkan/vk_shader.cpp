@@ -14,7 +14,9 @@ namespace engine{
     }
 
     VulkanShader::~VulkanShader(){
-        vkDestroyShaderModule(device, shaderModule, nullptr);
+        if(device != VK_NULL_HANDLE && shaderModule != VK_NULL_HANDLE){
+            vkDestroyShaderModule(device, shaderModule, nullptr);
+        }
     }
 
 }

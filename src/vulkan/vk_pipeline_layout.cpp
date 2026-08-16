@@ -17,6 +17,8 @@ namespace engine{
     }
 
     VulkanPipelineLayout::~VulkanPipelineLayout(){
-        vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+        if(device != VK_NULL_HANDLE && pipelineLayout != VK_NULL_HANDLE){
+            vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+        }
     }
 }

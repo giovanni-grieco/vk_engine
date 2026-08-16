@@ -99,7 +99,9 @@ namespace engine{
     }
 
     VulkanInstance::~VulkanInstance(){
-        vkDestroyInstance(instance, nullptr);
+        if(instance != VK_NULL_HANDLE){
+            vkDestroyInstance(instance, nullptr);
+        }
     }
 
     bool VulkanInstance::checkValidationLayerSupport(const std::vector<const char*>& validationLayers)

@@ -129,7 +129,9 @@ namespace engine
         {
             for (auto imageView : imageViews)
             {
-                vkDestroyImageView(device, imageView, nullptr);
+                if(imageView != VK_NULL_HANDLE){
+                    vkDestroyImageView(device, imageView, nullptr);
+                }
             }
 
             vkDestroySwapchainKHR(device, swapChain, nullptr);

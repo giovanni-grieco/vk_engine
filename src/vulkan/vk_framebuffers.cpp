@@ -40,7 +40,9 @@ namespace engine{
 
     void VulkanFramebuffers::destroy(){
         for (auto framebuffer: frameBuffers){
-            vkDestroyFramebuffer(device, framebuffer, nullptr);
+            if(device != VK_NULL_HANDLE && framebuffer != VK_NULL_HANDLE){
+                vkDestroyFramebuffer(device, framebuffer, nullptr);
+            }
         }
     }
 }

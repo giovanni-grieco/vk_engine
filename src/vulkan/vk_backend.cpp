@@ -67,12 +67,42 @@ namespace engine
 
         vkResetCommandBuffer(commandBuffer.commandBuffers[currentFrame], 0);
 
-        if (frameCount <= frameSwitch)
-            commandBuffer.recordCommandBuffer(imageIndex, currentFrame, pipeline, swapChain, renderPass, frameBuffers, vertexBuffer1, triangle1.size());
-        else if (frameCount > frameSwitch && frameCount <= frameSwitch * 2)
-            commandBuffer.recordCommandBuffer(imageIndex, currentFrame, pipeline, swapChain, renderPass, frameBuffers, vertexBuffer2, triangle2.size());
-        else if (frameCount > frameSwitch * 2 && frameCount <= frameSwitch * 3)
-            commandBuffer.recordCommandBuffer(imageIndex, currentFrame, pipeline, swapChain, renderPass, frameBuffers, vertexBuffer3, triangle3.size());
+        if (frameCount <= frameSwitch){
+            commandBuffer.recordCommandBuffer(
+                imageIndex, 
+                currentFrame, 
+                pipeline, 
+                swapChain, 
+                renderPass, 
+                frameBuffers, 
+                vertexBuffer1, 
+                triangle1.size()
+            );
+        }
+        else if (frameCount > frameSwitch && frameCount <= frameSwitch * 2){
+            commandBuffer.recordCommandBuffer(
+                imageIndex, 
+                currentFrame, 
+                pipeline, 
+                swapChain, 
+                renderPass, 
+                frameBuffers, 
+                vertexBuffer2, 
+                triangle2.size()
+            );
+        }
+        else if (frameCount > frameSwitch * 2 && frameCount <= frameSwitch * 3){
+            commandBuffer.recordCommandBuffer(
+                imageIndex, 
+                currentFrame, 
+                pipeline, 
+                swapChain, 
+                renderPass, 
+                frameBuffers, 
+                vertexBuffer3,
+                triangle3.size()
+            );
+        }
         else if (frameCount > frameSwitch * 3)
         {
             commandBuffer.recordCommandBuffer(
@@ -84,8 +114,10 @@ namespace engine
                 frameBuffers,
                 vertexBufferQuad,
                 indexBufferQuad,
-                static_cast<uint32_t>(quadIndices.size()));
+                static_cast<uint32_t>(quadIndices.size())
+            );
         }
+        
         frameCount = (frameCount + 1) % (frameSwitch * 4);
 
         VkSubmitInfo submitInfo{};

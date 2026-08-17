@@ -40,4 +40,12 @@ namespace engine{
         auto windowObj = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
         windowObj->frameBufferResizeFlag = true;
     }
+
+    bool Window::shouldWindowClose(){
+        return glfwWindowShouldClose(window) != 0;
+    }
+
+    void Window::setWindowTitle(std::string title){
+        glfwSetWindowTitle(window, title.c_str());
+    }
 }

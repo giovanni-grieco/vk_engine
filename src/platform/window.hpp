@@ -24,5 +24,8 @@ namespace engine
             std::vector<const char *> getRequiredExtensions();
             BufferSize getBufferSize();
             static void frameBufferResizeCallback(GLFWwindow* window, int width, int height);
+
+            bool shouldWindowClose();
+            void setWindowTitle(std::string title);
     };
 }

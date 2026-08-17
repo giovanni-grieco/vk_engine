@@ -41,6 +41,8 @@ namespace engine
             VulkanBuffer vertexBuffer1;
             VulkanBuffer vertexBuffer2;
             VulkanBuffer vertexBuffer3;
+            VulkanBuffer vertexBufferQuad;
+            VulkanBuffer indexBufferQuad;
             VulkanBackend(std::string applicationName,
                         bool enableValidationLayers,
                         const std::vector<const char *> validationLayers,
@@ -62,6 +64,6 @@ namespace engine
 
         private:
             int frameCount = 0;
-            const int frameSwitch = 3;
+            const int frameSwitch = 10;
     };
 }

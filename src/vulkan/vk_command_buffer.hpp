@@ -17,7 +17,28 @@ namespace engine{
             std::vector<VkCommandBuffer> commandBuffers;
             VulkanCommandBuffer(int bufferAmount, VulkanDevice& device, VulkanCommandPool& commandPool);
 
-            void recordCommandBuffer(uint32_t imageIndex, uint32_t currentFrame, VulkanPipeline& pipeline, VulkanSwapChain& swapChain, VulkanRenderPass& renderPass, VulkanFramebuffers& frameBuffers, VulkanBuffer& vertexBuffer, uint32_t vertexCount);
-    };
+            void recordCommandBuffer(
+                uint32_t imageIndex, 
+                uint32_t currentFrame, 
+                VulkanPipeline& pipeline, 
+                VulkanSwapChain& swapChain, 
+                VulkanRenderPass& renderPass, 
+                VulkanFramebuffers& frameBuffers, 
+                VulkanBuffer& vertexBuffer, 
+                uint32_t vertexCount
+            );
+
+            void recordCommandBuffer(
+                uint32_t imageIndex, 
+                uint32_t currentFrame, 
+                VulkanPipeline& pipeline, 
+                VulkanSwapChain& swapChain, 
+                VulkanRenderPass& renderPass, 
+                VulkanFramebuffers& frameBuffers, 
+                VulkanBuffer& vertexBuffer, 
+                VulkanBuffer& indexBuffer, 
+                uint32_t indexSize
+            );
+        };
 
 }

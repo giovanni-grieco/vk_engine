@@ -26,7 +26,9 @@ namespace engine
           sync(MAX_FRAMES_IN_FLIGHT, swapChain.images.size(), device),
           vertexBuffer1(device, commandPool, queues),
           vertexBuffer2(device, commandPool, queues),
-          vertexBuffer3(device, commandPool, queues)
+          vertexBuffer3(device, commandPool, queues),
+          vertexBufferQuad(device, commandPool, queues),
+          indexBufferQuad(device, commandPool, queues)
     {
         vertexBuffer1.create(BufferType::VERTEX, sizeof(Vertex) * triangle1.size());
         vertexBuffer1.upload(triangle1.data(), sizeof(Vertex) * triangle1.size());
@@ -36,6 +38,12 @@ namespace engine
 
         vertexBuffer3.create(BufferType::VERTEX, sizeof(Vertex) * triangle3.size());
         vertexBuffer3.upload(triangle3.data(), sizeof(Vertex) * triangle3.size());
+
+        vertexBufferQuad.create(BufferType::VERTEX, sizeof(Vertex) * quadVertices.size());
+        vertexBufferQuad.upload(quadVertices.data(), sizeof(Vertex) * quadVertices.size());
+
+        indexBufferQuad.create(BufferType::INDEX, sizeof(Vertex) * quadIndices.size());
+        indexBufferQuad.upload(quadIndices.data(), sizeof(Vertex) * quadIndices.size());
     }
 
     void VulkanBackend::drawFrame(Window &window)
@@ -63,10 +71,22 @@ namespace engine
             commandBuffer.recordCommandBuffer(imageIndex, currentFrame, pipeline, swapChain, renderPass, frameBuffers, vertexBuffer1, triangle1.size());
         else if (frameCount > frameSwitch && frameCount <= frameSwitch * 2)
             commandBuffer.recordCommandBuffer(imageIndex, currentFrame, pipeline, swapChain, renderPass, frameBuffers, vertexBuffer2, triangle2.size());
-        else if (frameCount > frameSwitch * 2)
+        else if (frameCount > frameSwitch * 2 && frameCount <= frameSwitch * 3)
             commandBuffer.recordCommandBuffer(imageIndex, currentFrame, pipeline, swapChain, renderPass, frameBuffers, vertexBuffer3, triangle3.size());
-
-        frameCount = (frameCount + 1) % (frameSwitch * 3);
+        else if (frameCount > frameSwitch * 3)
+        {
+            commandBuffer.recordCommandBuffer(
+                imageIndex,
+                currentFrame,
+                pipeline,
+                swapChain,
+                renderPass,
+                frameBuffers,
+                vertexBufferQuad,
+                indexBufferQuad,
+                static_cast<uint32_t>(quadIndices.size()));
+        }
+        frameCount = (frameCount + 1) % (frameSwitch * 4);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

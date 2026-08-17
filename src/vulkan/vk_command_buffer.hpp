@@ -8,6 +8,7 @@
 #include "vk_swap_chain.hpp"
 #include "vk_pipeline.hpp"
 #include "vk_buffer.hpp"
+#include "vk_descriptor_sets.hpp"
 
 #include <vector>
 
@@ -25,7 +26,8 @@ namespace engine{
                 VulkanRenderPass& renderPass, 
                 VulkanFramebuffers& frameBuffers, 
                 VulkanBuffer& vertexBuffer, 
-                uint32_t vertexCount
+                uint32_t vertexCount,
+                VulkanDescriptorSets& descriptorSets
             );
 
             void recordCommandBuffer(
@@ -37,7 +39,8 @@ namespace engine{
                 VulkanFramebuffers& frameBuffers, 
                 VulkanBuffer& vertexBuffer, 
                 VulkanBuffer& indexBuffer, 
-                uint32_t indexSize
+                uint32_t indexSize,
+                VulkanDescriptorSets& descriptorSets
             );
         };
 

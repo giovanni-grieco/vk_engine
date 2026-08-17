@@ -1,12 +1,12 @@
 #include "vk_pipeline_layout.hpp"
 
 namespace engine{
-    VulkanPipelineLayout::VulkanPipelineLayout(VulkanDevice& device){
+    VulkanPipelineLayout::VulkanPipelineLayout(VulkanDevice& device, VulkanDescriptorSetLayout& descriptorSetLayout){
         this->device = device.device;
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = 0;            // Optional
-        pipelineLayoutInfo.pSetLayouts = nullptr;         // Optional
+        pipelineLayoutInfo.setLayoutCount = 1;            // Optional
+        pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout.layout;         // Optional
         pipelineLayoutInfo.pushConstantRangeCount = 0;    // Optional
         pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 
@@ -19,6 +19,8 @@ namespace engine{
     VulkanPipelineLayout::~VulkanPipelineLayout(){
         if(device != VK_NULL_HANDLE && pipelineLayout != VK_NULL_HANDLE){
             vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+            device = VK_NULL_HANDLE;
+            pipelineLayout = VK_NULL_HANDLE;
         }
     }
 }

@@ -10,6 +10,7 @@ namespace engine
     VulkanPipeline::VulkanPipeline(VulkanDevice &device, VulkanSwapChain &swapChain, VulkanPipelineLayout &pipelineLayout, VulkanRenderPass &renderPass, std::vector<std::string>& shaderFilePaths, std::vector<VulkanShaderType>& types)
     {
         this->device = device.device;
+        this->layout=pipelineLayout.pipelineLayout;
         std::vector<std::vector<char>> shaders;
         std::vector<std::unique_ptr<VulkanShader>> shaderModules;
         for (const auto &shaderFilePath : shaderFilePaths)
@@ -97,7 +98,7 @@ namespace engine
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
         rasterizer.lineWidth = 1.0f;
         rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-        rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+        rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizer.depthBiasEnable = VK_FALSE;
         rasterizer.depthBiasConstantFactor = 0.0f;
         rasterizer.depthBiasClamp = 0.0f;
@@ -166,6 +167,9 @@ namespace engine
     {
         if(device!=VK_NULL_HANDLE && pipeline!=VK_NULL_HANDLE){
             vkDestroyPipeline(this->device, this->pipeline, nullptr);
+            device = VK_NULL_HANDLE;
+            pipeline = VK_NULL_HANDLE;
+            layout = VK_NULL_HANDLE;
         }
     }
 }

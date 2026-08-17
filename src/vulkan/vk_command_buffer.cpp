@@ -21,15 +21,15 @@ namespace engine
     }
 
     void VulkanCommandBuffer::recordCommandBuffer(
-        uint32_t imageIndex, 
-        uint32_t currentFrame, 
-        VulkanPipeline &pipeline, 
-        VulkanSwapChain &swapChain, 
-        VulkanRenderPass &renderPass, 
-        VulkanFramebuffers &frameBuffers, 
+        uint32_t imageIndex,
+        uint32_t currentFrame,
+        VulkanPipeline &pipeline,
+        VulkanSwapChain &swapChain,
+        VulkanRenderPass &renderPass,
+        VulkanFramebuffers &frameBuffers,
         VulkanBuffer &vertexBuffer,
-        uint32_t vertexCount
-    )
+        uint32_t vertexCount,
+        VulkanDescriptorSets &descriptorSets)
     {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -61,6 +61,13 @@ namespace engine
         VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(commandBuffers[currentFrame], 0, 1, vertexBuffers, offsets);
 
+        VkDescriptorSet sets[] = {descriptorSets.descriptorSets[currentFrame]};
+        vkCmdBindDescriptorSets(commandBuffers[currentFrame],
+                                VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                pipeline.layout,
+                                0, 1, sets,
+                                0, nullptr);
+
         VkViewport viewport{};
         viewport.x = 0.0f;
         viewport.y = 0.0f;
@@ -86,16 +93,16 @@ namespace engine
     }
 
     void VulkanCommandBuffer::recordCommandBuffer(
-        uint32_t imageIndex, 
-        uint32_t currentFrame, 
-        VulkanPipeline &pipeline, 
-        VulkanSwapChain &swapChain, 
-        VulkanRenderPass &renderPass, 
-        VulkanFramebuffers &frameBuffers, 
+        uint32_t imageIndex,
+        uint32_t currentFrame,
+        VulkanPipeline &pipeline,
+        VulkanSwapChain &swapChain,
+        VulkanRenderPass &renderPass,
+        VulkanFramebuffers &frameBuffers,
         VulkanBuffer &vertexBuffer,
         VulkanBuffer &indexBuffer,
-        uint32_t indexSize
-    )
+        uint32_t indexSize,
+        VulkanDescriptorSets &descriptorSets)
     {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -128,6 +135,13 @@ namespace engine
         vkCmdBindVertexBuffers(commandBuffers[currentFrame], 0, 1, vertexBuffers, offsets);
 
         vkCmdBindIndexBuffer(commandBuffers[currentFrame], indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+
+        VkDescriptorSet sets[] = {descriptorSets.descriptorSets[currentFrame]};
+        vkCmdBindDescriptorSets(commandBuffers[currentFrame],
+                                VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                pipeline.layout,
+                                0, 1, sets,
+                                0, nullptr);
 
         VkViewport viewport{};
         viewport.x = 0.0f;

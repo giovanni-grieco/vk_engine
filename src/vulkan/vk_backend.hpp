@@ -16,6 +16,11 @@
 #include "vk_command_buffer.hpp"
 #include "vk_sync.hpp"
 #include "vk_buffer.hpp"
+#include "vk_descriptor_set_layout.hpp"
+#include "vk_descriptor_pool.hpp"  
+#include "vk_descriptor_sets.hpp"   
+#include "vk_uniform_buffer.hpp"
+
 
 namespace engine
 {
@@ -32,6 +37,7 @@ namespace engine
             VulkanQueues queues;
             VulkanSwapChain swapChain;
             VulkanRenderPass renderPass;
+            VulkanDescriptorSetLayout descriptorSetLayout;
             VulkanPipelineLayout pipelineLayout;
             VulkanPipeline pipeline;
             VulkanFramebuffers frameBuffers;
@@ -43,6 +49,10 @@ namespace engine
             VulkanBuffer vertexBuffer3;
             VulkanBuffer vertexBufferQuad;
             VulkanBuffer indexBufferQuad;
+            VulkanUniformBuffer uniformBuffer;
+            VulkanDescriptorPool descriptorPool;
+            VulkanDescriptorSets descriptorSets;
+            
             VulkanBackend(std::string applicationName,
                         bool enableValidationLayers,
                         const std::vector<const char *> validationLayers,
@@ -65,5 +75,7 @@ namespace engine
         private:
             int frameCount = 0;
             const int frameSwitch = 10;
+
+            void updateUbo(uint32_t currentFrameIndex);
     };
 }

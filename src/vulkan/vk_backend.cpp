@@ -24,11 +24,18 @@ namespace engine
           commandPool(device, surface),
           commandBuffer(MAX_FRAMES_IN_FLIGHT, device, commandPool),
           sync(MAX_FRAMES_IN_FLIGHT, swapChain.images.size(), device),
-          vertexBuffer1(device, BufferType::VERTEX, sizeof(Vertex) * triangle1.size(), (void *)triangle1.data()),
-          vertexBuffer2(device, BufferType::VERTEX, sizeof(Vertex) * triangle2.size(), (void *)triangle2.data()),
-          vertexBuffer3(device, BufferType::VERTEX, sizeof(Vertex) * triangle3.size(), (void *)triangle3.data())
+          vertexBuffer1(device, commandPool, queues),
+          vertexBuffer2(device, commandPool, queues),
+          vertexBuffer3(device, commandPool, queues)
     {
-        // std::cout << "La finestra passata è la stessa dell'oggetto corrente: "<< ((&this->window) == &window) << "\n";
+        vertexBuffer1.create(BufferType::VERTEX, sizeof(Vertex) * triangle1.size());
+        vertexBuffer1.upload(triangle1.data(), sizeof(Vertex) * triangle1.size());
+
+        vertexBuffer2.create(BufferType::VERTEX, sizeof(Vertex) * triangle2.size());
+        vertexBuffer2.upload(triangle2.data(), sizeof(Vertex) * triangle2.size());
+
+        vertexBuffer3.create(BufferType::VERTEX, sizeof(Vertex) * triangle3.size());
+        vertexBuffer3.upload(triangle3.data(), sizeof(Vertex) * triangle3.size());
     }
 
     void VulkanBackend::drawFrame(Window &window)

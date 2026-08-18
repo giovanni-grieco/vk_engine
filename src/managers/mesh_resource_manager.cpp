@@ -15,10 +15,8 @@ namespace engine
 
     bool MeshResourceManager::remove(MeshID meshHandle)
     {
-        auto result = handle2mesh.erase(meshHandle);
-        if( result > 0 ){
-
-        }
+        return handle2mesh.erase(meshHandle) > 0;
+        
     }
 
     Mesh MeshResourceManager::get(MeshID meshHandle)

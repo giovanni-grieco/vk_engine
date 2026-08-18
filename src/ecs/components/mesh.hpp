@@ -2,8 +2,14 @@
 
 #include "geometry/mesh.hpp"
 
+#include <vector>
+
 namespace engine{
     struct MeshComponent{
-        MeshID meshHandle;
+        
+        std::vector<Mesh> mesh;
+
+        MeshID meshHandle = -1;
+
     };
 }

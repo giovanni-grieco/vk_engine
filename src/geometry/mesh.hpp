@@ -7,7 +7,7 @@
 
 namespace engine{
 
-    typedef uint32_t MeshID;
+    typedef int32_t MeshID;
 
     struct Mesh{
         std::vector<Vertex> vertices;

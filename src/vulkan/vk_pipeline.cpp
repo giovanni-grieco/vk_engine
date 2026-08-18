@@ -4,6 +4,8 @@
 #include "util/utils.hpp"
 #include "mesh/vk_vertex.hpp"
 
+#include <memory>
+
 namespace engine
 {
 

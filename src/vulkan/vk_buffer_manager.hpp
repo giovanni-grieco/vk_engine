@@ -7,8 +7,7 @@
 namespace engine{
 
     class VulkanBufferManager{
-        public:
-            std::unordered_map<MeshID, VkBuffer> id2buffer;
+        
 
             
     };

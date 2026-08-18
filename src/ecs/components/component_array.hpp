@@ -15,13 +15,12 @@ namespace engine
     };
 
     template <typename T>
-    class ComponentArray :  public IComponentArray
+    class ComponentArray : public IComponentArray
     {
     public:
+        ComponentArray<T>() : entityToIndex(MAX_ENTITIES, -1){};
 
-        ComponentArray<T>() : entityToIndex(MAX_ENTITIES, -1) {};
-
-        T& getComponent(const Entity entity)
+        T &getComponent(const Entity entity)
         {
             int position = findComponentIndex(entity);
             if (position == -1)
@@ -31,23 +30,25 @@ namespace engine
 
         void addComponent(const Entity entity, const T &component)
         {
-            if (entityToIndex[entity] != -1) {
+            if (entityToIndex[entity] != -1)
+            {
                 std::cerr << "Warning: Entity already has this component — skipping add.\n";
                 return;
             }
-            std::cout<< "Add Component v1 called\n";
+            std::cout << "Add Component v1 called\n";
             components.push_back(component);
             entities.push_back(entity);
             entityToIndex[entity] = components.size() - 1;
         }
 
-        void addComponent(const Entity entity, T&& component)
+        void addComponent(const Entity entity, T &&component)
         {
-            if (entityToIndex[entity] != -1) {
+            if (entityToIndex[entity] != -1)
+            {
                 std::cerr << "Warning: Entity already has this component — skipping add.\n";
                 return;
             }
-            std::cout<< "Add Component v2 called\n";
+            std::cout << "Add Component v2 called\n";
             components.push_back(std::move(component));
             entities.push_back(entity);
             entityToIndex[entity] = components.size() - 1;
@@ -61,7 +62,6 @@ namespace engine
             T deletedComponent = components[position];
             Entity deletedEntity = entities[position];
             entityToIndex[deletedEntity] = -1;
-
 
             T lastComponent = components[components.size() - 1];
             Entity lastEntity = entities[entities.size() - 1];
@@ -80,14 +80,15 @@ namespace engine
         }
 
         void removeEntity(Entity entity) override
-        {   
+        {
             int position = findComponentIndex(entity);
-            if (position == -1) return;
+            if (position == -1)
+                return;
 
             entityToIndex[entity] = -1;
 
             Entity lastEntity = entities.back();
-            
+
             if (position != static_cast<int>(components.size()) - 1)
             {
                 components[position] = std::move(components.back());
@@ -96,24 +97,25 @@ namespace engine
             }
             components.pop_back();
             entities.pop_back();
-
         }
 
-        bool hasComponent(Entity entity) const {
+        bool hasComponent(Entity entity) const
+        {
             return entityToIndex[entity] != -1;
         }
 
-        std::vector<T>& getComponents()
+        std::vector<T> &getComponents()
         {
             return components;
         }
 
-        std::vector<Entity>& getEntities()
+        std::vector<Entity> &getEntities()
         {
             return entities;
         }
 
-        const std::vector<Entity>& getEntitiesConst() const{
+        const std::vector<Entity> &getEntitiesConst() const
+        {
             return entities;
         }
 
@@ -125,12 +127,12 @@ namespace engine
             for (auto e : entities)
                 std::cout << e << " ";
             std::cout << "\n";
-            std::cout <<"=====================\n";
+            std::cout << "=====================\n";
         }
 
     private:
-        std::vector<T> components{};    // List of components
-        std::vector<Entity> entities{}; // List of entities which are using this component
+        std::vector<T> components{};      // List of components
+        std::vector<Entity> entities{};   // List of entities which are using this component
         std::vector<int> entityToIndex{}; // List of indices of the components for each entity
 
         int findComponentIndex(const Entity entity) const

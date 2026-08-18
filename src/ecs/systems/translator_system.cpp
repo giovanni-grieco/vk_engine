@@ -13,7 +13,7 @@ namespace engine{
     }
 
     void Translator::update(){
-        for (Transform& transform : ComponentManager::getInstance().getComponentArray<Transform>().getComponents()){
+        for (TransformComponent& transform : ComponentManager::getInstance().getComponentArray<TransformComponent>().getComponents()){
             transform.position.x = transform.position.x + speed;
         }
     }

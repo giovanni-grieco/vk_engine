@@ -20,7 +20,7 @@ namespace engine{
             void update() override {
                 if (flag){
                     std::cout << "Debugger update() called\n";
-                    for (Transform& transform : ComponentManager::getInstance().getComponentArray<Transform>().getComponents()){
+                    for (TransformComponent& transform : ComponentManager::getInstance().getComponentArray<TransformComponent>().getComponents()){
                         transform.dump();
                     }
                 }

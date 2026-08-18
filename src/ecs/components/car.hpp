@@ -2,7 +2,7 @@
 
 #include <string>
 
-struct Car{
+struct CarComponent{
     std::string manufacturer;
     std::string modelName;
     int year;

@@ -8,7 +8,7 @@ namespace engine{
 
     void CarSystem::update() {
         ComponentManager& cm = ComponentManager::getInstance(); 
-        for(const Entity e : cm.getEntitiesWithComponent<Car>()){
+        for(const Entity e : cm.getEntitiesWithComponent<CarComponent>()){
             std::cout<<"Entity "<<e<<" is a car!\n";
         }
     }

@@ -1,6 +1,7 @@
 #include "vk_backend.hpp"
 
 #include "geometry/vertex.hpp"
+#include "geometry/mesh.hpp"
 #include "mesh/vk_uniform_buffer_object.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <chrono>
@@ -28,40 +29,45 @@ namespace engine
           commandPool(device, surface),
           commandBuffer(MAX_FRAMES_IN_FLIGHT, device, commandPool),
           sync(MAX_FRAMES_IN_FLIGHT, swapChain.images.size(), device),
-          vertexBuffer1(device, commandPool, queues),
-          vertexBuffer2(device, commandPool, queues),
-          vertexBuffer3(device, commandPool, queues),
-          vertexBufferQuad(device, commandPool, queues),
-          indexBufferQuad(device, commandPool, queues),
+          bufferManager(device, commandPool, queues),
           uniformBuffer(device, sizeof(UniformBufferObject), MAX_FRAMES_IN_FLIGHT),
           descriptorPool(device.device, MAX_FRAMES_IN_FLIGHT),
           descriptorSets(device, descriptorSetLayout, descriptorPool, uniformBuffer, MAX_FRAMES_IN_FLIGHT)
     {
-        vertexBuffer1.create(BufferType::VERTEX, sizeof(Vertex) * triangle1.size());
-        vertexBuffer1.upload(triangle1.data(), sizeof(Vertex) * triangle1.size());
+        Mesh triangle1Mesh{triangle1, {0, 1, 2}};
+        Mesh triangle2Mesh{triangle2, {0, 1, 2}};
+        Mesh triangle3Mesh{triangle3, {0, 1, 2}};
+        Mesh quadMesh{quadVertices, quadIndices};
 
-        vertexBuffer2.create(BufferType::VERTEX, sizeof(Vertex) * triangle2.size());
-        vertexBuffer2.upload(triangle2.data(), sizeof(Vertex) * triangle2.size());
+        meshTriangle1 = bufferManager.addMesh(triangle1Mesh);
+        meshTriangle2 = bufferManager.addMesh(triangle2Mesh);
+        meshTriangle3 = bufferManager.addMesh(triangle3Mesh);
+        meshQuad      = bufferManager.addMesh(quadMesh);
+    }
 
-        vertexBuffer3.create(BufferType::VERTEX, sizeof(Vertex) * triangle3.size());
-        vertexBuffer3.upload(triangle3.data(), sizeof(Vertex) * triangle3.size());
+    MeshID VulkanBackend::addMesh(const Mesh &mesh)
+    {
+        return bufferManager.addMesh(mesh);
+    }
 
-        vertexBufferQuad.create(BufferType::VERTEX, sizeof(Vertex) * quadVertices.size());
-        vertexBufferQuad.upload(quadVertices.data(), sizeof(Vertex) * quadVertices.size());
+    void VulkanBackend::submitDrawPackets(const std::vector<DrawPacket> &drawPackets)
+    {
+        this->drawPackets_ = drawPackets;
+    }
 
-        indexBufferQuad.create(BufferType::INDEX, sizeof(uint16_t) * quadIndices.size());
-        indexBufferQuad.upload(quadIndices.data(), sizeof(uint16_t) * quadIndices.size());
+    void VulkanBackend::removeMesh(MeshID mesh)
+    {
+        bufferManager.removeMesh(mesh);
+    }
+
+    void VulkanBackend::compactBuffers()
+    {
+        bufferManager.compact();
     }
 
     void VulkanBackend::updateUbo(uint32_t currentFrame)
     {
-        static auto startTime = std::chrono::high_resolution_clock::now();
-
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
         UniformBufferObject ubo{};
-        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         ubo.proj = glm::perspective(glm::radians(45.0f), swapChain.extent.width / (float) swapChain.extent.height, 0.1f, 10.0f);
         ubo.proj[1][1] *= -1;
@@ -90,65 +96,36 @@ namespace engine
 
         vkResetCommandBuffer(commandBuffer.commandBuffers[currentFrame], 0);
         updateUbo(currentFrame);
-        if (frameCount <= frameSwitch)
+
+        // Use the application's draw packets if any were submitted; otherwise
+        // render the default demo scene.
+        std::vector<DrawPacket> drawPackets = drawPackets_;
+        if (drawPackets.empty())
         {
-            commandBuffer.recordCommandBuffer(
-                imageIndex,
-                currentFrame,
-                pipeline,
-                swapChain,
-                renderPass,
-                frameBuffers,
-                vertexBuffer1,
-                triangle1.size(),
-                descriptorSets
-            );
-        }
-        else if (frameCount > frameSwitch && frameCount <= frameSwitch * 2)
-        {
-            commandBuffer.recordCommandBuffer(
-                imageIndex,
-                currentFrame,
-                pipeline,
-                swapChain,
-                renderPass,
-                frameBuffers,
-                vertexBuffer2,
-                triangle2.size(),
-                descriptorSets
-            );
-        }
-        else if (frameCount > frameSwitch * 2 && frameCount <= frameSwitch * 3)
-        {
-            commandBuffer.recordCommandBuffer(
-                imageIndex,
-                currentFrame,
-                pipeline,
-                swapChain,
-                renderPass,
-                frameBuffers,
-                vertexBuffer3,
-                triangle3.size(),
-                descriptorSets
-            );
-        }
-        else if (frameCount > frameSwitch * 3)
-        {
-            commandBuffer.recordCommandBuffer(
-                imageIndex,
-                currentFrame,
-                pipeline,
-                swapChain,
-                renderPass,
-                frameBuffers,
-                vertexBufferQuad,
-                indexBufferQuad,
-                static_cast<uint32_t>(quadIndices.size()),
-                descriptorSets
-            );
+            static auto startTime = std::chrono::high_resolution_clock::now();
+            auto currentTime = std::chrono::high_resolution_clock::now();
+            float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+            glm::mat4 spin = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+            drawPackets = {
+                {meshTriangle1, glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, 0.0f, 0.0f))},
+                {meshTriangle2, spin},
+                {meshTriangle3, glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.0f, 0.0f))},
+                {meshQuad,      glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.5f, 0.0f))},
+            };
         }
 
-        frameCount = (frameCount + 1) % (frameSwitch * 4);
+        commandBuffer.recordCommandBuffer(
+            imageIndex,
+            currentFrame,
+            pipeline,
+            swapChain,
+            renderPass,
+            frameBuffers,
+            bufferManager,
+            drawPackets,
+            descriptorSets
+        );
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

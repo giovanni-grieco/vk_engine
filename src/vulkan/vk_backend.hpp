@@ -15,11 +15,13 @@
 #include "vk_command_pool.hpp"
 #include "vk_command_buffer.hpp"
 #include "vk_sync.hpp"
-#include "vk_buffer.hpp"
+#include "vk_buffer_manager.hpp"
 #include "vk_descriptor_set_layout.hpp"
 #include "vk_descriptor_pool.hpp"  
 #include "vk_descriptor_sets.hpp"   
 #include "vk_uniform_buffer.hpp"
+
+#include <vector>
 
 
 namespace engine
@@ -44,11 +46,11 @@ namespace engine
             VulkanCommandPool commandPool;
             VulkanCommandBuffer commandBuffer;
             VulkanSyncObjects sync;
-            VulkanBuffer vertexBuffer1;
-            VulkanBuffer vertexBuffer2;
-            VulkanBuffer vertexBuffer3;
-            VulkanBuffer vertexBufferQuad;
-            VulkanBuffer indexBufferQuad;
+            VulkanBufferManager bufferManager;
+            MeshID meshTriangle1;
+            MeshID meshTriangle2;
+            MeshID meshTriangle3;
+            MeshID meshQuad;
             VulkanUniformBuffer uniformBuffer;
             VulkanDescriptorPool descriptorPool;
             VulkanDescriptorSets descriptorSets;
@@ -70,11 +72,24 @@ namespace engine
             void drawFrame(Window &window);
             void waitForIdle();
 
+            // Top-down API: register CPU mesh data and get a handle back.
+            MeshID addMesh(const Mesh &mesh);
+
+            // Top-down API: queue the draw packets for the next frame.
+            void submitDrawPackets(const std::vector<DrawPacket> &drawPackets);
+
+            // Top-down API: mark a mesh handle as deleted (leaves a GPU hole
+            // until compactBuffers() is called).
+            void removeMesh(MeshID mesh);
+
+            // Top-down API: rebuild the unified buffers with only live meshes.
+            // Stalls the device; call when no frames are in flight.
+            void compactBuffers();
+
             void recreateSwapChain(Window &window);
 
         private:
-            int frameCount = 0;
-            const int frameSwitch = 10;
+            std::vector<DrawPacket> drawPackets_;
 
             void updateUbo(uint32_t currentFrameIndex);
     };

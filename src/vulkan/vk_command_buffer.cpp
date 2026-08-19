@@ -1,6 +1,8 @@
 #include "vk_command_buffer.hpp"
 
 #include "geometry/vertex.hpp"
+#include "mesh/vk_uniform_buffer_object.hpp"
+#include "mesh/vk_push_constant.hpp"
 
 namespace engine
 {
@@ -162,6 +164,105 @@ namespace engine
         vkCmdEndRenderPass(commandBuffers[currentFrame]);
 
         if (vkEndCommandBuffer(commandBuffers[currentFrame]) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to record command buffer!");
+        }
+    }
+
+    void VulkanCommandBuffer::recordCommandBuffer(
+        uint32_t imageIndex,
+        uint32_t currentFrame,
+        VulkanPipeline &pipeline,
+        VulkanSwapChain &swapChain,
+        VulkanRenderPass &renderPass,
+        VulkanFramebuffers &frameBuffers,
+        VulkanBufferManager &bufferManager,
+        const std::vector<DrawPacket> &drawPackets,
+        VulkanDescriptorSets &descriptorSets)
+    {
+        VkCommandBuffer commandBuffer = commandBuffers[currentFrame];
+
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = 0;
+        beginInfo.pInheritanceInfo = nullptr;
+
+        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
+        {
+            throw std::runtime_error("Failed to begin recording command buffer!");
+        }
+
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = renderPass.renderPass;
+        renderPassInfo.framebuffer = frameBuffers.frameBuffers[imageIndex];
+
+        renderPassInfo.renderArea = {0, 0};
+        renderPassInfo.renderArea.extent = swapChain.extent;
+
+        VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+        renderPassInfo.clearValueCount = 1;
+        renderPassInfo.pClearValues = &clearColor;
+
+        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline);
+
+        // Bind the unified vertex + index buffers once for the whole batch.
+        VkBuffer vertexBuffers[] = {bufferManager.vertexBufferHandle()};
+        VkDeviceSize vertexOffsets[] = {0};
+        vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, vertexOffsets);
+        vkCmdBindIndexBuffer(commandBuffer, bufferManager.indexBufferHandle(), 0, VK_INDEX_TYPE_UINT16);
+
+        VkDescriptorSet sets[] = {descriptorSets.descriptorSets[currentFrame]};
+        vkCmdBindDescriptorSets(commandBuffer,
+                                VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                pipeline.layout,
+                                0, 1, sets,
+                                0, nullptr);
+
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = static_cast<float>(swapChain.extent.width);
+        viewport.height = static_cast<float>(swapChain.extent.height);
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+        VkRect2D scissor{};
+        scissor.offset = {0, 0};
+        scissor.extent = swapChain.extent;
+        vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+        for (const DrawPacket &packet : drawPackets)
+        {
+            const MeshDrawInfo *info = bufferManager.getDrawInfo(packet.meshId);
+            if (info == nullptr)
+            {
+                continue; // unknown mesh handle — skip it
+            }
+
+            ModelPushConstant push{};
+            push.model = packet.model;
+            vkCmdPushConstants(commandBuffer,
+                               pipeline.layout,
+                               VK_SHADER_STAGE_VERTEX_BIT,
+                               0,
+                               sizeof(ModelPushConstant),
+                               &push);
+
+            vkCmdDrawIndexed(commandBuffer,
+                             info->indexCount,
+                             1,
+                             info->firstIndex,
+                             info->vertexOffset,
+                             0);
+        }
+
+        vkCmdEndRenderPass(commandBuffer);
+
+        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to record command buffer!");
         }

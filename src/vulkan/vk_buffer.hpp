@@ -41,13 +41,14 @@ namespace engine{
             void create(BufferType type, size_t size);
 
             // Stages the given CPU data into the buffer via a temporary staging buffer.
-            void upload(const void* data, size_t size);
+            // dstOffset is the byte offset inside the destination buffer.
+            void upload(const void* data, size_t size, VkDeviceSize dstOffset = 0);
 
             // Frees the GPU resources (called by the destructor too).
             void destroy();
 
         private:
             void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& outBuffer, VkDeviceMemory& outMemory);
-            void copyBuffer(VkBuffer src, VkBuffer dst, VkDeviceSize size);
+            void copyBuffer(VkBuffer src, VkBuffer dst, VkDeviceSize size, VkDeviceSize dstOffset = 0);
     };
 }

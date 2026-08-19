@@ -83,7 +83,7 @@ namespace engine
         createBuffer(size, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, buffer, bufferMemory);
     }
 
-    void VulkanBuffer::upload(const void *data, size_t size)
+    void VulkanBuffer::upload(const void *data, size_t size, VkDeviceSize dstOffset)
     {
         // Stage the data in a temporary host-visible buffer, then copy it to the device-local buffer.
         VkBuffer stagingBuffer;
@@ -99,7 +99,7 @@ namespace engine
         memcpy(mapped, data, size);
         vkUnmapMemory(device, stagingMemory);
 
-        copyBuffer(stagingBuffer, buffer, size);
+        copyBuffer(stagingBuffer, buffer, size, dstOffset);
 
         vkDestroyBuffer(device, stagingBuffer, nullptr);
         vkFreeMemory(device, stagingMemory, nullptr);
@@ -152,7 +152,7 @@ namespace engine
         }
     }
 
-    void VulkanBuffer::copyBuffer(VkBuffer src, VkBuffer dst, VkDeviceSize size)
+    void VulkanBuffer::copyBuffer(VkBuffer src, VkBuffer dst, VkDeviceSize size, VkDeviceSize dstOffset)
     {
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -171,7 +171,7 @@ namespace engine
 
         VkBufferCopy copyRegion{};
         copyRegion.srcOffset = 0;
-        copyRegion.dstOffset = 0;
+        copyRegion.dstOffset = dstOffset;
         copyRegion.size = size;
         vkCmdCopyBuffer(commandBuffer, src, dst, 1, &copyRegion);
 

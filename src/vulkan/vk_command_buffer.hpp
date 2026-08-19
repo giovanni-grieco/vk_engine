@@ -8,6 +8,7 @@
 #include "vk_swap_chain.hpp"
 #include "vk_pipeline.hpp"
 #include "vk_buffer.hpp"
+#include "vk_buffer_manager.hpp"
 #include "vk_descriptor_sets.hpp"
 
 #include <vector>
@@ -40,6 +41,20 @@ namespace engine{
                 VulkanBuffer& vertexBuffer, 
                 VulkanBuffer& indexBuffer, 
                 uint32_t indexSize,
+                VulkanDescriptorSets& descriptorSets
+            );
+
+            // Batched draw: binds the unified buffers once and issues one
+            // vkCmdDrawIndexed per DrawPacket, pushing its model matrix.
+            void recordCommandBuffer(
+                uint32_t imageIndex, 
+                uint32_t currentFrame, 
+                VulkanPipeline& pipeline, 
+                VulkanSwapChain& swapChain, 
+                VulkanRenderPass& renderPass, 
+                VulkanFramebuffers& frameBuffers, 
+                VulkanBufferManager& bufferManager, 
+                const std::vector<DrawPacket>& drawPackets,
                 VulkanDescriptorSets& descriptorSets
             );
         };

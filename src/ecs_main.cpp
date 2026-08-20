@@ -11,7 +11,7 @@
 
 using namespace engine;
 
-/*
+
 int main()
 {   
     std::cout<<"vk_engine started!\n" << "-----------------\n";
@@ -20,8 +20,8 @@ int main()
     ComponentManager& componentManager = ComponentManager::getInstance();
     SystemManager& systemManager = SystemManager::getInstance();
 
-    componentManager.registerComponent<Transform>();
-    componentManager.registerComponent<Car>();
+    componentManager.registerComponent<TransformComponent>();
+    componentManager.registerComponent<CarComponent>();
 
     bool debuggerEnableFlag = true;
 
@@ -35,9 +35,9 @@ int main()
     std::cout<<"e: "<<e<<"\n";
     Entity e1 = entityManager.createEntity();
     std::cout<<"e1: "<<e1<<"\n";
-    Transform t {{50.f, 50.f, 50.f}, {0.f, 0.f, 0.f}};
+    TransformComponent t {{50.f, 50.f, 50.f}, {0.f, 0.f, 0.f}};
 
-    componentManager.addComponent<Transform>(e, t);
+    componentManager.addComponent<TransformComponent>(e, t);
 
     systemManager.start();
 
@@ -47,9 +47,11 @@ int main()
 
     entityManager.destroyEntity(e);
     Entity e2 = entityManager.createEntity();
-    Car car {"Ford", "Mustang", 1977};
-    componentManager.addComponent<Car>(e2, car);
+    CarComponent car {"Ford", "Mustang", 1977};
+    componentManager.addComponent<CarComponent>(e2, car);
     std::cout<<"e2: "<<e2<<"\n";
+
+    
 
     for(int i = 0; i<5; i++){
         systemManager.update();
@@ -58,4 +60,4 @@ int main()
 
 
     std::cout<< "-----------------\n"<<"vk_engine closing!\n";
-}*/
+}

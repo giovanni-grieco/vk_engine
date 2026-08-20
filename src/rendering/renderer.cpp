@@ -23,7 +23,14 @@ namespace engine{
         return frameInfo;
     }
 
-    
+    std::vector<DrawPacket> makeDrawPackets(std::vector<Entity> entities){
+        
+        std::vector<DrawPacket> result;
+        // implementare la logica per creare la model matrix
+        // Prendere transform e utilizzarla per creare una model matrix
+        
+        return result;
+    }    
 
     void Renderer::render(){
         ComponentManager& cm = ComponentManager::getInstance(); 

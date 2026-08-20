@@ -4,18 +4,21 @@
 #include <vector>
 #include "vulkan/vk_device.hpp"
 
-namespace engine{
-    enum class VulkanShaderType{
+namespace engine
+{
+    enum class VulkanShaderType
+    {
         VERTEX,
         FRAGMENT
     };
 
-    class VulkanShader{
-        public:
-            VkDevice device;
-            VkShaderModule shaderModule;
-            VulkanShaderType type;
-            VulkanShader(VulkanDevice& device, const std::vector<char>& code, VulkanShaderType type);
-            ~VulkanShader();
+    class VulkanShader
+    {
+    public:
+        VkDevice device;
+        VkShaderModule shaderModule;
+        VulkanShaderType type;
+        VulkanShader(VulkanDevice &device, const std::vector<char> &code, VulkanShaderType type);
+        ~VulkanShader();
     };
 }

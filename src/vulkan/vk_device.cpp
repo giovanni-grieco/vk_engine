@@ -2,12 +2,14 @@
 
 #include "vk_swap_chain_support_details.hpp"
 
-namespace engine{
+namespace engine
+{
 
-    VulkanDevice::VulkanDevice(VulkanInstance& instance, VulkanSurface& surface, const std::vector<const char *>& deviceExtensions){
-        
+    VulkanDevice::VulkanDevice(VulkanInstance &instance, VulkanSurface &surface, const std::vector<const char *> &deviceExtensions)
+    {
+
         pickPhysicalDevice(instance.instance, surface.surface, deviceExtensions);
-        
+
         engine::VulkanQueueFamilyIndices indices = engine::findQueueFamilies(physicalDevice, surface.surface);
 
         std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
@@ -35,8 +37,8 @@ namespace engine{
 
         createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
         createInfo.ppEnabledExtensionNames = deviceExtensions.data();
-   
-        createInfo.enabledLayerCount=0;
+
+        createInfo.enabledLayerCount = 0;
 
         if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS)
         {
@@ -44,13 +46,15 @@ namespace engine{
         }
     }
 
-    VulkanDevice::~VulkanDevice(){
-        if (device != VK_NULL_HANDLE) {
+    VulkanDevice::~VulkanDevice()
+    {
+        if (device != VK_NULL_HANDLE)
+        {
             vkDestroyDevice(device, nullptr);
         }
     }
 
-    bool checkDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& deviceExtensions)
+    bool checkDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char *> &deviceExtensions)
     {
         uint32_t deviceExtensionCount;
         vkEnumerateDeviceExtensionProperties(device, nullptr, &deviceExtensionCount, nullptr);
@@ -59,8 +63,10 @@ namespace engine{
 
         std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
         std::cout << "Checking:\n";
-        for (const auto& availableExtension : availableDeviceExtensions){
-            if(requiredExtensions.find(availableExtension.extensionName) != requiredExtensions.end()){
+        for (const auto &availableExtension : availableDeviceExtensions)
+        {
+            if (requiredExtensions.find(availableExtension.extensionName) != requiredExtensions.end())
+            {
                 std::cout << "\t" << availableExtension.extensionName << " is supported!\n";
             }
             requiredExtensions.erase(availableExtension.extensionName);
@@ -69,21 +75,20 @@ namespace engine{
         return requiredExtensions.empty();
     }
 
-    bool checkSwapChainSupportDetails(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface){
+    bool checkSwapChainSupportDetails(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface)
+    {
         VulkanSwapChainSupportDetails swapChainSupportDetails = querySwapChainSupport(physicalDevice, surface);
-        //both of them must not be empty
+        // both of them must not be empty
         return !(swapChainSupportDetails.formats.empty() && swapChainSupportDetails.presentModes.empty());
     }
 
-    bool isDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, const std::vector<const char *>& deviceExtensions)
+    bool isDeviceSuitable(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, const std::vector<const char *> &deviceExtensions)
     {
         // TODO
         VkPhysicalDeviceProperties deviceProperties;
         vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
 
-        bool result = engine::findQueueFamilies(physicalDevice, surface).isComplete() 
-        && checkDeviceExtensionSupport(physicalDevice, deviceExtensions)
-        && checkSwapChainSupportDetails(physicalDevice, surface);
+        bool result = engine::findQueueFamilies(physicalDevice, surface).isComplete() && checkDeviceExtensionSupport(physicalDevice, deviceExtensions) && checkSwapChainSupportDetails(physicalDevice, surface);
         if (!result)
         {
             std::cout << "GPU " << deviceProperties.deviceName << " is not suitable!\n";
@@ -95,7 +100,7 @@ namespace engine{
         return result;
     }
 
-    void VulkanDevice::pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface, const std::vector<const char *>& deviceExtensions)
+    void VulkanDevice::pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface, const std::vector<const char *> &deviceExtensions)
     {
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);

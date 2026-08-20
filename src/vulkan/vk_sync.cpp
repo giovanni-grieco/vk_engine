@@ -39,13 +39,16 @@ namespace engine
 
     VulkanSyncObjects::~VulkanSyncObjects()
     {
-        for (size_t i = 0; i<imageAvailableSemaphores.size(); i++){
+        for (size_t i = 0; i < imageAvailableSemaphores.size(); i++)
+        {
             vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
         }
-        for (size_t i = 0; i<renderFinishedSemaphores.size(); i++){
+        for (size_t i = 0; i < renderFinishedSemaphores.size(); i++)
+        {
             vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
         }
-        for (size_t i = 0; i<inFlightFences.size(); i++){
+        for (size_t i = 0; i < inFlightFences.size(); i++)
+        {
             vkDestroyFence(device, inFlightFences[i], nullptr);
         }
     }

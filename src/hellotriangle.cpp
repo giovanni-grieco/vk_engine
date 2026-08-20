@@ -47,11 +47,11 @@ private:
     std::chrono::steady_clock::time_point last = std::chrono::steady_clock::now();
     double avgFps = 0.0;
 
-
-    FrameInfo makeFrameInfo(engine::VulkanSwapChain& swapChain){
+    FrameInfo makeFrameInfo(engine::VulkanSwapChain &swapChain)
+    {
         FrameInfo frameInfo{};
         frameInfo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        frameInfo.projection = glm::perspective(glm::radians(45.0f), swapChain.extent.width / (float) swapChain.extent.height, 0.1f, 10.0f);
+        frameInfo.projection = glm::perspective(glm::radians(45.0f), swapChain.extent.width / (float)swapChain.extent.height, 0.1f, 10.0f);
         frameInfo.projection[1][1] *= -1;
         return frameInfo;
     }
@@ -70,11 +70,10 @@ private:
             double fps = 1.0 / dt;
             avgFps = avgFps == 0.0 ? fps : avgFps * 0.95 + fps * 0.05;
 
-
             FrameInfo frameInfo = makeFrameInfo(vulkanBackend.swapChain);
             vulkanBackend.drawFrame(window, frameInfo);
 
-            std::string title = applicationName + " - FPS: "+ std::to_string(avgFps);
+            std::string title = applicationName + " - FPS: " + std::to_string(avgFps);
             window.setWindowTitle(title);
         }
 

@@ -9,10 +9,10 @@
 namespace engine
 {
 
-    VulkanPipeline::VulkanPipeline(VulkanDevice &device, VulkanSwapChain &swapChain, VulkanPipelineLayout &pipelineLayout, VulkanRenderPass &renderPass, std::vector<std::string>& shaderFilePaths, std::vector<VulkanShaderType>& types)
+    VulkanPipeline::VulkanPipeline(VulkanDevice &device, VulkanSwapChain &swapChain, VulkanPipelineLayout &pipelineLayout, VulkanRenderPass &renderPass, std::vector<std::string> &shaderFilePaths, std::vector<VulkanShaderType> &types)
     {
         this->device = device.device;
-        this->layout=pipelineLayout.pipelineLayout;
+        this->layout = pipelineLayout.pipelineLayout;
         std::vector<std::vector<char>> shaders;
         std::vector<std::unique_ptr<VulkanShader>> shaderModules;
         for (const auto &shaderFilePath : shaderFilePaths)
@@ -28,7 +28,7 @@ namespace engine
         }
 
         std::vector<VkPipelineShaderStageCreateInfo> shaderStagesCreateInfo{};
-        for (int i = 0; i<shaderModules.size() ; i++)
+        for (int i = 0; i < shaderModules.size(); i++)
         {
             VkPipelineShaderStageCreateInfo shaderStageInfo{};
             shaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -41,8 +41,8 @@ namespace engine
                 shaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
             }
 
-            //ERROR ON PURPOSE
-            //shaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+            // ERROR ON PURPOSE
+            // shaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
 
             shaderStageInfo.module = shaderModules[i]->shaderModule;
             shaderStageInfo.pName = "main";
@@ -155,19 +155,21 @@ namespace engine
 
         pipelineInfo.renderPass = renderPass.renderPass;
 
-        pipelineInfo.subpass=0;
+        pipelineInfo.subpass = 0;
 
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
         pipelineInfo.basePipelineIndex = -1;
 
-        if(vkCreateGraphicsPipelines(device.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS){
+        if (vkCreateGraphicsPipelines(device.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS)
+        {
             throw std::runtime_error("failed to create graphics pipeline");
         }
     }
 
     VulkanPipeline::~VulkanPipeline()
     {
-        if(device!=VK_NULL_HANDLE && pipeline!=VK_NULL_HANDLE){
+        if (device != VK_NULL_HANDLE && pipeline != VK_NULL_HANDLE)
+        {
             vkDestroyPipeline(this->device, this->pipeline, nullptr);
             device = VK_NULL_HANDLE;
             pipeline = VK_NULL_HANDLE;

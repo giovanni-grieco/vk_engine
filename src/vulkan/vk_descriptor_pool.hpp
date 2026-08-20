@@ -13,7 +13,7 @@ namespace engine
         VulkanDescriptorPool(VkDevice device, uint32_t maxSets);
         ~VulkanDescriptorPool();
 
-        VulkanDescriptorPool(const VulkanDescriptorPool&) = delete;
-        VulkanDescriptorPool& operator=(const VulkanDescriptorPool&) = delete;
+        VulkanDescriptorPool(const VulkanDescriptorPool &) = delete;
+        VulkanDescriptorPool &operator=(const VulkanDescriptorPool &) = delete;
     };
 }

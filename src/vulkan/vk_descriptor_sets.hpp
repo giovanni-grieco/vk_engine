@@ -15,13 +15,13 @@ namespace engine
     public:
         std::vector<VkDescriptorSet> descriptorSets;
 
-        VulkanDescriptorSets(VulkanDevice& device,
-                             VulkanDescriptorSetLayout& layout,
-                             VulkanDescriptorPool& pool,
-                             VulkanUniformBuffer& uniformBuffer,
+        VulkanDescriptorSets(VulkanDevice &device,
+                             VulkanDescriptorSetLayout &layout,
+                             VulkanDescriptorPool &pool,
+                             VulkanUniformBuffer &uniformBuffer,
                              uint32_t framesInFlight);
 
-        VulkanDescriptorSets(const VulkanDescriptorSets&) = delete;
-        VulkanDescriptorSets& operator=(const VulkanDescriptorSets&) = delete;
+        VulkanDescriptorSets(const VulkanDescriptorSets &) = delete;
+        VulkanDescriptorSets &operator=(const VulkanDescriptorSets &) = delete;
     };
 }

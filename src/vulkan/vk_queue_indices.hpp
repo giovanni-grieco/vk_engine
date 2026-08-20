@@ -4,8 +4,8 @@
 #include <vector>
 #include <optional>
 
-
-namespace engine{
+namespace engine
+{
     struct VulkanQueueFamilyIndices
     {
         std::optional<uint32_t> graphicsFamily;

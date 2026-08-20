@@ -4,7 +4,6 @@
 
 namespace engine
 {
-
     // Per-draw transform, pushed via vkCmdPushConstants.
     struct ModelPushConstant
     {

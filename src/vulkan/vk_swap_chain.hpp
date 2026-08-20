@@ -19,9 +19,10 @@ namespace engine
         VkExtent2D extent;
         VulkanSwapChain(VulkanDevice &device, VulkanSurface &surface, Window &window);
         ~VulkanSwapChain();
-        void recreate(VulkanDevice& device, VulkanSurface& surface, Window& window);
+        void recreate(VulkanDevice &device, VulkanSurface &surface, Window &window);
+
     private:
-        void init(VulkanDevice& device, VulkanSurface& surface, Window& window);
+        void init(VulkanDevice &device, VulkanSurface &surface, Window &window);
         void destroy();
     };
 }

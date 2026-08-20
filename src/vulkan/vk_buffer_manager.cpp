@@ -4,13 +4,13 @@
 
 namespace engine
 {
-    VulkanBufferManager::VulkanBufferManager(VulkanDevice& device, VulkanCommandPool& commandPool, VulkanQueues& queues)
+    VulkanBufferManager::VulkanBufferManager(VulkanDevice &device, VulkanCommandPool &commandPool, VulkanQueues &queues)
         : vertexBuffer_(device, commandPool, queues),
           indexBuffer_(device, commandPool, queues)
     {
     }
 
-    MeshID VulkanBufferManager::addMesh(const Mesh& mesh)
+    MeshID VulkanBufferManager::addMesh(const Mesh &mesh)
     {
         const MeshID id = nextId_++;
         meshes_.emplace(id, mesh);
@@ -20,29 +20,29 @@ namespace engine
         // ahead of the live data when holes exist (removed meshes), which is
         // safe — holes are simply left unused until the next reallocation.
         const uint32_t vertexBase = vertexCount_;
-        const uint32_t indexBase  = indexCount_;
+        const uint32_t indexBase = indexCount_;
 
         const uint32_t newVertexCount = vertexCount_ + static_cast<uint32_t>(mesh.vertices.size());
-        const uint32_t newIndexCount  = indexCount_  + static_cast<uint32_t>(mesh.indices.size());
+        const uint32_t newIndexCount = indexCount_ + static_cast<uint32_t>(mesh.indices.size());
 
         const VkDeviceSize neededVertexBytes = static_cast<VkDeviceSize>(newVertexCount) * sizeof(Vertex);
-        const VkDeviceSize neededIndexBytes  = static_cast<VkDeviceSize>(newIndexCount) * sizeof(uint16_t);
+        const VkDeviceSize neededIndexBytes = static_cast<VkDeviceSize>(newIndexCount) * sizeof(uint16_t);
 
         if (neededVertexBytes > vertexBuffer_.size || neededIndexBytes > indexBuffer_.size)
         {
             // Grow (double the previous capacity) and re-upload everything compactly.
             const VkDeviceSize vertexCapacity = std::max(neededVertexBytes, static_cast<VkDeviceSize>(vertexBuffer_.size * 2));
-            const VkDeviceSize indexCapacity  = std::max(neededIndexBytes,  static_cast<VkDeviceSize>(indexBuffer_.size * 2));
+            const VkDeviceSize indexCapacity = std::max(neededIndexBytes, static_cast<VkDeviceSize>(indexBuffer_.size * 2));
             reallocateAndUpload(vertexCapacity, indexCapacity);
-            std::cout << "telescope increase of Vulkan buffer:\n\t"<< "vertexCapacity: " <<vertexCapacity<<"\n\t"<<"indexCapacity: "<<indexCapacity<<"\n";
+            std::cout << "telescope increase of Vulkan buffer:\n\t" << "vertexCapacity: " << vertexCapacity << "\n\t" << "indexCapacity: " << indexCapacity << "\n";
         }
         else
         {
             // Fits in the existing buffers: just append this mesh.
             MeshDrawInfo info;
             info.vertexOffset = static_cast<int32_t>(vertexBase);
-            info.firstIndex   = indexBase;
-            info.indexCount   = static_cast<uint32_t>(mesh.indices.size());
+            info.firstIndex = indexBase;
+            info.indexCount = static_cast<uint32_t>(mesh.indices.size());
             id2drawInfo_[id] = info;
 
             vertexBuffer_.upload(mesh.vertices.data(),
@@ -53,7 +53,7 @@ namespace engine
                                 static_cast<VkDeviceSize>(indexBase) * sizeof(uint16_t));
 
             vertexCount_ = newVertexCount;
-            indexCount_  = newIndexCount;
+            indexCount_ = newIndexCount;
         }
 
         return id;
@@ -76,12 +76,12 @@ namespace engine
         vkDeviceWaitIdle(vertexBuffer_.device);
 
         VkDeviceSize vertexBytes = 0;
-        VkDeviceSize indexBytes  = 0;
+        VkDeviceSize indexBytes = 0;
         for (MeshID id : meshOrder_)
         {
-            const Mesh& mesh = meshes_.at(id);
+            const Mesh &mesh = meshes_.at(id);
             vertexBytes += static_cast<VkDeviceSize>(mesh.vertices.size()) * sizeof(Vertex);
-            indexBytes  += static_cast<VkDeviceSize>(mesh.indices.size()) * sizeof(uint16_t);
+            indexBytes += static_cast<VkDeviceSize>(mesh.indices.size()) * sizeof(uint16_t);
         }
 
         if (vertexBytes == 0 && indexBytes == 0)
@@ -89,7 +89,7 @@ namespace engine
             vertexBuffer_.destroy();
             indexBuffer_.destroy();
             vertexCount_ = 0;
-            indexCount_  = 0;
+            indexCount_ = 0;
             return;
         }
 
@@ -97,7 +97,7 @@ namespace engine
         reallocateAndUpload(vertexBytes, indexBytes);
     }
 
-    const MeshDrawInfo* VulkanBufferManager::getDrawInfo(MeshID id) const
+    const MeshDrawInfo *VulkanBufferManager::getDrawInfo(MeshID id) const
     {
         const auto it = id2drawInfo_.find(id);
         return it == id2drawInfo_.end() ? nullptr : &it->second;
@@ -112,16 +112,16 @@ namespace engine
         indexBuffer_.create(BufferType::INDEX, indexCapacity);
 
         uint32_t vertexBase = 0;
-        uint32_t indexBase  = 0;
+        uint32_t indexBase = 0;
 
         for (MeshID id : meshOrder_)
         {
-            const Mesh& mesh = meshes_.at(id);
+            const Mesh &mesh = meshes_.at(id);
 
             MeshDrawInfo info;
             info.vertexOffset = static_cast<int32_t>(vertexBase);
-            info.firstIndex   = indexBase;
-            info.indexCount   = static_cast<uint32_t>(mesh.indices.size());
+            info.firstIndex = indexBase;
+            info.indexCount = static_cast<uint32_t>(mesh.indices.size());
             id2drawInfo_[id] = info;
 
             vertexBuffer_.upload(mesh.vertices.data(),
@@ -132,12 +132,11 @@ namespace engine
                                 static_cast<VkDeviceSize>(indexBase) * sizeof(uint16_t));
 
             vertexBase += static_cast<uint32_t>(mesh.vertices.size());
-            indexBase  += static_cast<uint32_t>(mesh.indices.size());
+            indexBase += static_cast<uint32_t>(mesh.indices.size());
         }
 
         // The buffers now hold exactly the live meshes, compactly.
         vertexCount_ = vertexBase;
-        indexCount_  = indexBase;
+        indexCount_ = indexBase;
     }
 }
-

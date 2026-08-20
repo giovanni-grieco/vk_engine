@@ -4,7 +4,8 @@
 #include <vulkan/vulkan.h>
 #include <array>
 
-namespace engine{
+namespace engine
+{
     VkVertexInputBindingDescription getBindingDescription();
     std::array<VkVertexInputAttributeDescription, 2> getAttributeDescription();
 }

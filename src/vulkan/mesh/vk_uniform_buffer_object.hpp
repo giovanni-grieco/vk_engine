@@ -4,7 +4,6 @@
 
 namespace engine
 {
-
     struct UniformBufferObject
     {
         glm::mat4 view;

@@ -2,8 +2,9 @@
 
 #include <stdexcept>
 
-namespace engine{
-    
+namespace engine
+{
+
     VulkanQueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface)
     {
         VulkanQueueFamilyIndices indices;

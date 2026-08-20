@@ -13,50 +13,49 @@
 
 #include <vector>
 
-namespace engine{
-    class VulkanCommandBuffer{
-        public:
-            std::vector<VkCommandBuffer> commandBuffers;
-            VulkanCommandBuffer(int bufferAmount, VulkanDevice& device, VulkanCommandPool& commandPool);
+namespace engine
+{
+    class VulkanCommandBuffer
+    {
+    public:
+        std::vector<VkCommandBuffer> commandBuffers;
+        VulkanCommandBuffer(int bufferAmount, VulkanDevice &device, VulkanCommandPool &commandPool);
 
-            void recordCommandBuffer(
-                uint32_t imageIndex, 
-                uint32_t currentFrame, 
-                VulkanPipeline& pipeline, 
-                VulkanSwapChain& swapChain, 
-                VulkanRenderPass& renderPass, 
-                VulkanFramebuffers& frameBuffers, 
-                VulkanBuffer& vertexBuffer, 
-                uint32_t vertexCount,
-                VulkanDescriptorSets& descriptorSets
-            );
+        void recordCommandBuffer(
+            uint32_t imageIndex,
+            uint32_t currentFrame,
+            VulkanPipeline &pipeline,
+            VulkanSwapChain &swapChain,
+            VulkanRenderPass &renderPass,
+            VulkanFramebuffers &frameBuffers,
+            VulkanBuffer &vertexBuffer,
+            uint32_t vertexCount,
+            VulkanDescriptorSets &descriptorSets);
 
-            void recordCommandBuffer(
-                uint32_t imageIndex, 
-                uint32_t currentFrame, 
-                VulkanPipeline& pipeline, 
-                VulkanSwapChain& swapChain, 
-                VulkanRenderPass& renderPass, 
-                VulkanFramebuffers& frameBuffers, 
-                VulkanBuffer& vertexBuffer, 
-                VulkanBuffer& indexBuffer, 
-                uint32_t indexSize,
-                VulkanDescriptorSets& descriptorSets
-            );
+        void recordCommandBuffer(
+            uint32_t imageIndex,
+            uint32_t currentFrame,
+            VulkanPipeline &pipeline,
+            VulkanSwapChain &swapChain,
+            VulkanRenderPass &renderPass,
+            VulkanFramebuffers &frameBuffers,
+            VulkanBuffer &vertexBuffer,
+            VulkanBuffer &indexBuffer,
+            uint32_t indexSize,
+            VulkanDescriptorSets &descriptorSets);
 
-            // Batched draw: binds the unified buffers once and issues one
-            // vkCmdDrawIndexed per DrawPacket, pushing its model matrix.
-            void recordCommandBuffer(
-                uint32_t imageIndex, 
-                uint32_t currentFrame, 
-                VulkanPipeline& pipeline, 
-                VulkanSwapChain& swapChain, 
-                VulkanRenderPass& renderPass, 
-                VulkanFramebuffers& frameBuffers, 
-                VulkanBufferManager& bufferManager, 
-                const std::vector<DrawPacket>& drawPackets,
-                VulkanDescriptorSets& descriptorSets
-            );
-        };
+        // Batched draw: binds the unified buffers once and issues one
+        // vkCmdDrawIndexed per DrawPacket, pushing its model matrix.
+        void recordCommandBuffer(
+            uint32_t imageIndex,
+            uint32_t currentFrame,
+            VulkanPipeline &pipeline,
+            VulkanSwapChain &swapChain,
+            VulkanRenderPass &renderPass,
+            VulkanFramebuffers &frameBuffers,
+            VulkanBufferManager &bufferManager,
+            const std::vector<DrawPacket> &drawPackets,
+            VulkanDescriptorSets &descriptorSets);
+    };
 
 }

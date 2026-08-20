@@ -6,16 +6,19 @@
 #include "vk_device.hpp"
 #include "vk_render_pass.hpp"
 
-namespace engine{
-    class VulkanFramebuffers{
-        public:
-            VkDevice device;
-            std::vector<VkFramebuffer> frameBuffers;
-            VulkanFramebuffers(VulkanDevice& device, VulkanSwapChain& swapChain, VulkanRenderPass& renderPass);
-            ~VulkanFramebuffers();
-            void recreate(VulkanDevice& device, VulkanSwapChain& swapChain, VulkanRenderPass& renderPass);
-        private:
-            void init(VulkanDevice& device, VulkanSwapChain& swapChain, VulkanRenderPass& renderPass);
-            void destroy();
+namespace engine
+{
+    class VulkanFramebuffers
+    {
+    public:
+        VkDevice device;
+        std::vector<VkFramebuffer> frameBuffers;
+        VulkanFramebuffers(VulkanDevice &device, VulkanSwapChain &swapChain, VulkanRenderPass &renderPass);
+        ~VulkanFramebuffers();
+        void recreate(VulkanDevice &device, VulkanSwapChain &swapChain, VulkanRenderPass &renderPass);
+
+    private:
+        void init(VulkanDevice &device, VulkanSwapChain &swapChain, VulkanRenderPass &renderPass);
+        void destroy();
     };
 }

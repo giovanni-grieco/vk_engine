@@ -1,6 +1,7 @@
 #include "vk_instance.hpp"
 
-namespace engine{
+namespace engine
+{
 
     void checkExtensionSupport(uint32_t glfwExtensionCount, uint32_t vkExtensionCount, const char **glfwExtensions, std::vector<VkExtensionProperties> &vkExtensions)
     {
@@ -38,7 +39,8 @@ namespace engine{
         std::cout << "------------------\n";
     }
 
-    VulkanInstance::VulkanInstance(std::string applicationName, Window& window, bool enableValidationLayers, const std::vector<const char*>& validationLayers){
+    VulkanInstance::VulkanInstance(std::string applicationName, Window &window, bool enableValidationLayers, const std::vector<const char *> &validationLayers)
+    {
         std::cout << "Enable validation layers: \t " << enableValidationLayers << "\n";
         std::cout << "Check validation layer support:  " << checkValidationLayerSupport(validationLayers) << "\n";
         if (enableValidationLayers && !checkValidationLayerSupport(validationLayers))
@@ -69,7 +71,7 @@ namespace engine{
 
         std::vector<const char *> requiredExtensions = window.getRequiredExtensions();
 
-        std::cout << "Required extensions:"<<requiredExtensions.size() << "\n";
+        std::cout << "Required extensions:" << requiredExtensions.size() << "\n";
         for (int i = 0; i < requiredExtensions.size(); i++)
         {
             std::cout << "\t" << requiredExtensions[i] << "\n";
@@ -77,7 +79,7 @@ namespace engine{
 
         createInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
         createInfo.ppEnabledExtensionNames = requiredExtensions.data();
-        
+
         VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
         if (result != VK_SUCCESS)
         {
@@ -98,13 +100,15 @@ namespace engine{
         checkExtensionSupport(static_cast<uint32_t>(requiredExtensions.size()), extensionCount, requiredExtensions.data(), extensions);
     }
 
-    VulkanInstance::~VulkanInstance(){
-        if(instance != VK_NULL_HANDLE){
+    VulkanInstance::~VulkanInstance()
+    {
+        if (instance != VK_NULL_HANDLE)
+        {
             vkDestroyInstance(instance, nullptr);
         }
     }
 
-    bool VulkanInstance::checkValidationLayerSupport(const std::vector<const char*>& validationLayers)
+    bool VulkanInstance::checkValidationLayerSupport(const std::vector<const char *> &validationLayers)
     {
         uint32_t layerCount;
         vkEnumerateInstanceLayerProperties(&layerCount, nullptr);

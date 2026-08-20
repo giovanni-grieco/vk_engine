@@ -12,7 +12,8 @@ namespace engine
         destroy();
     }
 
-    void VulkanDescriptorSetLayout::init(VkDevice device){
+    void VulkanDescriptorSetLayout::init(VkDevice device)
+    {
         this->device = device;
         VkDescriptorSetLayoutBinding uboLayoutBinding{};
         uboLayoutBinding.binding = 0;
@@ -32,8 +33,10 @@ namespace engine
         }
     }
 
-    void VulkanDescriptorSetLayout::destroy(){
-        if(device != VK_NULL_HANDLE && layout != VK_NULL_HANDLE){
+    void VulkanDescriptorSetLayout::destroy()
+    {
+        if (device != VK_NULL_HANDLE && layout != VK_NULL_HANDLE)
+        {
             vkDestroyDescriptorSetLayout(device, layout, nullptr);
             device = VK_NULL_HANDLE;
             layout = VK_NULL_HANDLE;

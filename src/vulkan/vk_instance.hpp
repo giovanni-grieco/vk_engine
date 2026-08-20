@@ -13,15 +13,14 @@
 namespace engine
 {
 
-
     class VulkanInstance
     {
     public:
         VkInstance instance;
-        VulkanInstance(std::string applicationName, Window& window, bool enableValidationLayers, const std::vector<const char*>& validationLayers);
+        VulkanInstance(std::string applicationName, Window &window, bool enableValidationLayers, const std::vector<const char *> &validationLayers);
         ~VulkanInstance();
-        
+
     private:
-        bool checkValidationLayerSupport(const std::vector<const char*>& validationLayers);
+        bool checkValidationLayerSupport(const std::vector<const char *> &validationLayers);
     };
 }

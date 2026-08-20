@@ -42,7 +42,7 @@ namespace engine
         meshTriangle1 = bufferManager.addMesh(triangle1Mesh);
         meshTriangle2 = bufferManager.addMesh(triangle2Mesh);
         meshTriangle3 = bufferManager.addMesh(triangle3Mesh);
-        meshQuad      = bufferManager.addMesh(quadMesh);
+        meshQuad = bufferManager.addMesh(quadMesh);
     }
 
     MeshID VulkanBackend::addMesh(const Mesh &mesh)
@@ -75,11 +75,12 @@ namespace engine
         uniformBuffer.update(currentFrame, &ubo, sizeof(UniformBufferObject));
     }*/
 
-    void VulkanBackend::updateUbo(uint32_t currentFrameIndex, UniformBufferObject& ubo){
+    void VulkanBackend::updateUbo(uint32_t currentFrameIndex, UniformBufferObject &ubo)
+    {
         uniformBuffer.update(currentFrameIndex, &ubo, sizeof(UniformBufferObject));
     }
 
-    void VulkanBackend::drawFrame(Window &window, FrameInfo& frameInfo)
+    void VulkanBackend::drawFrame(Window &window, FrameInfo &frameInfo)
     {
         vkWaitForFences(device.device, 1, &sync.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
@@ -99,9 +100,9 @@ namespace engine
         vkResetFences(device.device, 1, &sync.inFlightFences[currentFrame]);
 
         vkResetCommandBuffer(commandBuffer.commandBuffers[currentFrame], 0);
-        //updateUbo(currentFrame);
+        // updateUbo(currentFrame);
 
-        UniformBufferObject ubo {frameInfo.view, frameInfo.projection};
+        UniformBufferObject ubo{frameInfo.view, frameInfo.projection};
         updateUbo(currentFrame, ubo);
 
         // Use the application's draw packets if any were submitted; otherwise
@@ -118,7 +119,7 @@ namespace engine
                 {meshTriangle1, glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, 0.0f, 0.0f))},
                 {meshTriangle2, spin},
                 {meshTriangle3, glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.0f, 0.0f))},
-                {meshQuad,      glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.5f, 0.0f))},
+                {meshQuad, glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.5f, 0.0f))},
             };
         }
 
@@ -131,8 +132,7 @@ namespace engine
             frameBuffers,
             bufferManager,
             drawPackets,
-            descriptorSets
-        );
+            descriptorSets);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

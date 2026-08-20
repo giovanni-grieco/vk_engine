@@ -12,14 +12,14 @@
 
 namespace engine{
 
-    Renderer::Renderer(VulkanBackend* vulkanBackend){
-        this->vulkanBackend = vulkanBackend;
-    }
+    Renderer::Renderer(Window& window, VulkanBackend& vulkanBackend)
+        : window(window), vulkan(vulkanBackend)
+    {}
 
     FrameInfo Renderer::frameInfoFromCamera(CameraComponent& camera){
         FrameInfo frameInfo{};
         frameInfo.view = glm::lookAt(camera.position, camera.forward, camera.up);
-        frameInfo.projection = glm::perspective(glm::radians(camera.fov), (vulkanBackend->swapChain.extent.width) / (float) (vulkanBackend->swapChain.extent.height), camera.nearPlane, camera.farPlane);
+        frameInfo.projection = glm::perspective(glm::radians(camera.fov), (vulkan.swapChain.extent.width) / (float) (vulkan.swapChain.extent.height), camera.nearPlane, camera.farPlane);
         return frameInfo;
     }
 
@@ -28,7 +28,7 @@ namespace engine{
         std::vector<DrawPacket> result;
         // implementare la logica per creare la model matrix
         // Prendere transform e utilizzarla per creare una model matrix
-        
+
         return result;
     }    
 
@@ -37,6 +37,6 @@ namespace engine{
         std::vector<Entity> entities = cm.getEntitiesWithComponent<MeshComponent>();
         CameraComponent camera = cm.getComponent<CameraComponent>(cm.getEntitiesWithComponent<CameraComponent>()[0]);
         FrameInfo frameInfo = frameInfoFromCamera(camera);
-
+        vulkan.drawFrame(window, frameInfo);
     }
 }

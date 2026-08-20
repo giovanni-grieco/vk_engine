@@ -93,7 +93,6 @@ namespace engine
     private:
         std::vector<DrawPacket> drawPackets_;
 
-        // void updateUbo(uint32_t currentFrameIndex);
 
         void updateUbo(uint32_t currentFrameIndex, UniformBufferObject &ubo);
     };

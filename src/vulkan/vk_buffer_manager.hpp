@@ -40,6 +40,8 @@ namespace engine
     private:
         void reallocateAndUpload(VkDeviceSize vertexCapacity, VkDeviceSize indexCapacity);
 
+        void allocate(VkDeviceSize vertexCapacity, VkDeviceSize indexCapacity);
+
         VulkanBuffer vertexBuffer_;
         VulkanBuffer indexBuffer_;
 

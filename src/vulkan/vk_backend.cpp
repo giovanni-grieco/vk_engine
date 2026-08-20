@@ -65,16 +65,6 @@ namespace engine
         bufferManager.compact();
     }
 
-    /*void VulkanBackend::updateUbo(uint32_t currentFrame)
-    {
-        UniformBufferObject ubo{};
-        ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        ubo.proj = glm::perspective(glm::radians(45.0f), swapChain.extent.width / (float) swapChain.extent.height, 0.1f, 10.0f);
-        ubo.proj[1][1] *= -1;
-
-        uniformBuffer.update(currentFrame, &ubo, sizeof(UniformBufferObject));
-    }*/
-
     void VulkanBackend::updateUbo(uint32_t currentFrameIndex, UniformBufferObject &ubo)
     {
         uniformBuffer.update(currentFrameIndex, &ubo, sizeof(UniformBufferObject));
@@ -190,9 +180,7 @@ namespace engine
 
     void VulkanBackend::recreateSwapChain(Window &window)
     {
-
         waitForIdle();
-
         swapChain.recreate(device, surface, window);
         frameBuffers.recreate(device, swapChain, renderPass);
     }

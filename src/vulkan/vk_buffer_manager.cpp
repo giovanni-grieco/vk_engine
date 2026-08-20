@@ -8,6 +8,7 @@ namespace engine
         : vertexBuffer_(device, commandPool, queues),
           indexBuffer_(device, commandPool, queues)
     {
+        allocate(2048, 256);
     }
 
     MeshID VulkanBufferManager::addMesh(const Mesh &mesh)
@@ -34,7 +35,7 @@ namespace engine
             const VkDeviceSize vertexCapacity = std::max(neededVertexBytes, static_cast<VkDeviceSize>(vertexBuffer_.size * 2));
             const VkDeviceSize indexCapacity = std::max(neededIndexBytes, static_cast<VkDeviceSize>(indexBuffer_.size * 2));
             reallocateAndUpload(vertexCapacity, indexCapacity);
-            std::cout << "telescope increase of Vulkan buffer:\n\t" << "vertexCapacity: " << vertexCapacity << "\n\t" << "indexCapacity: " << indexCapacity << "\n";
+            std::cout << "telescope increase of Vulkan buffer:\n\t" << "vertexCapacity bytes: " << vertexCapacity << "\n\t" << "indexCapacity bytes: " << indexCapacity << "\n";
         }
         else
         {
@@ -101,6 +102,12 @@ namespace engine
     {
         const auto it = id2drawInfo_.find(id);
         return it == id2drawInfo_.end() ? nullptr : &it->second;
+    }
+
+    void VulkanBufferManager::allocate(VkDeviceSize vertexCapacity, VkDeviceSize indexCapacity)
+    {
+        vertexBuffer_.create(BufferType::VERTEX, vertexCapacity);
+        indexBuffer_.create(BufferType::INDEX, indexCapacity);
     }
 
     void VulkanBufferManager::reallocateAndUpload(VkDeviceSize vertexCapacity, VkDeviceSize indexCapacity)

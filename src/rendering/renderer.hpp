@@ -17,5 +17,7 @@ namespace engine
     private:
         Window &window;
         VulkanBackend &vulkan;
+
+        FrameInfo demoFrameInfo();
     };
 }

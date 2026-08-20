@@ -27,5 +27,6 @@ namespace engine
 
             bool shouldWindowClose();
             void setWindowTitle(std::string title);
+            void pollEvents();
     };
 }

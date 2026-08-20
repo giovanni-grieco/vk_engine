@@ -16,6 +16,15 @@ namespace engine
     {
     }
 
+    FrameInfo Renderer::demoFrameInfo()
+    {
+        FrameInfo frameInfo{};
+        frameInfo.view = glm::lookAt(glm::vec3(0.0f, 3.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        frameInfo.projection = glm::perspective(glm::radians(45.0f), vulkan.swapChain.extent.width / (float)vulkan.swapChain.extent.height, 0.1f, 10.0f);
+        frameInfo.projection[1][1] *= -1;
+        return frameInfo;
+    }
+
     FrameInfo Renderer::frameInfoFromCamera(CameraComponent &camera)
     {
         FrameInfo frameInfo{};
@@ -53,13 +62,21 @@ namespace engine
     }
 
     void Renderer::render()
-    {
+    {   
         ComponentManager &cm = ComponentManager::getInstance();
-        CameraComponent camera = cm.getComponent<CameraComponent>(cm.getEntitiesWithComponent<CameraComponent>()[0]);
-        FrameInfo frameInfo = frameInfoFromCamera(camera);
-        std::vector<DrawPacket> drawPackets = makeDrawPackets();
+        auto cameras = cm.getEntitiesWithComponent<CameraComponent>();
 
-        vulkan.submitDrawPackets(drawPackets);
+        FrameInfo frameInfo;
+
+        if(!cameras.empty()){
+            auto camera = cm.getComponent<CameraComponent>(cameras[0]);
+            frameInfo = frameInfoFromCamera(camera);
+            std::vector<DrawPacket> drawPackets = makeDrawPackets();
+            vulkan.submitDrawPackets(drawPackets);
+        }else{
+            frameInfo = demoFrameInfo();
+        }
+
         vulkan.drawFrame(window, frameInfo);
     }
 }

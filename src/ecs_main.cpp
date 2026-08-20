@@ -1,63 +1,77 @@
-#include "ecs/components/transform.hpp"
-#include "ecs/components/car.hpp"
 #include "ecs/component_manager.hpp"
 #include "ecs/entity_manager.hpp"
 #include "ecs/system_manager.hpp"
-#include "ecs/systems/translator_system.hpp"
-#include "ecs/systems/debugger_system.hpp"
-#include "ecs/systems/car_system.hpp"
+
+#include "ecs/components/transform.hpp"
+#include "ecs/components/mesh.hpp"
+#include "ecs/components/camera.hpp"
+
+#include "ecs/systems/camera_system.hpp"
+
+#include "time/engine_time.hpp"
+
+#include "rendering/renderer.hpp"
+#include "platform/window.hpp"
+#include "vulkan/vk_backend.hpp"
 
 #include <memory>
 
 using namespace engine;
 
+void initComponents(){
+    ComponentManager &cm = ComponentManager::getInstance();
+
+    cm.registerComponent<TransformComponent>();
+    cm.registerComponent<MeshComponent>();
+    cm.registerComponent<CameraComponent>();
+}
+
+void initSystems(){
+    SystemManager &sm = SystemManager::getInstance();
+
+    sm.registerSystem(std::make_unique<CameraSystem>(0.3f));
+
+    sm.start();
+}
 
 int main()
-{   
-    std::cout<<"vk_engine started!\n" << "-----------------\n";
+{
+    const int width = 800;
+    const int height = 600;
+    const bool validationLayer = true;
+    const std::string applicationName = "VK Engine";
+    const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
-    EntityManager& entityManager = EntityManager::getInstance();
-    ComponentManager& componentManager = ComponentManager::getInstance();
-    SystemManager& systemManager = SystemManager::getInstance();
+    const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    const std::vector<std::string> shadersFilePaths = {"shaders/triangle.vert.spv", "shaders/triangle.frag.spv"};
+    const std::vector<engine::VulkanShaderType> shaderTypes = {engine::VulkanShaderType::VERTEX, engine::VulkanShaderType::FRAGMENT};
 
-    componentManager.registerComponent<TransformComponent>();
-    componentManager.registerComponent<CarComponent>();
 
-    bool debuggerEnableFlag = true;
+    std::cout << "vk_engine started!\n"
+              << "-----------------\n";
 
-    float translatorSpeed = 0.1473;
+    Window window{width, height, applicationName};
 
-    systemManager.registerSystem(std::make_unique<Debugger>(debuggerEnableFlag));
-    systemManager.registerSystem(std::make_unique<Translator>(translatorSpeed));
-    systemManager.registerSystem(std::make_unique<CarSystem>());
+    VulkanBackend backend{applicationName, validationLayer, validationLayers, deviceExtensions, shadersFilePaths, shaderTypes, window};
 
-    Entity e = entityManager.createEntity();
-    std::cout<<"e: "<<e<<"\n";
-    Entity e1 = entityManager.createEntity();
-    std::cout<<"e1: "<<e1<<"\n";
-    TransformComponent t {{50.f, 50.f, 50.f}, {0.f, 0.f, 0.f}};
+    Renderer renderer{window, backend};
 
-    componentManager.addComponent<TransformComponent>(e, t);
+    EntityManager &em = EntityManager::getInstance();
+    ComponentManager &cm = ComponentManager::getInstance();
+    SystemManager &sm = SystemManager::getInstance();
 
-    systemManager.start();
+    initComponents();
+    initSystems();
 
-    for(int i = 0; i<5; i++){
-        systemManager.update();
+    while (!window.shouldWindowClose())
+    {   
+        window.pollEvents();
+        EngineTime::getInstance().beginFrame();
+        sm.update();
+        renderer.render();
     }
+    backend.waitForIdle();
 
-    entityManager.destroyEntity(e);
-    Entity e2 = entityManager.createEntity();
-    CarComponent car {"Ford", "Mustang", 1977};
-    componentManager.addComponent<CarComponent>(e2, car);
-    std::cout<<"e2: "<<e2<<"\n";
-
-    
-
-    for(int i = 0; i<5; i++){
-        systemManager.update();
-    }
-
-
-
-    std::cout<< "-----------------\n"<<"vk_engine closing!\n";
+    std::cout << "-----------------\n"
+              << "vk_engine closing!\n";
 }

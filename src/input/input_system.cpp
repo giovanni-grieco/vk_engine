@@ -1,5 +1,6 @@
 // input.cpp
 #include "input_system.hpp"
+#include <iostream>
 
 namespace engine
 {
@@ -10,6 +11,11 @@ namespace engine
     {
         if (key >= 0 && key <= GLFW_KEY_LAST)
             keys_[key] = down;
+        
+        if (down)
+            std::cout<<"pressed key: "<< key<<"\n";
+        else
+            std::cout<<"released key: "<< key<<"\n";
     }
 
     void Input::onMouseButton(int button, bool down)

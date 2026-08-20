@@ -65,7 +65,7 @@ namespace engine
         bufferManager.compact();
     }
 
-    void VulkanBackend::updateUbo(uint32_t currentFrame)
+    /*void VulkanBackend::updateUbo(uint32_t currentFrame)
     {
         UniformBufferObject ubo{};
         ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -73,9 +73,13 @@ namespace engine
         ubo.proj[1][1] *= -1;
 
         uniformBuffer.update(currentFrame, &ubo, sizeof(UniformBufferObject));
+    }*/
+
+    void VulkanBackend::updateUbo(uint32_t currentFrameIndex, UniformBufferObject& ubo){
+        uniformBuffer.update(currentFrameIndex, &ubo, sizeof(UniformBufferObject));
     }
 
-    void VulkanBackend::drawFrame(Window &window)
+    void VulkanBackend::drawFrame(Window &window, FrameInfo& frameInfo)
     {
         vkWaitForFences(device.device, 1, &sync.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
@@ -95,7 +99,10 @@ namespace engine
         vkResetFences(device.device, 1, &sync.inFlightFences[currentFrame]);
 
         vkResetCommandBuffer(commandBuffer.commandBuffers[currentFrame], 0);
-        updateUbo(currentFrame);
+        //updateUbo(currentFrame);
+
+        UniformBufferObject ubo {frameInfo.view, frameInfo.projection};
+        updateUbo(currentFrame, ubo);
 
         // Use the application's draw packets if any were submitted; otherwise
         // render the default demo scene.

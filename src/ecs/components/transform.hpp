@@ -7,8 +7,8 @@
 namespace engine{
     struct TransformComponent{
 
-        glm::vec3 position;
-        glm::vec3 rotation;
+        glm::vec3 position{};
+        glm::vec3 rotation{};
 
         void dump(){
             std::cout << "Transform: \n";

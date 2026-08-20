@@ -1,6 +1,7 @@
 #pragma once
 
 #include "platform/window.hpp"
+#include "rendering/frame_info.hpp"
 
 #include "vk_instance.hpp"
 #include "vk_device.hpp"
@@ -20,6 +21,7 @@
 #include "vk_descriptor_pool.hpp"  
 #include "vk_descriptor_sets.hpp"   
 #include "vk_uniform_buffer.hpp"
+#include "mesh/vk_uniform_buffer_object.hpp"
 
 #include <vector>
 
@@ -69,7 +71,8 @@ namespace engine
             VulkanBackend(VulkanBackend &&other) = delete;
             VulkanBackend &operator=(VulkanBackend &&other) = delete;
 
-            void drawFrame(Window &window);
+            //void drawFrame(Window &window);
+            void drawFrame(Window& window, FrameInfo& frameInfo);
             void waitForIdle();
 
             // Top-down API: register CPU mesh data and get a handle back.
@@ -91,6 +94,8 @@ namespace engine
         private:
             std::vector<DrawPacket> drawPackets_;
 
-            void updateUbo(uint32_t currentFrameIndex);
+            //void updateUbo(uint32_t currentFrameIndex);
+
+            void updateUbo(uint32_t currentFrameIndex, UniformBufferObject& ubo);
     };
 }

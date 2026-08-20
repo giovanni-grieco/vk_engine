@@ -6,5 +6,5 @@ struct CarComponent
 {
     std::string manufacturer;
     std::string modelName;
-    int year;
+    int year{};
 };

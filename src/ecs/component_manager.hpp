@@ -16,12 +16,7 @@ namespace engine
     {
     public:
 
-        static ComponentManager& getInstance(){
-            if (instance == nullptr){
-                instance = std::unique_ptr<ComponentManager>(std::make_unique<ComponentManager>());
-            }
-            return *instance;
-        }
+        static ComponentManager& getInstance();
 
         ComponentManager() = default;
 

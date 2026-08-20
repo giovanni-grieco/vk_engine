@@ -10,7 +10,8 @@ namespace engine
     class Input
     {
     public:
-        static Input& getInstance()
+
+        static Input &getInstance()
         {
             if (instance == nullptr)
             {
@@ -18,6 +19,8 @@ namespace engine
             }
             return *instance;
         }
+
+        Input() = default;
 
         // Called by GLFW callbacks (thread-safe enough: same thread as glfwPollEvents)
         void onKey(int key, bool down);
@@ -33,18 +36,15 @@ namespace engine
         bool isMouseDown(int button) const;
 
         // Edge detection (this-frame transitions)
-        bool isKeyPressed(int key) const;   // rising edge
-        bool isKeyReleased(int key) const;  // falling edge
+        bool isKeyPressed(int key) const;  // rising edge
+        bool isKeyReleased(int key) const; // falling edge
 
         glm::vec2 mousePosition() const;
-        glm::vec2 mouseDelta() const;       // per-frame movement
+        glm::vec2 mouseDelta() const; // per-frame movement
         glm::vec2 scrollDelta() const;
 
     private:
-
         static std::unique_ptr<Input> instance;
-
-        Input() = default;
 
         std::array<bool, GLFW_KEY_LAST + 1> keys_{};
         std::array<bool, GLFW_KEY_LAST + 1> prevKeys_{};

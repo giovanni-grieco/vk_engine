@@ -38,26 +38,26 @@ namespace engine
 
         if(input.isKeyPressed(65)){
             //go left
-            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, worldUp));
+            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
             cameraComponent.position -= right * translationSpeed * dt;
         }
 
         if(input.isKeyPressed(68)){
             //go right
-            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, worldUp));
+            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
             cameraComponent.position += right * translationSpeed * dt;
         }
 
 
         if(input.isKeyPressed(81)){
             //go up
-            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, worldUp));
+            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
             glm::vec3 up = glm::normalize(glm::cross(right, cameraComponent.forward));
             cameraComponent.position += up * translationSpeed * dt;
         }
         
         if(input.isKeyPressed(69)){
-            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, worldUp));
+            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
             glm::vec3 up = glm::normalize(glm::cross(right, cameraComponent.forward));
             cameraComponent.position -= up * translationSpeed * dt;
         }

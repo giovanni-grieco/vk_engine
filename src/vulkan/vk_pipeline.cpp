@@ -1,7 +1,7 @@
 #include "vk_pipeline.hpp"
 #include "vk_pipeline_layout.hpp"
 #include "vk_shader.hpp"
-#include "util/utils.hpp"
+#include "utils/files.hpp"
 #include "mesh/vk_vertex.hpp"
 
 #include <memory>

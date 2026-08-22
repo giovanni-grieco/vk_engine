@@ -4,6 +4,7 @@
 #include "ecs/components/camera.hpp"
 #include "input/input_system.hpp"
 #include "time/engine_time.hpp"
+#include "utils/angles.hpp"
 
 #include <glm/glm.hpp>
 
@@ -36,47 +37,68 @@ namespace engine
         }
 
         if(input.isKeyPressed(65)){
-            //The vector obtained via cross product of up and forward
-            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
+            //go left
+            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, worldUp));
             cameraComponent.position -= right * translationSpeed * dt;
         }
 
         if(input.isKeyPressed(68)){
             //go right
-            //std::cout<<"Camera right\n";
-            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
+            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, worldUp));
             cameraComponent.position += right * translationSpeed * dt;
         }
 
 
         if(input.isKeyPressed(81)){
             //go up
-            glm::vec3 up = cameraComponent.up;
+            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, worldUp));
+            glm::vec3 up = glm::normalize(glm::cross(right, cameraComponent.forward));
             cameraComponent.position += up * translationSpeed * dt;
         }
         
         if(input.isKeyPressed(69)){
-            glm::vec3 up = cameraComponent.up;
+            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, worldUp));
+            glm::vec3 up = glm::normalize(glm::cross(right, cameraComponent.forward));
             cameraComponent.position -= up * translationSpeed * dt;
         }
 
+        // Rotation amount for this frame, in degrees.
+        const float angle = angularSpeed * dt;
 
-        if(input.isKeyPressed(265)){
-            //camera rotate up
-            std::cout<<"Camera rotate up\n";
+        // Camera right vector, recomputed every frame from the current basis.
+        const glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
+
+        // Artificial clamp: keep forward within 1..179 degrees of the FIXED world
+        // up (i.e. pitch within +/-89 of horizontal) so `right` never degenerates.
+        constexpr float kMinAngleToWorldUp = 1.0f;
+        constexpr float kMaxAngleToWorldUp = 179.0f;
+
+        if(input.isKeyPressed(265)){ // pitch up: rotate the whole basis around `right`
+            const glm::vec3 candidate = rotateVector(cameraComponent.forward, right, angle);
+            if (angleBetween(candidate, worldUp) >= kMinAngleToWorldUp)
+            {
+                cameraComponent.forward = candidate;
+                cameraComponent.up = rotateVector(cameraComponent.up, right, angle);
+            }
         }
 
-        if(input.isKeyPressed(262)){
-            //camera rotate right
-            std::cout<<"Camera rotate right\n";
+        if(input.isKeyPressed(264)){ // pitch down
+            const glm::vec3 candidate = rotateVector(cameraComponent.forward, right, -angle);
+            if (angleBetween(candidate, worldUp) <= kMaxAngleToWorldUp)
+            {
+                cameraComponent.forward = candidate;
+                cameraComponent.up = rotateVector(cameraComponent.up, right, -angle);
+            }
         }
 
-        if(input.isKeyPressed(264)){
-            std::cout<<"Camera rotate down\n";
+        if(input.isKeyPressed(262)){ // yaw right: rotate the whole basis around world up
+            cameraComponent.forward = rotateVector(cameraComponent.forward, worldUp, -angle);
+            cameraComponent.up = rotateVector(cameraComponent.up, worldUp, -angle);
         }
 
-        if(input.isKeyPressed(263)){
-            std::cout<<"Camera rotate left\n";
+        if(input.isKeyPressed(263)){ // yaw left
+            cameraComponent.forward = rotateVector(cameraComponent.forward, worldUp, angle);
+            cameraComponent.up = rotateVector(cameraComponent.up, worldUp, angle);
         }
 
     }

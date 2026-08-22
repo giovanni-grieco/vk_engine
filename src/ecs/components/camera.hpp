@@ -4,7 +4,7 @@
 
 namespace engine
 {
-    
+    const glm::vec3 worldUp {0.0f, 1.0f, 0.0f};
     struct CameraComponent
     {
         glm::vec3 position{0.0f, 0.0f, 2.0f};

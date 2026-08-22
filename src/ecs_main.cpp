@@ -7,6 +7,7 @@
 #include "ecs/components/camera.hpp"
 
 #include "ecs/systems/camera_system.hpp"
+#include "ecs/systems/translator_system.hpp"
 
 #include "time/engine_time.hpp"
 
@@ -18,18 +19,24 @@
 
 using namespace engine;
 
-void initComponents(){
+void init(){
+    EntityManager &em = EntityManager::getInstance();
     ComponentManager &cm = ComponentManager::getInstance();
+    SystemManager &sm = SystemManager::getInstance();
+
+    sm.registerSystem(std::make_unique<CameraSystem>(1.0f, 1.0f));
+    //sm.registerSystem(std::make_unique<Translator>(0.3f));
+
+
 
     cm.registerComponent<TransformComponent>();
     cm.registerComponent<MeshComponent>();
     cm.registerComponent<CameraComponent>();
-}
+    Entity camera = em.createEntity();
 
-void initSystems(){
-    SystemManager &sm = SystemManager::getInstance();
+    cm.addComponent<CameraComponent>(camera, CameraComponent{});
 
-    sm.registerSystem(std::make_unique<CameraSystem>(0.3f));
+
 
     sm.start();
 }
@@ -60,8 +67,7 @@ int main()
     ComponentManager &cm = ComponentManager::getInstance();
     SystemManager &sm = SystemManager::getInstance();
 
-    initComponents();
-    initSystems();
+    init();
 
     while (!window.shouldWindowClose())
     {   

@@ -14,7 +14,7 @@ namespace engine{
 
     void Translator::update(){
         for (TransformComponent& transform : ComponentManager::getInstance().getComponentArray<TransformComponent>().getComponents()){
-            transform.position.x = transform.position.x + speed;
+            transform.position.x = transform.position.y - speed;
         }
     }
 }

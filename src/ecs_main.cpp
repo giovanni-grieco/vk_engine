@@ -24,7 +24,7 @@ void init(){
     ComponentManager &cm = ComponentManager::getInstance();
     SystemManager &sm = SystemManager::getInstance();
 
-    sm.registerSystem(std::make_unique<CameraSystem>(1.0f, 20.0f));
+    sm.registerSystem(std::make_unique<CameraSystem>(5.0f, 50.0f));
     //sm.registerSystem(std::make_unique<Translator>(0.3f));
 
 

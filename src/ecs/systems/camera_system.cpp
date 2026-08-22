@@ -25,38 +25,43 @@ namespace engine
         ComponentManager &cm = ComponentManager::getInstance();
 
         CameraComponent &cameraComponent = cm.getComponent<CameraComponent>(camera);
-        Input& input = Input::getInstance();
+        Input &input = Input::getInstance();
 
         float dt = EngineTime::getInstance().deltaTime();
 
-        if (input.isKeyPressed(87)){
+        if (input.isKeyPressed(87))
+        {
             cameraComponent.position += cameraComponent.forward * translationSpeed * dt;
         }
-        if(input.isKeyPressed(83)){
+        if (input.isKeyPressed(83))
+        {
             cameraComponent.position -= cameraComponent.forward * translationSpeed * dt;
         }
 
-        if(input.isKeyPressed(65)){
-            //go left
+        if (input.isKeyPressed(65))
+        {
+            // go left
             glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
             cameraComponent.position -= right * translationSpeed * dt;
         }
 
-        if(input.isKeyPressed(68)){
-            //go right
+        if (input.isKeyPressed(68))
+        {
+            // go right
             glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
             cameraComponent.position += right * translationSpeed * dt;
         }
 
-
-        if(input.isKeyPressed(81)){
-            //go up
+        if (input.isKeyPressed(81))
+        {
+            // go up
             glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
             glm::vec3 up = glm::normalize(glm::cross(right, cameraComponent.forward));
             cameraComponent.position += up * translationSpeed * dt;
         }
-        
-        if(input.isKeyPressed(69)){
+
+        if (input.isKeyPressed(69))
+        {
             glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
             glm::vec3 up = glm::normalize(glm::cross(right, cameraComponent.forward));
             cameraComponent.position -= up * translationSpeed * dt;
@@ -70,37 +75,32 @@ namespace engine
 
         // Artificial clamp: keep forward within 1..179 degrees of the FIXED world
         // up (i.e. pitch within +/-89 of horizontal) so `right` never degenerates.
-        constexpr float kMinAngleToWorldUp = 1.0f;
-        constexpr float kMaxAngleToWorldUp = 179.0f;
 
-        if(input.isKeyPressed(265)){ // pitch up: rotate the whole basis around `right`
+        if (input.isKeyPressed(265))
+        { // pitch up: rotate the whole basis around `right`
             const glm::vec3 candidate = rotateVector(cameraComponent.forward, right, angle);
-            if (angleBetween(candidate, worldUp) >= kMinAngleToWorldUp)
-            {
-                cameraComponent.forward = candidate;
-                cameraComponent.up = rotateVector(cameraComponent.up, right, angle);
-            }
+            cameraComponent.forward = candidate;
+            cameraComponent.up = rotateVector(cameraComponent.up, right, angle);
         }
 
-        if(input.isKeyPressed(264)){ // pitch down
+        if (input.isKeyPressed(264))
+        { // pitch down
             const glm::vec3 candidate = rotateVector(cameraComponent.forward, right, -angle);
-            if (angleBetween(candidate, worldUp) <= kMaxAngleToWorldUp)
-            {
-                cameraComponent.forward = candidate;
-                cameraComponent.up = rotateVector(cameraComponent.up, right, -angle);
-            }
+            cameraComponent.forward = candidate;
+            cameraComponent.up = rotateVector(cameraComponent.up, right, -angle);
         }
 
-        if(input.isKeyPressed(262)){ // yaw right: rotate the whole basis around world up
+        if (input.isKeyPressed(262))
+        { // yaw right: rotate the whole basis around world up
             cameraComponent.forward = rotateVector(cameraComponent.forward, worldUp, -angle);
             cameraComponent.up = rotateVector(cameraComponent.up, worldUp, -angle);
         }
 
-        if(input.isKeyPressed(263)){ // yaw left
+        if (input.isKeyPressed(263))
+        { // yaw left
             cameraComponent.forward = rotateVector(cameraComponent.forward, worldUp, angle);
             cameraComponent.up = rotateVector(cameraComponent.up, worldUp, angle);
         }
-
     }
 
     void CameraSystem::update()

@@ -11,6 +11,7 @@
 
 #include "time/engine_time.hpp"
 
+#include "input/input_system.hpp"
 #include "rendering/renderer.hpp"
 #include "platform/window.hpp"
 #include "vulkan/vk_backend.hpp"
@@ -41,6 +42,23 @@ void init(){
     sm.start();
 }
 
+void runMainLoop(Window& window, SystemManager& sm, Renderer& renderer, VulkanBackend& backend){
+    init();
+
+    EngineTime& time = EngineTime::getInstance();
+
+    while (!window.shouldWindowClose())
+    {   
+        window.pollEvents();
+        time.beginFrame();
+        sm.update();
+        renderer.render();
+        Input::getInstance().endFrame();
+        window.setWindowTitle("VK Engine - FPS: "+std::to_string(time.fps()));
+    }
+    backend.waitForIdle();
+}
+
 int main()
 {
     const int width = 800;
@@ -67,16 +85,7 @@ int main()
     ComponentManager &cm = ComponentManager::getInstance();
     SystemManager &sm = SystemManager::getInstance();
 
-    init();
-
-    while (!window.shouldWindowClose())
-    {   
-        window.pollEvents();
-        EngineTime::getInstance().beginFrame();
-        sm.update();
-        renderer.render();
-    }
-    backend.waitForIdle();
+    runMainLoop(window, sm, renderer, backend);
 
     std::cout << "-----------------\n"
               << "vk_engine closing!\n";

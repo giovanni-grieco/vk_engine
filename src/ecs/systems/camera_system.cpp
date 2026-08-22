@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 
 #include <iostream>
+#include <math.h>
 
 namespace engine
 {
@@ -20,6 +21,19 @@ namespace engine
 
     void CameraSystem::start() {}
 
+    float updateTranslationSpeed(float currentSpeed, float delta){
+        
+        float candidateSpeed = currentSpeed+delta;
+
+        if(delta > 0){
+            candidateSpeed = std::min(candidateSpeed, CameraSystem::MAX_TRANS_SPEED);
+        }else if(delta < 0){
+            candidateSpeed = std::max(candidateSpeed, CameraSystem::MIN_TRANS_SPEED);
+        }
+
+        return candidateSpeed;
+    }
+
     void CameraSystem::handleInputs(Entity camera)
     {
         ComponentManager &cm = ComponentManager::getInstance();
@@ -29,30 +43,35 @@ namespace engine
 
         float dt = EngineTime::getInstance().deltaTime();
 
-        if (input.isKeyPressed(87))
+        
+        this->translationSpeed = updateTranslationSpeed(this->translationSpeed, input.scrollDelta().y);
+
+
+
+        if (input.isKeyDown(Key::W))
         {
             cameraComponent.position += cameraComponent.forward * translationSpeed * dt;
         }
-        if (input.isKeyPressed(83))
+        if (input.isKeyDown(Key::S))
         {
             cameraComponent.position -= cameraComponent.forward * translationSpeed * dt;
         }
 
-        if (input.isKeyPressed(65))
+        if (input.isKeyDown(Key::A))
         {
             // go left
             glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
             cameraComponent.position -= right * translationSpeed * dt;
         }
 
-        if (input.isKeyPressed(68))
+        if (input.isKeyDown(Key::D))
         {
             // go right
             glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
             cameraComponent.position += right * translationSpeed * dt;
         }
 
-        if (input.isKeyPressed(81))
+        if (input.isKeyDown(Key::Q))
         {
             // go up
             glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
@@ -60,7 +79,7 @@ namespace engine
             cameraComponent.position += up * translationSpeed * dt;
         }
 
-        if (input.isKeyPressed(69))
+        if (input.isKeyDown(Key::E))
         {
             glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
             glm::vec3 up = glm::normalize(glm::cross(right, cameraComponent.forward));
@@ -76,27 +95,27 @@ namespace engine
         // Artificial clamp: keep forward within 1..179 degrees of the FIXED world
         // up (i.e. pitch within +/-89 of horizontal) so `right` never degenerates.
 
-        if (input.isKeyPressed(265))
+        if (input.isKeyDown(Key::Up))
         { // pitch up: rotate the whole basis around `right`
             const glm::vec3 candidate = rotateVector(cameraComponent.forward, right, angle);
             cameraComponent.forward = candidate;
             cameraComponent.up = rotateVector(cameraComponent.up, right, angle);
         }
 
-        if (input.isKeyPressed(264))
+        if (input.isKeyDown(Key::Down))
         { // pitch down
             const glm::vec3 candidate = rotateVector(cameraComponent.forward, right, -angle);
             cameraComponent.forward = candidate;
             cameraComponent.up = rotateVector(cameraComponent.up, right, -angle);
         }
 
-        if (input.isKeyPressed(262))
+        if (input.isKeyDown(Key::Right))
         { // yaw right: rotate the whole basis around world up
             cameraComponent.forward = rotateVector(cameraComponent.forward, worldUp, -angle);
             cameraComponent.up = rotateVector(cameraComponent.up, worldUp, -angle);
         }
 
-        if (input.isKeyPressed(263))
+        if (input.isKeyDown(Key::Left))
         { // yaw left
             cameraComponent.forward = rotateVector(cameraComponent.forward, worldUp, angle);
             cameraComponent.up = rotateVector(cameraComponent.up, worldUp, angle);

@@ -14,8 +14,8 @@ namespace engine
         glfwSetWindowUserPointer(window, this);
         glfwSetFramebufferSizeCallback(window, frameBufferResizeCallback);
 
-        glfwSetKeyCallback(window, [](GLFWwindow *, int key, int, int action, int)
-                           { Input::getInstance().onKey(key, action == GLFW_PRESS || action == GLFW_REPEAT); });
+        glfwSetKeyCallback(window, [](GLFWwindow *, int, int scancode, int action, int)
+                           { Input::getInstance().onKey(scancode, action == GLFW_PRESS || action == GLFW_REPEAT); });
         glfwSetMouseButtonCallback(window, [](GLFWwindow *, int button, int action, int)
                                    { Input::getInstance().onMouseButton(button, action == GLFW_PRESS); });
         glfwSetCursorPosCallback(window, [](GLFWwindow *, double x, double y)

@@ -2,11 +2,28 @@
 #pragma once
 #include <array>
 #include <glm/vec2.hpp>
-#include <GLFW/glfw3.h>
 #include <memory>
+#include <unordered_map>
 
 namespace engine
 {
+    // Engine-level, platform-independent key codes. The input system maps these
+    // to the underlying platform scancode internally, keeping GLFW hidden.
+    enum class Key : int
+    {
+        Unknown = -1,
+        W, S, A, D, Q, E,
+        Up, Down, Left, Right,
+        Count
+    };
+
+    enum class MouseButton : int
+    {
+        Left, Right, Middle,
+        Button4, Button5, Button6, Button7, Button8,
+        Count
+    };
+
     class Input
     {
     public:
@@ -22,8 +39,8 @@ namespace engine
 
         Input() = default;
 
-        // Called by GLFW callbacks (thread-safe enough: same thread as glfwPollEvents)
-        void onKey(int key, bool down);
+        // Internal: called by the window's GLFW callbacks (same thread as glfwPollEvents).
+        void onKey(int scancode, bool down);
         void onMouseButton(int button, bool down);
         void onCursorPos(double x, double y);
         void onScroll(double xOffset, double yOffset);
@@ -32,12 +49,12 @@ namespace engine
         void endFrame();
 
         // Continuous state (held)
-        bool isKeyDown(int key) const;
-        bool isMouseDown(int button) const;
+        bool isKeyDown(Key key) const;
+        bool isMouseDown(MouseButton button) const;
 
         // Edge detection (this-frame transitions)
-        bool isKeyPressed(int key) const;  // rising edge
-        bool isKeyReleased(int key) const; // falling edge
+        bool isKeyPressed(Key key) const;  // rising edge
+        bool isKeyReleased(Key key) const; // falling edge
 
         glm::vec2 mousePosition() const;
         glm::vec2 mouseDelta() const; // per-frame movement
@@ -46,10 +63,12 @@ namespace engine
     private:
         static std::unique_ptr<Input> instance;
 
-        std::array<bool, GLFW_KEY_LAST + 1> keys_{};
-        std::array<bool, GLFW_KEY_LAST + 1> prevKeys_{};
-        std::array<bool, GLFW_MOUSE_BUTTON_LAST + 1> mouseButtons_{};
-        std::array<bool, GLFW_MOUSE_BUTTON_LAST + 1> prevMouseButtons_{};
+        // Key state is indexed by platform scancode (physical key position).
+        // Scancodes are platform-specific and sparse, so a fixed array would be unsafe.
+        std::unordered_map<int, bool> keys_{};
+        std::unordered_map<int, bool> prevKeys_{};
+        std::array<bool, static_cast<std::size_t>(MouseButton::Count)> mouseButtons_{};
+        std::array<bool, static_cast<std::size_t>(MouseButton::Count)> prevMouseButtons_{};
 
         glm::vec2 mousePos_{};
         glm::vec2 prevMousePos_{};

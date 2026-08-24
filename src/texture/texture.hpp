@@ -2,8 +2,12 @@
 
 #include <string>
 #include <vector>
+#include <stdint.h>
 
 namespace engine{
+
+    typedef int32_t TextureID;
+
     struct Texture{
         int texWidth = 0;
         int texHeight = 0;

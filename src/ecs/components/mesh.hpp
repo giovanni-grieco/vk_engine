@@ -8,7 +8,7 @@ namespace engine
 {
     struct MeshComponent
     {
-        std::vector<Mesh> mesh;
+        Mesh mesh;
         MeshID meshHandle = -1;
     };
 }

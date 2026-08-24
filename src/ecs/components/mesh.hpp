@@ -8,7 +8,6 @@ namespace engine
 {
     struct MeshComponent
     {
-        Mesh mesh;
         MeshID meshHandle = -1;
     };
 }

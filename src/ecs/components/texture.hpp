@@ -4,7 +4,6 @@
 
 namespace engine{
     struct TextureComponent{
-        Texture texture;
         TextureID textureHandle = -1;
     };
 }

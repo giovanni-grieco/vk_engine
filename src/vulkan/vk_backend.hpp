@@ -17,7 +17,7 @@
 #include "vk_command_pool.hpp"
 #include "vk_command_buffer.hpp"
 #include "vk_sync.hpp"
-#include "vk_buffer_manager.hpp"
+#include "vk_mesh_buffer_manager.hpp"
 #include "vk_descriptor_set_layout.hpp"
 #include "vk_descriptor_pool.hpp"
 #include "vk_descriptor_sets.hpp"
@@ -78,10 +78,7 @@ namespace engine
 
         // Top-down API: register CPU mesh data and get a handle back.
         MeshID addMesh(const Mesh &mesh);
-
-        // Top-down API: queue the draw packets for the next frame.
-        void submitDrawPackets(const std::vector<DrawPacket> &drawPackets);
-
+        
         // Top-down API: mark a mesh handle as deleted (leaves a GPU hole
         // until compactBuffers() is called).
         void removeMesh(MeshID mesh);
@@ -89,6 +86,12 @@ namespace engine
         // Top-down API: rebuild the unified buffers with only live meshes.
         // Stalls the device; call when no frames are in flight.
         void compactBuffers();
+
+
+
+        // Top-down API: queue the draw packets for the next frame.
+        void submitDrawPackets(const std::vector<DrawPacket> &drawPackets);
+
 
         void recreateSwapChain(Window &window);
 

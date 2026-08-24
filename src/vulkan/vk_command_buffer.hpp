@@ -8,7 +8,7 @@
 #include "vk_swap_chain.hpp"
 #include "vk_pipeline.hpp"
 #include "vk_buffer.hpp"
-#include "vk_buffer_manager.hpp"
+#include "vk_mesh_buffer_manager.hpp"
 #include "vk_descriptor_sets.hpp"
 #include "rendering/draw_packet.hpp"
 

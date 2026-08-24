@@ -89,6 +89,15 @@ if (NOT TINYOBJ_PATH)
 endif()
 
 # =============================================
+# 4.1 STB Image
+# =============================================
+
+if (NOT STBIMAGE_PATH)
+  message(STATUS "STBIMAGE_PATH not specified in .env.cmake, using external/stb_image")
+  set(STBIMAGE_PATH external/stb_image)
+endif()
+
+# =============================================
 # 5. Target Setup
 # =============================================
 file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
@@ -106,6 +115,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   ${PROJECT_SOURCE_DIR}/src
   ${Vulkan_INCLUDE_DIRS}
   ${TINYOBJ_PATH}
+  ${STBIMAGE_PATH}
   ${GLFW_INCLUDE_DIRS}
   ${GLM_INCLUDE_DIRS}
 )

@@ -10,6 +10,7 @@
 #include "vk_buffer.hpp"
 #include "vk_buffer_manager.hpp"
 #include "vk_descriptor_sets.hpp"
+#include "rendering/draw_packet.hpp"
 
 #include <vector>
 

@@ -2,6 +2,7 @@
 
 #include "platform/window.hpp"
 #include "rendering/frame_info.hpp"
+#include "rendering/draw_packet.hpp"
 
 #include "vk_instance.hpp"
 #include "vk_device.hpp"
@@ -21,6 +22,7 @@
 #include "vk_descriptor_pool.hpp"
 #include "vk_descriptor_sets.hpp"
 #include "vk_uniform_buffer.hpp"
+
 #include "mesh/vk_uniform_buffer_object.hpp"
 
 #include <vector>

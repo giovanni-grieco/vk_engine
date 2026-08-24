@@ -16,6 +16,8 @@
 #include "platform/window.hpp"
 #include "vulkan/vk_backend.hpp"
 
+#include "texture/texture.hpp"
+
 #include <memory>
 
 using namespace engine;
@@ -84,6 +86,10 @@ int main()
     EntityManager &em = EntityManager::getInstance();
     ComponentManager &cm = ComponentManager::getInstance();
     SystemManager &sm = SystemManager::getInstance();
+    Texture tex{};
+    //Texture tex = createTextureFromFile("textures/texture.jpg");
+    createTextureFromFile(tex, "textures/texture.jpg");
+    tex.dump();
 
     runMainLoop(window, sm, renderer, backend);
 

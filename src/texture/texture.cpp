@@ -11,6 +11,7 @@ namespace engine
 
 
     void createTextureFromFile(Texture& result, std::string filepath){
+        stbi_set_flip_vertically_on_load(true); // Vulkan's image origin is the top-left corner
         int texWidth, texHeight, texChannels;
         stbi_uc *pixels = stbi_load(filepath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 
@@ -37,6 +38,7 @@ namespace engine
     {
         Texture result{};
 
+        stbi_set_flip_vertically_on_load(true); // Vulkan's image origin is the top-left corner
         int texWidth, texHeight, texChannels;
         stbi_uc *pixels = stbi_load(filepath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 

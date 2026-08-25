@@ -12,10 +12,14 @@ namespace engine
         pushConstantRange.offset = 0;
         pushConstantRange.size = sizeof(ModelPushConstant);
 
+        VkDescriptorSetLayout setLayouts[] = {
+            descriptorSetLayout.uboSetLayout,
+            descriptorSetLayout.textureSetLayout};
+
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = 1;                        // Optional
-        pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout.layout; // Optional
+        pipelineLayoutInfo.setLayoutCount = 2; // Optional
+        pipelineLayoutInfo.pSetLayouts = setLayouts; // Optional
         pipelineLayoutInfo.pushConstantRangeCount = 1;                // Optional
         pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;  // Optional
 

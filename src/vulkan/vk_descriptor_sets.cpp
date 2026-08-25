@@ -9,7 +9,7 @@ namespace engine
                                                VulkanUniformBuffer &uniformBuffer,
                                                uint32_t framesInFlight)
     {
-        std::vector<VkDescriptorSetLayout> layouts(framesInFlight, layout.layout);
+        std::vector<VkDescriptorSetLayout> layouts(framesInFlight, layout.uboSetLayout);
 
         VkDescriptorSetAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -31,7 +31,7 @@ namespace engine
             VkWriteDescriptorSet descriptorWrite{};
             descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrite.dstSet = descriptorSets[i];
-            descriptorWrite.dstBinding = 0; // matches layout(binding = 0) in your shader
+            descriptorWrite.dstBinding = 0; // matches layout(set = 0, binding = 0) in your shader
             descriptorWrite.dstArrayElement = 0;
             descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             descriptorWrite.descriptorCount = 1;

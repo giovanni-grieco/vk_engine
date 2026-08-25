@@ -18,11 +18,13 @@
 #include "vk_command_buffer.hpp"
 #include "vk_sync.hpp"
 #include "vk_mesh_buffer_manager.hpp"
+#include "vk_texture_manager.hpp"
 #include "vk_descriptor_set_layout.hpp"
 #include "vk_descriptor_pool.hpp"
 #include "vk_descriptor_sets.hpp"
 #include "vk_uniform_buffer.hpp"
 
+#include "texture/texture.hpp"
 #include "mesh/vk_uniform_buffer_object.hpp"
 
 #include <vector>
@@ -54,6 +56,8 @@ namespace engine
         MeshID meshTriangle2;
         MeshID meshTriangle3;
         MeshID meshQuad;
+        VulkanTextureManager textureManager;
+        TextureID defaultTextureId = -1;
         VulkanUniformBuffer uniformBuffer;
         VulkanDescriptorPool descriptorPool;
         VulkanDescriptorSets descriptorSets;
@@ -85,6 +89,17 @@ namespace engine
 
         // Top-down API: rebuild the unified buffers with only live meshes.
         // Stalls the device; call when no frames are in flight.
+        // Top-down API: upload a CPU texture and get a handle back.
+        TextureID addTexture(const Texture &texture);
+
+        // Top-down API: mark a texture handle as deleted (its GPU image is
+        // destroyed when compactTextures() is called).
+        void removeTexture(TextureID texture);
+
+        // Top-down API: destroy the GPU images of removed textures.
+        // Stalls the device; call when no frames are in flight.
+        void compactTextures();
+
         void compactBuffers();
 
 

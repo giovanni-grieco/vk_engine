@@ -11,7 +11,8 @@ namespace engine
     {
     public:
         VkDevice device = VK_NULL_HANDLE;
-        VkDescriptorSetLayout layout = VK_NULL_HANDLE;
+        VkDescriptorSetLayout uboSetLayout = VK_NULL_HANDLE;     // set 0: per-frame UBO
+        VkDescriptorSetLayout textureSetLayout = VK_NULL_HANDLE; // set 1: per-texture sampler
 
         VulkanDescriptorSetLayout(VkDevice device);
         ~VulkanDescriptorSetLayout();

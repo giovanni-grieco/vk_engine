@@ -177,6 +177,8 @@ namespace engine
         VulkanRenderPass &renderPass,
         VulkanFramebuffers &frameBuffers,
         VulkanBufferManager &bufferManager,
+        VulkanTextureManager &textureManager,
+        TextureID defaultTextureId,
         const std::vector<DrawPacket> &drawPackets,
         VulkanDescriptorSets &descriptorSets)
     {
@@ -214,11 +216,12 @@ namespace engine
         vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, vertexOffsets);
         vkCmdBindIndexBuffer(commandBuffer, bufferManager.indexBufferHandle(), 0, VK_INDEX_TYPE_UINT16);
 
-        VkDescriptorSet sets[] = {descriptorSets.descriptorSets[currentFrame]};
+        // Set 0 (per frame): the camera uniform buffer, shared by all draws.
+        VkDescriptorSet uboSet = descriptorSets.descriptorSets[currentFrame];
         vkCmdBindDescriptorSets(commandBuffer,
                                 VK_PIPELINE_BIND_POINT_GRAPHICS,
                                 pipeline.layout,
-                                0, 1, sets,
+                                0, 1, &uboSet,
                                 0, nullptr);
 
         VkViewport viewport{};
@@ -242,6 +245,25 @@ namespace engine
             {
                 continue; // unknown mesh handle — skip it
             }
+
+            // Set 1 (per draw): the texture requested by this packet, falling
+            // back to the default texture when the id is unknown or -1.
+            const TextureDrawInfo *texInfo = textureManager.getTextureInfo(packet.textureId);
+            if (texInfo == nullptr)
+            {
+                texInfo = textureManager.getTextureInfo(defaultTextureId);
+            }
+            if (texInfo == nullptr)
+            {
+                continue; // no usable texture — skip it
+            }
+
+            VkDescriptorSet textureSet = texInfo->descriptorSet;
+            vkCmdBindDescriptorSets(commandBuffer,
+                                    VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                    pipeline.layout,
+                                    1, 1, &textureSet,
+                                    0, nullptr);
 
             ModelPushConstant push{};
             push.model = packet.model;

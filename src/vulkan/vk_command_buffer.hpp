@@ -9,6 +9,7 @@
 #include "vk_pipeline.hpp"
 #include "vk_buffer.hpp"
 #include "vk_mesh_buffer_manager.hpp"
+#include "vk_texture_manager.hpp"
 #include "vk_descriptor_sets.hpp"
 #include "rendering/draw_packet.hpp"
 
@@ -45,8 +46,9 @@ namespace engine
             uint32_t indexSize,
             VulkanDescriptorSets &descriptorSets);
 
-        // Batched draw: binds the unified buffers once and issues one
-        // vkCmdDrawIndexed per DrawPacket, pushing its model matrix.
+        // Batched draw: binds the unified buffers and UBO set once, then issues
+        // one vkCmdDrawIndexed per DrawPacket — pushing its model matrix and
+        // binding the descriptor set of its texture.
         void recordCommandBuffer(
             uint32_t imageIndex,
             uint32_t currentFrame,
@@ -55,6 +57,8 @@ namespace engine
             VulkanRenderPass &renderPass,
             VulkanFramebuffers &frameBuffers,
             VulkanBufferManager &bufferManager,
+            VulkanTextureManager &textureManager,
+            TextureID defaultTextureId,
             const std::vector<DrawPacket> &drawPackets,
             VulkanDescriptorSets &descriptorSets);
     };

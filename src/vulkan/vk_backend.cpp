@@ -2,12 +2,23 @@
 
 #include "geometry/vertex.hpp"
 #include "geometry/mesh.hpp"
+#include "texture/texture.hpp"
 #include "mesh/vk_uniform_buffer_object.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <chrono>
 
 namespace engine
 {
+    namespace
+    {
+        Texture loadDefaultTexture()
+        {
+            Texture texture{};
+            createTextureFromFile(texture, "textures/texture.jpg");
+            return texture;
+        }
+    }
+
     VulkanBackend::VulkanBackend(
         std::string applicationName,
         bool enableValidationLayers,
@@ -30,6 +41,8 @@ namespace engine
           commandBuffer(MAX_FRAMES_IN_FLIGHT, device, commandPool),
           sync(MAX_FRAMES_IN_FLIGHT, swapChain.images.size(), device),
           bufferManager(device, commandPool, queues),
+          textureManager(device, commandPool, queues, descriptorSetLayout.textureSetLayout),
+          defaultTextureId(textureManager.addTexture(loadDefaultTexture())),
           uniformBuffer(device, sizeof(UniformBufferObject), MAX_FRAMES_IN_FLIGHT),
           descriptorPool(device.device, MAX_FRAMES_IN_FLIGHT),
           descriptorSets(device, descriptorSetLayout, descriptorPool, uniformBuffer, MAX_FRAMES_IN_FLIGHT)
@@ -63,6 +76,21 @@ namespace engine
     void VulkanBackend::compactBuffers()
     {
         bufferManager.compact();
+    }
+
+    TextureID VulkanBackend::addTexture(const Texture &texture)
+    {
+        return textureManager.addTexture(texture);
+    }
+
+    void VulkanBackend::removeTexture(TextureID texture)
+    {
+        textureManager.removeTexture(texture);
+    }
+
+    void VulkanBackend::compactTextures()
+    {
+        textureManager.compact();
     }
 
     void VulkanBackend::updateUbo(uint32_t currentFrameIndex, UniformBufferObject &ubo)
@@ -121,6 +149,8 @@ namespace engine
             renderPass,
             frameBuffers,
             bufferManager,
+            textureManager,
+            defaultTextureId,
             drawPackets,
             descriptorSets);
 

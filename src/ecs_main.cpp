@@ -59,7 +59,7 @@ public:
         Mesh quad {quadVertices, quadIndices};
         MeshID meshHandle = backend.addMesh(quad);
 
-        Texture tex = createTextureFromFile("textures/statue.jpg");
+        Texture tex = createTextureFromFile("textures/texture.jpg");
         TextureID texHandle = backend.addTexture(tex);
 
         Entity gameObject = em.createEntity();

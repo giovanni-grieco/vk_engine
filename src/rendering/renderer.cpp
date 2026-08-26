@@ -3,6 +3,7 @@
 #include "ecs/components/mesh.hpp"
 #include "ecs/components/camera.hpp"
 #include "ecs/components/transform.hpp"
+#include "ecs/components/texture.hpp"
 #include "frame_info.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -53,9 +54,16 @@ namespace engine
                             * glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f))
                             * glm::scale(glm::mat4(1.0f), transform.scale);
 
+            TextureID textureHandle = -1;
+            if(cm.hasComponent<TextureComponent>(entity)){
+                TextureComponent& texComp = cm.getComponent<TextureComponent>(entity);
+                textureHandle = texComp.textureHandle;
+            }
+
             DrawPacket packet{};
             packet.meshId = mesh.meshHandle;
             packet.model = model;
+            packet.textureId=textureHandle;
             result.push_back(packet);
         }
 

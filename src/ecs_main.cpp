@@ -5,6 +5,7 @@
 #include "ecs/components/transform.hpp"
 #include "ecs/components/mesh.hpp"
 #include "ecs/components/camera.hpp"
+#include "ecs/components/texture.hpp"
 
 #include "ecs/systems/camera_system.hpp"
 #include "ecs/systems/translator_system.hpp"
@@ -15,6 +16,9 @@
 #include "rendering/renderer.hpp"
 #include "platform/window.hpp"
 #include "vulkan/vk_backend.hpp"
+
+#include "geometry/vertex.hpp"
+#include "geometry/mesh.hpp"
 
 #include "texture/texture.hpp"
 
@@ -42,14 +46,26 @@ public:
         SystemManager &sm = SystemManager::getInstance();
 
         sm.registerSystem(std::make_unique<CameraSystem>(5.0f, 50.0f));
-        // sm.registerSystem(std::make_unique<Translator>(0.3f));
+        sm.registerSystem(std::make_unique<Translator>(1.0f));
 
         cm.registerComponent<TransformComponent>();
         cm.registerComponent<MeshComponent>();
         cm.registerComponent<CameraComponent>();
+        cm.registerComponent<TextureComponent>();
 
         Entity camera = em.createEntity();
         cm.addComponent<CameraComponent>(camera, CameraComponent{});
+
+        Mesh quad {quadVertices, quadIndices};
+        MeshID meshHandle = backend.addMesh(quad);
+
+        Texture tex = createTextureFromFile("textures/statue.jpg");
+        TextureID texHandle = backend.addTexture(tex);
+
+        Entity gameObject = em.createEntity();
+        cm.addComponent<MeshComponent>(gameObject, MeshComponent{meshHandle});
+        cm.addComponent<TransformComponent>(gameObject, TransformComponent{});
+        cm.addComponent<TextureComponent>(gameObject, TextureComponent{texHandle});
 
         sm.start();
     }

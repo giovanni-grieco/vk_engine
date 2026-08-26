@@ -14,7 +14,7 @@ namespace engine
         Texture loadDefaultTexture()
         {
             Texture texture{};
-            createTextureFromFile(texture, "textures/texture.jpg");
+            createTextureFromFile(texture, "textures/default_texture.png");
             return texture;
         }
     }
@@ -42,7 +42,6 @@ namespace engine
           sync(MAX_FRAMES_IN_FLIGHT, swapChain.images.size(), device),
           bufferManager(device, commandPool, queues),
           textureManager(device, commandPool, queues, descriptorSetLayout.textureSetLayout),
-          defaultTextureId(textureManager.addTexture(loadDefaultTexture())),
           uniformBuffer(device, sizeof(UniformBufferObject), MAX_FRAMES_IN_FLIGHT),
           descriptorPool(device.device, MAX_FRAMES_IN_FLIGHT),
           descriptorSets(device, descriptorSetLayout, descriptorPool, uniformBuffer, MAX_FRAMES_IN_FLIGHT)
@@ -56,6 +55,8 @@ namespace engine
         meshTriangle2 = bufferManager.addMesh(triangle2Mesh);
         meshTriangle3 = bufferManager.addMesh(triangle3Mesh);
         meshQuad = bufferManager.addMesh(quadMesh);
+        
+        defaultTextureId = textureManager.addTexture(loadDefaultTexture());
     }
 
     MeshID VulkanBackend::addMesh(const Mesh &mesh)
@@ -134,10 +135,10 @@ namespace engine
             glm::mat4 spin = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
             drawPackets = {
-                {meshTriangle1, -1, glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, 0.0f, 0.0f))},
-                {meshTriangle2, -1, spin},
-                {meshTriangle3, -1, glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.0f, 0.0f))},
-                {meshQuad, -1, glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.5f, 0.0f))},
+                {meshTriangle1, defaultTextureId, glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, 0.0f, 0.0f))},
+                {meshTriangle2, defaultTextureId, spin},
+                {meshTriangle3, defaultTextureId, glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.0f, 0.0f))},
+                {meshQuad, defaultTextureId, glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.5f, 0.0f))},
             };
         }
 

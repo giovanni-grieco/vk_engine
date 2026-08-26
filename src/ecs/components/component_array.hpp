@@ -1,8 +1,12 @@
 #pragma once
 
 #include <vector>
+#include <string>
+#include <stdexcept>
+#include <typeinfo>
 #include "ecs/entity/entity.hpp"
 #include <iostream>
+#include "utils/reflection.hpp"
 
 namespace engine
 {
@@ -24,7 +28,9 @@ namespace engine
         {
             int position = findComponentIndex(entity);
             if (position == -1)
-                throw std::runtime_error("Entity does not have this component.");
+                throw std::runtime_error("Entity " + std::to_string(entity) +
+                                         " does not have component of type '" +
+                                         type_name<T>() + "'.");
             return components[static_cast<size_t>(position)];
         }
 
@@ -58,7 +64,9 @@ namespace engine
         {
             int position = findComponentIndex(entity);
             if (position == -1)
-                throw std::runtime_error("Entity does not have this component.");
+                throw std::runtime_error("Entity " + std::to_string(entity) +
+                                         " does not have component of type '" +
+                                         type_name<T>() + "'.");
             T deletedComponent = components[position];
             Entity deletedEntity = entities[position];
             entityToIndex[deletedEntity] = -1;

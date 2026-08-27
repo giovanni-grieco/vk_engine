@@ -32,11 +32,12 @@ namespace engine
           device(instance, surface, deviceExtensions),
           queues(device, surface),
           swapChain(device, surface, window),
-          renderPass(device, swapChain),
+          depthBuffer(device, swapChain.extent.width, swapChain.extent.height),
+          renderPass(device, swapChain, depthBuffer.depthFormat()),
           descriptorSetLayout(device.device),
           pipelineLayout(device, descriptorSetLayout),
           pipeline(device, swapChain, pipelineLayout, renderPass, shadersFilePaths, shaderTypes),
-          frameBuffers(device, swapChain, renderPass),
+          frameBuffers(device, swapChain, renderPass, depthBuffer),
           commandPool(device, surface),
           commandBuffer(MAX_FRAMES_IN_FLIGHT, device, commandPool),
           sync(MAX_FRAMES_IN_FLIGHT, swapChain.images.size(), device),
@@ -213,6 +214,7 @@ namespace engine
     {
         waitForIdle();
         swapChain.recreate(device, surface, window);
-        frameBuffers.recreate(device, swapChain, renderPass);
+        depthBuffer.recreate(device, swapChain.extent.width, swapChain.extent.height);
+        frameBuffers.recreate(device, swapChain, renderPass, depthBuffer);
     }
 }

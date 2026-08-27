@@ -2,9 +2,9 @@
 
 namespace engine
 {
-    VulkanFramebuffers::VulkanFramebuffers(VulkanDevice &device, VulkanSwapChain &swapChain, VulkanRenderPass &renderPass)
+    VulkanFramebuffers::VulkanFramebuffers(VulkanDevice &device, VulkanSwapChain &swapChain, VulkanRenderPass &renderPass, VulkanDepthBuffer &depthBuffer)
     {
-        init(device, swapChain, renderPass);
+        init(device, swapChain, renderPass, depthBuffer);
     }
 
     VulkanFramebuffers::~VulkanFramebuffers()
@@ -12,13 +12,13 @@ namespace engine
         destroy();
     }
 
-    void VulkanFramebuffers::recreate(VulkanDevice &device, VulkanSwapChain &swapChain, VulkanRenderPass &renderPass)
+    void VulkanFramebuffers::recreate(VulkanDevice &device, VulkanSwapChain &swapChain, VulkanRenderPass &renderPass, VulkanDepthBuffer &depthBuffer)
     {
         destroy();
-        init(device, swapChain, renderPass);
+        init(device, swapChain, renderPass, depthBuffer);
     }
 
-    void VulkanFramebuffers::init(VulkanDevice &device, VulkanSwapChain &swapChain, VulkanRenderPass &renderPass)
+    void VulkanFramebuffers::init(VulkanDevice &device, VulkanSwapChain &swapChain, VulkanRenderPass &renderPass, VulkanDepthBuffer &depthBuffer)
     {
         this->device = device.device;
         frameBuffers.resize(swapChain.imageViews.size());
@@ -26,12 +26,13 @@ namespace engine
         for (size_t i = 0; i < swapChain.imageViews.size(); i++)
         {
             VkImageView attachments[] = {
-                swapChain.imageViews[i]};
+                swapChain.imageViews[i],
+                depthBuffer.imageView};
 
             VkFramebufferCreateInfo framebufferInfo{};
             framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
             framebufferInfo.renderPass = renderPass.renderPass;
-            framebufferInfo.attachmentCount = 1;
+            framebufferInfo.attachmentCount = 2;
             framebufferInfo.pAttachments = attachments;
             framebufferInfo.width = swapChain.extent.width;
             framebufferInfo.height = swapChain.extent.height;

@@ -11,7 +11,7 @@ namespace engine
     public:
         VkDevice device;
         VkRenderPass renderPass;
-        VulkanRenderPass(VulkanDevice &device, VulkanSwapChain &swapChain);
+        VulkanRenderPass(VulkanDevice &device, VulkanSwapChain &swapChain, VkFormat depthFormat);
         ~VulkanRenderPass();
     };
 }

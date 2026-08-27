@@ -14,6 +14,7 @@
 #include "vk_pipeline.hpp"
 #include "vk_shader.hpp"
 #include "vk_framebuffers.hpp"
+#include "vk_depth_buffer.hpp"
 #include "vk_command_pool.hpp"
 #include "vk_command_buffer.hpp"
 #include "vk_sync.hpp"
@@ -43,6 +44,7 @@ namespace engine
         VulkanDevice device;
         VulkanQueues queues;
         VulkanSwapChain swapChain;
+        VulkanDepthBuffer depthBuffer;
         VulkanRenderPass renderPass;
         VulkanDescriptorSetLayout descriptorSetLayout;
         VulkanPipelineLayout pipelineLayout;

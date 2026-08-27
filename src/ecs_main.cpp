@@ -46,7 +46,7 @@ public:
         SystemManager &sm = SystemManager::getInstance();
 
         sm.registerSystem(std::make_unique<CameraSystem>(5.0f, 50.0f));
-        sm.registerSystem(std::make_unique<Translator>(1.0f));
+        //sm.registerSystem(std::make_unique<Translator>(1.0f));
 
         cm.registerComponent<TransformComponent>();
         cm.registerComponent<MeshComponent>();
@@ -56,16 +56,25 @@ public:
         Entity camera = em.createEntity();
         cm.addComponent<CameraComponent>(camera, CameraComponent{});
 
-        Mesh quad {quadVertices, quadIndices};
-        MeshID meshHandle = backend.addMesh(quad);
+        Mesh quadMesh {quadVertices, quadIndices};
+        MeshID meshHandle = backend.addMesh(quadMesh);
 
         Texture tex = createTextureFromFile("textures/texture.jpg");
         TextureID texHandle = backend.addTexture(tex);
 
-        Entity gameObject = em.createEntity();
-        cm.addComponent<MeshComponent>(gameObject, MeshComponent{meshHandle});
-        cm.addComponent<TransformComponent>(gameObject, TransformComponent{});
-        cm.addComponent<TextureComponent>(gameObject, TextureComponent{texHandle});
+        Entity quad = em.createEntity();
+        Entity quad1 = em.createEntity();
+
+        cm.addComponent<TransformComponent>(quad, TransformComponent{});
+        cm.addComponent<MeshComponent>(quad, MeshComponent{meshHandle});
+        cm.addComponent<TextureComponent>(quad, TextureComponent{texHandle});
+
+        TransformComponent transform {};
+        transform.position.z = -1;
+
+        cm.addComponent<TransformComponent>(quad1, transform);
+        cm.addComponent<MeshComponent>(quad1, MeshComponent{meshHandle});
+        cm.addComponent<TextureComponent>(quad1, TextureComponent{texHandle});
 
         sm.start();
     }

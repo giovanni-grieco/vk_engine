@@ -43,7 +43,7 @@ namespace engine
         {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
     };
 
-    const std::vector<uint16_t> quadIndices = {
+    const std::vector<uint32_t> quadIndices = {
         0, 1, 2, 2, 3, 0
     };
 

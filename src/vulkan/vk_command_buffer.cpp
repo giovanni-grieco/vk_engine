@@ -136,7 +136,7 @@ namespace engine
         VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(commandBuffers[currentFrame], 0, 1, vertexBuffers, offsets);
 
-        vkCmdBindIndexBuffer(commandBuffers[currentFrame], indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+        vkCmdBindIndexBuffer(commandBuffers[currentFrame], indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT32);
 
         VkDescriptorSet sets[] = {descriptorSets.descriptorSets[currentFrame]};
         vkCmdBindDescriptorSets(commandBuffers[currentFrame],
@@ -217,7 +217,7 @@ namespace engine
         VkBuffer vertexBuffers[] = {bufferManager.vertexBufferHandle()};
         VkDeviceSize vertexOffsets[] = {0};
         vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, vertexOffsets);
-        vkCmdBindIndexBuffer(commandBuffer, bufferManager.indexBufferHandle(), 0, VK_INDEX_TYPE_UINT16);
+        vkCmdBindIndexBuffer(commandBuffer, bufferManager.indexBufferHandle(), 0, VK_INDEX_TYPE_UINT32);
 
         // Set 0 (per frame): the camera uniform buffer, shared by all draws.
         VkDescriptorSet uboSet = descriptorSets.descriptorSets[currentFrame];

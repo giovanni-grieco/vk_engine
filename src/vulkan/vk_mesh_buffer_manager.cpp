@@ -27,7 +27,7 @@ namespace engine
         const uint32_t newIndexCount = indexCount_ + static_cast<uint32_t>(mesh.indices.size());
 
         const VkDeviceSize neededVertexBytes = static_cast<VkDeviceSize>(newVertexCount) * sizeof(Vertex);
-        const VkDeviceSize neededIndexBytes = static_cast<VkDeviceSize>(newIndexCount) * sizeof(uint16_t);
+        const VkDeviceSize neededIndexBytes = static_cast<VkDeviceSize>(newIndexCount) * sizeof(uint32_t);
 
         if (neededVertexBytes > vertexBuffer_.size || neededIndexBytes > indexBuffer_.size)
         {
@@ -50,8 +50,8 @@ namespace engine
                                  mesh.vertices.size() * sizeof(Vertex),
                                  static_cast<VkDeviceSize>(vertexBase) * sizeof(Vertex));
             indexBuffer_.upload(mesh.indices.data(),
-                                mesh.indices.size() * sizeof(uint16_t),
-                                static_cast<VkDeviceSize>(indexBase) * sizeof(uint16_t));
+                                mesh.indices.size() * sizeof(uint32_t),
+                                static_cast<VkDeviceSize>(indexBase) * sizeof(uint32_t));
 
             vertexCount_ = newVertexCount;
             indexCount_ = newIndexCount;
@@ -82,7 +82,7 @@ namespace engine
         {
             const Mesh &mesh = meshes_.at(id);
             vertexBytes += static_cast<VkDeviceSize>(mesh.vertices.size()) * sizeof(Vertex);
-            indexBytes += static_cast<VkDeviceSize>(mesh.indices.size()) * sizeof(uint16_t);
+            indexBytes += static_cast<VkDeviceSize>(mesh.indices.size()) * sizeof(uint32_t);
         }
 
         if (vertexBytes == 0 && indexBytes == 0)
@@ -135,8 +135,8 @@ namespace engine
                                  mesh.vertices.size() * sizeof(Vertex),
                                  static_cast<VkDeviceSize>(vertexBase) * sizeof(Vertex));
             indexBuffer_.upload(mesh.indices.data(),
-                                mesh.indices.size() * sizeof(uint16_t),
-                                static_cast<VkDeviceSize>(indexBase) * sizeof(uint16_t));
+                                mesh.indices.size() * sizeof(uint32_t),
+                                static_cast<VkDeviceSize>(indexBase) * sizeof(uint32_t));
 
             vertexBase += static_cast<uint32_t>(mesh.vertices.size());
             indexBase += static_cast<uint32_t>(mesh.indices.size());

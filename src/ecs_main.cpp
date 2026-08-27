@@ -57,6 +57,18 @@ public:
         Entity camera = em.createEntity();
         cm.addComponent<CameraComponent>(camera, CameraComponent{});
 
+        Entity floor = em.createEntity();
+        MeshID floorMeshHandle = backend.addMesh(createMeshFromFile("models/quad.obj"));
+        TextureID floorTextureHandle = backend.addTexture(createTextureFromFile("textures/floor.jpg"));
+
+        TransformComponent floorTransform{};
+        floorTransform.position.y = -1;
+        floorTransform.rotation.z = 180;
+        floorTransform.scale = glm::vec3(10.0f);
+        cm.addComponent<TransformComponent>(floor, floorTransform);
+        cm.addComponent<MeshComponent>(floor, MeshComponent{floorMeshHandle});
+        cm.addComponent<TextureComponent>(floor, TextureComponent{floorTextureHandle});
+
         Mesh quadMesh {quadVertices, quadIndices};
         MeshID meshHandle = backend.addMesh(quadMesh);
 
@@ -72,6 +84,7 @@ public:
         cm.addComponent<MeshComponent>(quad, MeshComponent{meshHandle});
         cm.addComponent<TextureComponent>(quad, TextureComponent{texHandle});
 
+        
         Entity house = em.createEntity();
 
         Mesh houseMesh = createMeshFromFile("models/viking_room.obj");
@@ -81,6 +94,7 @@ public:
         TextureID houseTextureHandle = backend.addTexture(houseTexture);
 
         TransformComponent houseTransform {};
+        houseTransform.position.y = -1;
         houseTransform.rotation.x = -90;
         houseTransform.rotation.y = -90;
 
@@ -89,7 +103,7 @@ public:
         cm.addComponent<MeshComponent>(house, MeshComponent{houseMeshHandle});
         cm.addComponent<TextureComponent>(house, TextureComponent{houseTextureHandle});
         
-        
+
 
         sm.start();
     }

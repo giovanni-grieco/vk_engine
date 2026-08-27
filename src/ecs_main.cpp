@@ -78,7 +78,7 @@ public:
         Entity quad = em.createEntity();
 
         TransformComponent quadTransform {};
-        quadTransform.position.z = -1;
+        quadTransform.position.z = -2;
 
         cm.addComponent<TransformComponent>(quad, quadTransform);
         cm.addComponent<MeshComponent>(quad, MeshComponent{meshHandle});
@@ -94,7 +94,7 @@ public:
         TextureID houseTextureHandle = backend.addTexture(houseTexture);
 
         TransformComponent houseTransform {};
-        houseTransform.position.y = -1;
+        houseTransform.position.y = -0.9f;
         houseTransform.rotation.x = -90;
         houseTransform.rotation.y = -90;
 
@@ -102,6 +102,16 @@ public:
         cm.addComponent<TransformComponent>(house, houseTransform);
         cm.addComponent<MeshComponent>(house, MeshComponent{houseMeshHandle});
         cm.addComponent<TextureComponent>(house, TextureComponent{houseTextureHandle});
+
+        Entity tieFighter = em.createEntity();
+
+        MeshID tieMeshHandle = backend.addMesh(createMeshFromFile("models/tie.obj"));
+        TransformComponent tieTransform {};
+        tieTransform.position.y = 10;
+        tieTransform.position.z = -2;
+
+        cm.addComponent<TransformComponent>(tieFighter, tieTransform);
+        cm.addComponent<MeshComponent>(tieFighter, MeshComponent{tieMeshHandle});
         
 
 

@@ -58,4 +58,8 @@ namespace engine
 
         return mesh;
     }
+
+    void Mesh::dump(){
+        std::cout << "Mesh dump:\n\t"<<"vertices:\t"<<vertices.size()<<"\n\t"<<"indices:\t"<<indices.size()<<"\n";
+    }
 }

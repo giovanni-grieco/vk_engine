@@ -88,6 +88,7 @@ public:
         Entity house = em.createEntity();
 
         Mesh houseMesh = createMeshFromFile("models/viking_room.obj");
+        houseMesh.dump();
         MeshID houseMeshHandle = backend.addMesh(houseMesh);
 
         Texture houseTexture = createTextureFromFile("textures/viking_room.png");
@@ -105,7 +106,9 @@ public:
 
         Entity tieFighter = em.createEntity();
 
-        MeshID tieMeshHandle = backend.addMesh(createMeshFromFile("models/tie.obj"));
+        Mesh tieMesh = createMeshFromFile("models/tie.obj");
+        tieMesh.dump();
+        MeshID tieMeshHandle = backend.addMesh(tieMesh);
         TransformComponent tieTransform {};
         tieTransform.position.y = 10;
         tieTransform.position.z = -2;

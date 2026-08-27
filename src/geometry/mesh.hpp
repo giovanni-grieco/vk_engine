@@ -15,6 +15,8 @@ namespace engine{
     struct Mesh{
         std::vector<Vertex> vertices;
         std::vector<uint32_t> indices;
+
+        void dump();
     };
 
     Mesh createMeshFromFile(std::string filepath);

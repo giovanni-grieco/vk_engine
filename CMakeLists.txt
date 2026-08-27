@@ -84,8 +84,8 @@ include_directories(external)
 # =============================================
 # If TINYOBJ_PATH not specified in .env.cmake, use bundled external copy
 if (NOT TINYOBJ_PATH)
-  message(STATUS "TINYOBJ_PATH not specified in .env.cmake, using external/tinyobjloader")
-  set(TINYOBJ_PATH external/tinyobjloader)
+  message(STATUS "TINYOBJ_PATH not specified in .env.cmake, using external/tinyobjectloader")
+  set(TINYOBJ_PATH external/tinyobjectloader)
 endif()
 
 # =============================================

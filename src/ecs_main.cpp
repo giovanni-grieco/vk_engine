@@ -37,8 +37,9 @@ public:
         : window(window),
           renderer(renderer),
           backend(backend)
-    {
-    }
+    {}
+
+
     void init()
     {
         EntityManager &em = EntityManager::getInstance();
@@ -63,18 +64,39 @@ public:
         TextureID texHandle = backend.addTexture(tex);
 
         Entity quad = em.createEntity();
-        Entity quad1 = em.createEntity();
 
-        cm.addComponent<TransformComponent>(quad, TransformComponent{});
+        TransformComponent quadTransform {};
+        quadTransform.position.z = -1;
+
+        cm.addComponent<TransformComponent>(quad, quadTransform);
         cm.addComponent<MeshComponent>(quad, MeshComponent{meshHandle});
         cm.addComponent<TextureComponent>(quad, TextureComponent{texHandle});
 
-        TransformComponent transform {};
-        transform.position.z = -1;
+        Entity house = em.createEntity();
 
-        cm.addComponent<TransformComponent>(quad1, transform);
-        cm.addComponent<MeshComponent>(quad1, MeshComponent{meshHandle});
-        cm.addComponent<TextureComponent>(quad1, TextureComponent{texHandle});
+        Mesh houseMesh = createMeshFromFile("models/viking_room.obj");
+        MeshID houseMeshHandle = backend.addMesh(houseMesh);
+
+        Texture houseTexture = createTextureFromFile("textures/viking_room.png");
+        TextureID houseTextureHandle = backend.addTexture(houseTexture);
+
+        TransformComponent houseTransform {};
+        houseTransform.rotation.x = -90;
+        houseTransform.rotation.y = -90;
+
+
+        cm.addComponent<TransformComponent>(house, houseTransform);
+        cm.addComponent<MeshComponent>(house, MeshComponent{houseMeshHandle});
+        cm.addComponent<TextureComponent>(house, TextureComponent{houseTextureHandle});
+        
+
+        Entity vase = em.createEntity();
+
+        Mesh vaseMesh = createMeshFromFile("models/flat_vase.obj");
+        MeshID vaseMeshHandle = backend.addMesh(vaseMesh);
+
+        cm.addComponent<TransformComponent>(vase, houseTransform);
+        cm.addComponent<MeshComponent>(vase, MeshComponent{vaseMeshHandle});
 
         sm.start();
     }

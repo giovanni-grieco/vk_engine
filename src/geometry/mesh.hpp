@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <glm/glm.hpp>
+#include <string>
 
 #include "vertex.hpp"
 
@@ -15,4 +16,6 @@ namespace engine{
         std::vector<Vertex> vertices;
         std::vector<uint16_t> indices;
     };
+
+    Mesh createMeshFromFile(std::string filepath);
 }

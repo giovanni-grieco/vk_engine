@@ -60,7 +60,7 @@ public:
         Mesh quadMesh {quadVertices, quadIndices};
         MeshID meshHandle = backend.addMesh(quadMesh);
 
-        Texture tex = createTextureFromFile("textures/texture.jpg");
+        Texture tex = createTextureFromFile("textures/statue.jpg");
         TextureID texHandle = backend.addTexture(tex);
 
         Entity quad = em.createEntity();
@@ -89,14 +89,7 @@ public:
         cm.addComponent<MeshComponent>(house, MeshComponent{houseMeshHandle});
         cm.addComponent<TextureComponent>(house, TextureComponent{houseTextureHandle});
         
-
-        Entity vase = em.createEntity();
-
-        Mesh vaseMesh = createMeshFromFile("models/flat_vase.obj");
-        MeshID vaseMeshHandle = backend.addMesh(vaseMesh);
-
-        cm.addComponent<TransformComponent>(vase, houseTransform);
-        cm.addComponent<MeshComponent>(vase, MeshComponent{vaseMeshHandle});
+        
 
         sm.start();
     }

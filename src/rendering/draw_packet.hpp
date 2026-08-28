@@ -10,5 +10,6 @@ namespace engine{
         MeshID meshId = -1;
         TextureID textureId = -1;
         glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 normal = glm::mat4(1.0f);
     };
 }

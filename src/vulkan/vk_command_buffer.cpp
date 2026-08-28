@@ -270,6 +270,7 @@ namespace engine
 
             ModelPushConstant push{};
             push.model = packet.model;
+            push.normal = packet.normal;
             vkCmdPushConstants(commandBuffer,
                                pipeline.layout,
                                VK_SHADER_STAGE_VERTEX_BIT,

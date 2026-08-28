@@ -8,7 +8,6 @@
 #include "ecs/components/texture.hpp"
 
 #include "ecs/systems/camera_system.hpp"
-#include "ecs/systems/translator_system.hpp"
 
 #include "time/engine_time.hpp"
 
@@ -33,14 +32,14 @@ public:
     VulkanBackend &backend;
     Renderer &renderer;
 
-    Game(Window &window, Renderer &renderer, VulkanBackend &backend)
+    Game(Window &window, VulkanBackend &backend, Renderer &renderer)
         : window(window),
-          renderer(renderer),
-          backend(backend)
+          backend(backend),
+          renderer(renderer)
     {}
 
 
-    void init()
+    void init() const
     {
         EntityManager &em = EntityManager::getInstance();
         ComponentManager &cm = ComponentManager::getInstance();
@@ -69,7 +68,7 @@ public:
         cm.addComponent<MeshComponent>(floor, MeshComponent{floorMeshHandle});
         cm.addComponent<TextureComponent>(floor, TextureComponent{floorTextureHandle});
 
-        Mesh quadMesh {quadVertices, quadIndices};
+        Mesh quadMesh {.vertices = quadVertices, .indices = quadIndices};
         MeshID meshHandle = backend.addMesh(quadMesh);
 
         Texture tex = createTextureFromFile("textures/statue.jpg");
@@ -84,7 +83,7 @@ public:
         cm.addComponent<MeshComponent>(quad, MeshComponent{meshHandle});
         cm.addComponent<TextureComponent>(quad, TextureComponent{texHandle});
 
-        
+
         Entity house = em.createEntity();
 
         Mesh houseMesh = createMeshFromFile("models/viking_room.obj");
@@ -115,13 +114,13 @@ public:
 
         cm.addComponent<TransformComponent>(tieFighter, tieTransform);
         cm.addComponent<MeshComponent>(tieFighter, MeshComponent{tieMeshHandle});
-        
+
 
 
         sm.start();
     }
 
-    void run()
+    void run() const
     {
 
         EngineTime &time = EngineTime::getInstance();
@@ -141,9 +140,9 @@ public:
 
 int main()
 {
-    const int width = 1920;
-    const int height = 1080;
-    const bool validationLayer = true;
+    constexpr int width = 1920;
+    constexpr int height = 1080;
+    constexpr bool validationLayer = true;
     const std::string applicationName = "VK Engine";
     const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
@@ -160,7 +159,7 @@ int main()
 
     Renderer renderer{window, backend};
 
-    Game game{window, renderer, backend};
+    const Game game{window, backend, renderer};
 
     game.init();
     game.run();

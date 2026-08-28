@@ -7,5 +7,5 @@
 namespace engine
 {
     VkVertexInputBindingDescription getBindingDescription();
-    std::array<VkVertexInputAttributeDescription, 3> getAttributeDescription();
+    std::array<VkVertexInputAttributeDescription, 4> getAttributeDescription();
 }

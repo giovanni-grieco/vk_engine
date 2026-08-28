@@ -54,6 +54,8 @@ namespace engine
                             * glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f))
                             * glm::scale(glm::mat4(1.0f), transform.scale);
 
+            glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(model)));
+
             TextureID textureHandle = -1;
             if(cm.hasComponent<TextureComponent>(entity)){
                 TextureComponent& texComp = cm.getComponent<TextureComponent>(entity);
@@ -62,8 +64,9 @@ namespace engine
 
             DrawPacket packet{};
             packet.meshId = mesh.meshHandle;
-            packet.model = model;
             packet.textureId=textureHandle;
+            packet.model = model;
+            packet.normal = glm::mat4(normalMat);
             result.push_back(packet);
         }
 

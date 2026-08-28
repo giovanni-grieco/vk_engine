@@ -8,5 +8,6 @@ namespace engine
     struct ModelPushConstant
     {
         glm::mat4 model;
+        glm::mat4 normal;
     };
 }

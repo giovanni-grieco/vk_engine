@@ -1,5 +1,5 @@
 #include "ecs/component_manager.hpp"
-#include "ecs/entity_manager.hpp"
+#include "ecs/scene_manager.hpp"
 #include "ecs/system_manager.hpp"
 
 #include "ecs/components/local_transform.hpp"
@@ -45,12 +45,12 @@ public:
 
     void init() const
     {
-        EntityManager &em = EntityManager::getInstance();
+        SceneManager &sm = SceneManager::getInstance();
         ComponentManager &cm = ComponentManager::getInstance();
-        SystemManager &sm = SystemManager::getInstance();
+        SystemManager &sysmg = SystemManager::getInstance();
 
-        sm.registerSystem(std::make_unique<TransformSystem>());
-        sm.registerSystem(std::make_unique<CameraSystem>(5.0f, 50.0f));
+        sysmg.registerSystem(std::make_unique<TransformSystem>());
+        sysmg.registerSystem(std::make_unique<CameraSystem>(5.0f, 50.0f));
     
         //sm.registerSystem(std::make_unique<Translator>(1.0f));
 
@@ -62,10 +62,10 @@ public:
         cm.registerComponent<ParentComponent>();
         cm.registerComponent<ChildrenComponent>();
 
-        Entity camera = em.createEntity();
+        Entity camera = sm.createEntity();
         cm.addComponent<CameraComponent>(camera, CameraComponent{});
 
-        Entity floor = em.createEntity();
+        Entity floor = sm.createEntity();
         MeshID floorMeshHandle = backend.addMesh(createMeshFromFile("models/quad.obj"));
         TextureID floorTextureHandle = backend.addTexture(createTextureFromFile("textures/floor.jpg"));
 
@@ -84,7 +84,7 @@ public:
         Texture tex = createTextureFromFile("textures/statue.jpg");
         TextureID texHandle = backend.addTexture(tex);
 
-        Entity quad = em.createEntity();
+        Entity quad = sm.createEntity();
 
         LocalTransformComponent quadTransform {};
         quadTransform.position.z = -2;
@@ -95,7 +95,7 @@ public:
         cm.addComponent<TextureComponent>(quad, TextureComponent{texHandle});
 
 
-        Entity house = em.createEntity();
+        Entity house = sm.createEntity();
 
         Mesh houseMesh = createMeshFromFile("models/viking_room.obj");
         MeshID houseMeshHandle = backend.addMesh(houseMesh);
@@ -114,7 +114,7 @@ public:
         cm.addComponent<MeshComponent>(house, MeshComponent{houseMeshHandle});
         cm.addComponent<TextureComponent>(house, TextureComponent{houseTextureHandle});
 
-        Entity tieFighter = em.createEntity();
+        Entity tieFighter = sm.createEntity();
 
         Mesh tieMesh = createMeshFromFile("models/tie.obj");
         tieMesh.dump();
@@ -129,19 +129,19 @@ public:
 
 
 
-        sm.start();
+        sysmg.start();
     }
 
     void run() const
     {
 
         EngineTime &time = EngineTime::getInstance();
-        SystemManager &sm = SystemManager::getInstance();
+        SystemManager &sysmg = SystemManager::getInstance();
         while (!window.shouldWindowClose())
         {
             window.pollEvents();
             time.beginFrame();
-            sm.update();
+            sysmg.update();
             renderer.render();
             Input::getInstance().endFrame();
             window.setWindowTitle("VK Engine - FPS: " + std::to_string(time.fps()));

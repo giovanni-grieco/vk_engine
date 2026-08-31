@@ -13,13 +13,16 @@ namespace engine{
 
             EntityManager()=default;
 
-            Entity createEntity();
-            void destroyEntity(Entity entity);
-            void destroyEntity(Entity entity, ComponentManager& cm);
             bool exists(Entity entity);
             const std::vector<Entity>& getActiveEntities() const;
 
         private:
+            friend class SceneManager;
+
+            Entity createEntity();
+            void destroyEntity(Entity entity);
+            void destroyEntity(Entity entity, ComponentManager& cm);
+
             static std::unique_ptr<EntityManager> instance;
             static unsigned int nextEntityId;
 

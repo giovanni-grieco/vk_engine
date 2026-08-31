@@ -13,6 +13,7 @@
 
 #include "ecs/systems/transform_system.hpp"
 #include "ecs/systems/camera_system.hpp"
+#include "ecs/systems/point_light_system.hpp"
 
 #include "time/engine_time.hpp"
 
@@ -52,6 +53,7 @@ public:
 
         sysmg.registerSystem(std::make_unique<TransformSystem>());
         sysmg.registerSystem(std::make_unique<CameraSystem>(5.0f, 50.0f));
+        sysmg.registerSystem(std::make_unique<PointLightSystem>());
     
         //sm.registerSystem(std::make_unique<Translator>(1.0f));
 

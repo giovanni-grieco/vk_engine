@@ -2,11 +2,15 @@
 #include "ecs/entity_manager.hpp"
 #include "ecs/system_manager.hpp"
 
-#include "ecs/components/transform.hpp"
+#include "ecs/components/local_transform.hpp"
+#include "ecs/components/world_transform.hpp"
+#include "ecs/components/parent.hpp"
+#include "ecs/components/children.hpp"
 #include "ecs/components/mesh.hpp"
 #include "ecs/components/camera.hpp"
 #include "ecs/components/texture.hpp"
 
+#include "ecs/systems/transform_system.hpp"
 #include "ecs/systems/camera_system.hpp"
 
 #include "time/engine_time.hpp"
@@ -45,13 +49,18 @@ public:
         ComponentManager &cm = ComponentManager::getInstance();
         SystemManager &sm = SystemManager::getInstance();
 
+        sm.registerSystem(std::make_unique<TransformSystem>());
         sm.registerSystem(std::make_unique<CameraSystem>(5.0f, 50.0f));
+    
         //sm.registerSystem(std::make_unique<Translator>(1.0f));
 
-        cm.registerComponent<TransformComponent>();
+        cm.registerComponent<LocalTransformComponent>();
+        cm.registerComponent<WorldTransformComponent>();
         cm.registerComponent<MeshComponent>();
         cm.registerComponent<CameraComponent>();
         cm.registerComponent<TextureComponent>();
+        cm.registerComponent<ParentComponent>();
+        cm.registerComponent<ChildrenComponent>();
 
         Entity camera = em.createEntity();
         cm.addComponent<CameraComponent>(camera, CameraComponent{});
@@ -60,11 +69,12 @@ public:
         MeshID floorMeshHandle = backend.addMesh(createMeshFromFile("models/quad.obj"));
         TextureID floorTextureHandle = backend.addTexture(createTextureFromFile("textures/floor.jpg"));
 
-        TransformComponent floorTransform{};
+        LocalTransformComponent floorTransform{};
         floorTransform.position.y = -1;
         floorTransform.rotation.z = 180;
         floorTransform.scale = glm::vec3(10.0f);
-        cm.addComponent<TransformComponent>(floor, floorTransform);
+        cm.addComponent<WorldTransformComponent>(floor, WorldTransformComponent{});
+        cm.addComponent<LocalTransformComponent>(floor, floorTransform);
         cm.addComponent<MeshComponent>(floor, MeshComponent{floorMeshHandle});
         cm.addComponent<TextureComponent>(floor, TextureComponent{floorTextureHandle});
 
@@ -76,10 +86,11 @@ public:
 
         Entity quad = em.createEntity();
 
-        TransformComponent quadTransform {};
+        LocalTransformComponent quadTransform {};
         quadTransform.position.z = -2;
 
-        cm.addComponent<TransformComponent>(quad, quadTransform);
+        cm.addComponent<WorldTransformComponent>(quad, WorldTransformComponent{});
+        cm.addComponent<LocalTransformComponent>(quad, quadTransform);
         cm.addComponent<MeshComponent>(quad, MeshComponent{meshHandle});
         cm.addComponent<TextureComponent>(quad, TextureComponent{texHandle});
 
@@ -87,19 +98,19 @@ public:
         Entity house = em.createEntity();
 
         Mesh houseMesh = createMeshFromFile("models/viking_room.obj");
-        houseMesh.dump();
         MeshID houseMeshHandle = backend.addMesh(houseMesh);
 
         Texture houseTexture = createTextureFromFile("textures/viking_room.png");
         TextureID houseTextureHandle = backend.addTexture(houseTexture);
 
-        TransformComponent houseTransform {};
+        LocalTransformComponent houseTransform {};
         houseTransform.position.y = -0.9f;
         houseTransform.rotation.x = -90;
         houseTransform.rotation.y = -90;
 
 
-        cm.addComponent<TransformComponent>(house, houseTransform);
+        cm.addComponent<WorldTransformComponent>(house, WorldTransformComponent{});
+        cm.addComponent<LocalTransformComponent>(house, houseTransform);
         cm.addComponent<MeshComponent>(house, MeshComponent{houseMeshHandle});
         cm.addComponent<TextureComponent>(house, TextureComponent{houseTextureHandle});
 
@@ -108,11 +119,12 @@ public:
         Mesh tieMesh = createMeshFromFile("models/tie.obj");
         tieMesh.dump();
         MeshID tieMeshHandle = backend.addMesh(tieMesh);
-        TransformComponent tieTransform {};
+        LocalTransformComponent tieTransform {};
         tieTransform.position.y = 10;
         tieTransform.position.z = -2;
 
-        cm.addComponent<TransformComponent>(tieFighter, tieTransform);
+        cm.addComponent<WorldTransformComponent>(tieFighter, WorldTransformComponent{});
+        cm.addComponent<LocalTransformComponent>(tieFighter, tieTransform);
         cm.addComponent<MeshComponent>(tieFighter, MeshComponent{tieMeshHandle});
 
 

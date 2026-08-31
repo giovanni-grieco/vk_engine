@@ -1,6 +1,5 @@
 #include "camera_system.hpp"
 #include "ecs/component_manager.hpp"
-#include "ecs/components/transform.hpp"
 #include "ecs/components/camera.hpp"
 #include "input/input_system.hpp"
 #include "time/engine_time.hpp"

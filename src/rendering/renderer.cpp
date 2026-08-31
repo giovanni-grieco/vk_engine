@@ -2,7 +2,7 @@
 #include "ecs/component_manager.hpp"
 #include "ecs/components/mesh.hpp"
 #include "ecs/components/camera.hpp"
-#include "ecs/components/transform.hpp"
+#include "ecs/components/world_transform.hpp"
 #include "ecs/components/texture.hpp"
 #include "frame_info.hpp"
 
@@ -46,13 +46,16 @@ namespace engine
         auto entitiesWithMesh = cm.getEntitiesWithComponent<MeshComponent>();
         for(auto entity : entitiesWithMesh){
             MeshComponent& mesh = cm.getComponent<MeshComponent>(entity);
-            TransformComponent& transform = cm.getComponent<TransformComponent>(entity);
+            
+            /*TransformComponent& transform = cm.getComponent<TransformComponent>(entity);
 
             glm::mat4 model = glm::translate(glm::mat4(1.0f), transform.position)
                             * glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f))
                             * glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f))
                             * glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f))
-                            * glm::scale(glm::mat4(1.0f), transform.scale);
+                            * glm::scale(glm::mat4(1.0f), transform.scale);*/
+
+            glm::mat4 model = cm.getComponent<WorldTransformComponent>(entity).matrix;
 
             glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(model)));
 

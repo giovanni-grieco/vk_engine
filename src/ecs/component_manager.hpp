@@ -2,6 +2,7 @@
 
 #include "ecs/entity/entity.hpp"
 #include "ecs/components/component_array.hpp"
+#include "ecs/components/children.hpp"
 #include "utils/reflection.hpp"
 
 #include <vector>
@@ -97,6 +98,8 @@ namespace engine
             return componentArray.getEntitiesConst();
         }
 
+
+        //TODO: Remove all the children of said entity aswell
         void removeEntity(Entity entity)
         {
             for (auto &[type, array] : componentArrays)

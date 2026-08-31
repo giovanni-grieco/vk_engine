@@ -1,14 +1,11 @@
 #pragma once
 
-#include <glm/vec3.hpp>
+#include <glm/glm.hpp>
 
 #include <iostream>
 
-namespace engine
-{
-    struct TransformComponent
-    {
-
+namespace engine{
+    struct LocalTransformComponent{
         glm::vec3 position{};
         glm::vec3 rotation{};
         glm::vec3 scale{1.0f, 1.0f, 1.0f};

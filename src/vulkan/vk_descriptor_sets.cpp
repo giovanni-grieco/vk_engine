@@ -6,8 +6,8 @@ namespace engine
     VulkanDescriptorSets::VulkanDescriptorSets(VulkanDevice &device,
                                                VulkanDescriptorSetLayout &layout,
                                                VulkanDescriptorPool &pool,
-                                               VulkanUniformBuffer &uniformBuffer,
-                                               VulkanUniformBuffer &lightBuffer,
+                                               VulkanHostBuffer &uniformBuffer,
+                                               VulkanHostBuffer &lightBuffer,
                                                uint32_t framesInFlight)
     {
         std::vector<VkDescriptorSetLayout> layouts(framesInFlight, layout.uboSetLayout);

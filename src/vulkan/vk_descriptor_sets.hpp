@@ -6,7 +6,7 @@
 #include "vk_device.hpp"
 #include "vk_descriptor_set_layout.hpp"
 #include "vk_descriptor_pool.hpp"
-#include "vk_uniform_buffer.hpp"
+#include "vk_host_buffer.hpp"
 
 namespace engine
 {
@@ -18,8 +18,8 @@ namespace engine
         VulkanDescriptorSets(VulkanDevice &device,
                              VulkanDescriptorSetLayout &layout,
                              VulkanDescriptorPool &pool,
-                             VulkanUniformBuffer &uniformBuffer,
-                             VulkanUniformBuffer &lightBuffer,
+                             VulkanHostBuffer &uniformBuffer,
+                             VulkanHostBuffer &lightBuffer,
                              uint32_t framesInFlight);
 
         VulkanDescriptorSets(const VulkanDescriptorSets &) = delete;

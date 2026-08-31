@@ -23,7 +23,7 @@
 #include "vk_descriptor_set_layout.hpp"
 #include "vk_descriptor_pool.hpp"
 #include "vk_descriptor_sets.hpp"
-#include "vk_uniform_buffer.hpp"
+#include "vk_host_buffer.hpp"
 
 #include "texture/texture.hpp"
 #include "data/vk_uniform_buffer_object.hpp"
@@ -61,8 +61,8 @@ namespace engine
         MeshID meshQuad;
         VulkanTextureManager textureManager;
         TextureID defaultTextureId = -1;
-        VulkanUniformBuffer uniformBuffer;
-        VulkanUniformBuffer lightBuffer;
+        VulkanHostBuffer uniformBuffer;
+        VulkanHostBuffer lightBuffer;
         VulkanDescriptorPool descriptorPool;
         VulkanDescriptorSets descriptorSets;
 

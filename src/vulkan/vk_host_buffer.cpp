@@ -1,4 +1,4 @@
-#include "vk_uniform_buffer.hpp"
+#include "vk_host_buffer.hpp"
 #include <cstring>
 #include <stdexcept>
 
@@ -19,8 +19,8 @@ namespace engine
         throw std::runtime_error("failed to find suitable memory type!");
     }
 
-    VulkanUniformBuffer::VulkanUniformBuffer(VulkanDevice &device, VkDeviceSize size, uint32_t framesInFlight,
-                                             VkBufferUsageFlags usage)
+    VulkanHostBuffer::VulkanHostBuffer(VulkanDevice &device, VkDeviceSize size, uint32_t framesInFlight,
+                                       VkBufferUsageFlags usage)
         : device_(device.device), size_(size), entries_(framesInFlight)
     {
         VkBufferCreateInfo bufferInfo{};
@@ -32,7 +32,7 @@ namespace engine
         for (auto &entry : entries_)
         {
             if (vkCreateBuffer(device_, &bufferInfo, nullptr, &entry.buffer) != VK_SUCCESS)
-                throw std::runtime_error("failed to create uniform buffer!");
+                throw std::runtime_error("failed to create host buffer!");
 
             VkMemoryRequirements memRequirements;
             vkGetBufferMemoryRequirements(device_, entry.buffer, &memRequirements);
@@ -46,14 +46,14 @@ namespace engine
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
             if (vkAllocateMemory(device_, &allocInfo, nullptr, &entry.memory) != VK_SUCCESS)
-                throw std::runtime_error("failed to allocate uniform buffer memory!");
+                throw std::runtime_error("failed to allocate host buffer memory!");
 
             vkBindBufferMemory(device_, entry.buffer, entry.memory, 0);
             vkMapMemory(device_, entry.memory, 0, size, 0, &entry.mapped);
         }
     }
 
-    VulkanUniformBuffer::~VulkanUniformBuffer()
+    VulkanHostBuffer::~VulkanHostBuffer()
     {
         for (auto &entry : entries_)
         {
@@ -63,7 +63,7 @@ namespace engine
         }
     }
 
-    void VulkanUniformBuffer::update(uint32_t frameIndex, const void *data, VkDeviceSize size)
+    void VulkanHostBuffer::update(uint32_t frameIndex, const void *data, VkDeviceSize size)
     {
         memcpy(entries_[frameIndex].mapped, data, size); // host-coherent => visible next submission
     }

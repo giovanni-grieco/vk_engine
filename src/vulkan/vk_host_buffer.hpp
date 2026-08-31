@@ -9,17 +9,19 @@
 namespace engine
 {
     // One persistently-mapped, host-visible buffer per frame in flight.
-    class VulkanUniformBuffer
+    // Backs both uniform buffers (UBOs) and storage buffers (SSBOs), depending
+    // on the VkBufferUsageFlags passed to the constructor.
+    class VulkanHostBuffer
     {
     public:
-        VulkanUniformBuffer(VulkanDevice &device, VkDeviceSize size, uint32_t framesInFlight,
-                            VkBufferUsageFlags usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
-        ~VulkanUniformBuffer();
+        VulkanHostBuffer(VulkanDevice &device, VkDeviceSize size, uint32_t framesInFlight,
+                         VkBufferUsageFlags usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
+        ~VulkanHostBuffer();
 
-        VulkanUniformBuffer(const VulkanUniformBuffer &) = delete;
-        VulkanUniformBuffer &operator=(const VulkanUniformBuffer &) = delete;
-        VulkanUniformBuffer(VulkanUniformBuffer &&) = delete;
-        VulkanUniformBuffer &operator=(VulkanUniformBuffer &&) = delete;
+        VulkanHostBuffer(const VulkanHostBuffer &) = delete;
+        VulkanHostBuffer &operator=(const VulkanHostBuffer &) = delete;
+        VulkanHostBuffer(VulkanHostBuffer &&) = delete;
+        VulkanHostBuffer &operator=(VulkanHostBuffer &&) = delete;
 
         // Copies CPU data into the buffer for the given frame index.
         void update(uint32_t frameIndex, const void *data, VkDeviceSize size);

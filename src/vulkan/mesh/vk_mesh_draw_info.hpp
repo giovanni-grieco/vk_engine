@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace engine{
     // GPU-side draw data for a mesh stored in the unified vertex/index buffers.

@@ -2,8 +2,6 @@
 
 #include <glm/matrix.hpp>
 
-#include <iostream>
-
 namespace engine
 {
     struct WorldTransformComponent

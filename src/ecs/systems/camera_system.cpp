@@ -8,7 +8,6 @@
 #include <glm/glm.hpp>
 
 #include <iostream>
-#include <math.h>
 
 namespace engine
 {

@@ -4,6 +4,7 @@
 
 namespace engine{
     class TransformSystem : public System{
+    public:
         void start() override;
         void update() override;
     };

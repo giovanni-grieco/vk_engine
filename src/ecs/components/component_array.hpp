@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
-#include <typeinfo>
 #include "ecs/entity/entity.hpp"
 #include <iostream>
 #include "utils/reflection.hpp"

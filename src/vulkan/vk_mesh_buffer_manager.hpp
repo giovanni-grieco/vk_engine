@@ -6,7 +6,7 @@
 
 #include "geometry/mesh.hpp"
 #include "vk_buffer.hpp"
-#include "vulkan/mesh/vk_mesh_draw_info.hpp"
+#include "vulkan/data/vk_mesh_draw_info.hpp"
 
 namespace engine
 {

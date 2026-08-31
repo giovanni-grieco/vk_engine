@@ -12,7 +12,8 @@ namespace engine
     class VulkanUniformBuffer
     {
     public:
-        VulkanUniformBuffer(VulkanDevice &device, VkDeviceSize size, uint32_t framesInFlight);
+        VulkanUniformBuffer(VulkanDevice &device, VkDeviceSize size, uint32_t framesInFlight,
+                            VkBufferUsageFlags usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
         ~VulkanUniformBuffer();
 
         VulkanUniformBuffer(const VulkanUniformBuffer &) = delete;

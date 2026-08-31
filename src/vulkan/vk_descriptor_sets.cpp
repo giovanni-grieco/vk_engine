@@ -7,6 +7,7 @@ namespace engine
                                                VulkanDescriptorSetLayout &layout,
                                                VulkanDescriptorPool &pool,
                                                VulkanUniformBuffer &uniformBuffer,
+                                               VulkanUniformBuffer &lightBuffer,
                                                uint32_t framesInFlight)
     {
         std::vector<VkDescriptorSetLayout> layouts(framesInFlight, layout.uboSetLayout);
@@ -23,21 +24,35 @@ namespace engine
 
         for (uint32_t i = 0; i < framesInFlight; i++)
         {
-            VkDescriptorBufferInfo bufferInfo{};
-            bufferInfo.buffer = uniformBuffer.buffer(i);
-            bufferInfo.offset = 0;
-            bufferInfo.range = uniformBuffer.size();
+            VkDescriptorBufferInfo uboInfo{};
+            uboInfo.buffer = uniformBuffer.buffer(i);
+            uboInfo.offset = 0;
+            uboInfo.range = uniformBuffer.size();
 
-            VkWriteDescriptorSet descriptorWrite{};
-            descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrite.dstSet = descriptorSets[i];
-            descriptorWrite.dstBinding = 0; // matches layout(set = 0, binding = 0) in your shader
-            descriptorWrite.dstArrayElement = 0;
-            descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            descriptorWrite.descriptorCount = 1;
-            descriptorWrite.pBufferInfo = &bufferInfo;
+            VkDescriptorBufferInfo lightInfo{};
+            lightInfo.buffer = lightBuffer.buffer(i);
+            lightInfo.offset = 0;
+            lightInfo.range = lightBuffer.size();
 
-            vkUpdateDescriptorSets(device.device, 1, &descriptorWrite, 0, nullptr);
+            VkWriteDescriptorSet descriptorWrites[2]{};
+
+            descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[0].dstSet = descriptorSets[i];
+            descriptorWrites[0].dstBinding = 0; // layout(set = 0, binding = 0) — camera UBO
+            descriptorWrites[0].dstArrayElement = 0;
+            descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptorWrites[0].descriptorCount = 1;
+            descriptorWrites[0].pBufferInfo = &uboInfo;
+
+            descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[1].dstSet = descriptorSets[i];
+            descriptorWrites[1].dstBinding = 1; // layout(set = 0, binding = 1) — point-light SSBO
+            descriptorWrites[1].dstArrayElement = 0;
+            descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+            descriptorWrites[1].descriptorCount = 1;
+            descriptorWrites[1].pBufferInfo = &lightInfo;
+
+            vkUpdateDescriptorSets(device.device, 2, descriptorWrites, 0, nullptr);
         }
     }
 }

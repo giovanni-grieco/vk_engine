@@ -19,6 +19,7 @@ namespace engine
                              VulkanDescriptorSetLayout &layout,
                              VulkanDescriptorPool &pool,
                              VulkanUniformBuffer &uniformBuffer,
+                             VulkanUniformBuffer &lightBuffer,
                              uint32_t framesInFlight);
 
         VulkanDescriptorSets(const VulkanDescriptorSets &) = delete;

@@ -1,5 +1,5 @@
 #include "vk_pipeline_layout.hpp"
-#include "mesh/vk_push_constant.hpp"
+#include "data/vk_push_constant.hpp"
 
 namespace engine
 {

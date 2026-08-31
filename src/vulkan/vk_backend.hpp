@@ -26,7 +26,8 @@
 #include "vk_uniform_buffer.hpp"
 
 #include "texture/texture.hpp"
-#include "mesh/vk_uniform_buffer_object.hpp"
+#include "data/vk_uniform_buffer_object.hpp"
+#include "data/vk_point_light.hpp"
 
 #include <vector>
 
@@ -61,6 +62,7 @@ namespace engine
         VulkanTextureManager textureManager;
         TextureID defaultTextureId = -1;
         VulkanUniformBuffer uniformBuffer;
+        VulkanUniformBuffer lightBuffer;
         VulkanDescriptorPool descriptorPool;
         VulkanDescriptorSets descriptorSets;
 
@@ -109,11 +111,15 @@ namespace engine
         // Top-down API: queue the draw packets for the next frame.
         void submitDrawPackets(const std::vector<DrawPacket> &drawPackets);
 
+        // Top-down API: queue the point-light list for the next frame.
+        void submitLights(const LightBufferData &lights);
+
 
         void recreateSwapChain(Window &window);
 
     private:
         std::vector<DrawPacket> drawPackets_;
+        LightBufferData lights_;
 
 
         void updateUbo(uint32_t currentFrameIndex, UniformBufferObject &ubo);

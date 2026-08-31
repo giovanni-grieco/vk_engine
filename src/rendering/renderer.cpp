@@ -4,6 +4,8 @@
 #include "ecs/components/camera.hpp"
 #include "ecs/components/world_transform.hpp"
 #include "ecs/components/texture.hpp"
+#include "ecs/components/point_light.hpp"
+#include "vulkan/data/vk_point_light.hpp"
 #include "frame_info.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -76,6 +78,24 @@ namespace engine
         return result;
     }
 
+    LightBufferData makeLightBuffer()
+    {
+        ComponentManager &cm = ComponentManager::getInstance();
+        LightBufferData data{};
+        for(auto entity : cm.getEntitiesWithComponent<PointLightComponent>()){
+            if(data.lightCount >= MAX_POINT_LIGHTS)
+                break;
+
+            PointLightComponent &light = cm.getComponent<PointLightComponent>(entity);
+            glm::mat4 &world = cm.getComponent<WorldTransformComponent>(entity).matrix;
+
+            data.lights[data.lightCount++] = PointLightGPU{
+                glm::vec4(glm::vec3(world[3]), light.intensity),
+                glm::vec4(light.color, 0.0f)};
+        }
+        return data;
+    }
+
     void Renderer::render()
     {   
         ComponentManager &cm = ComponentManager::getInstance();
@@ -92,6 +112,7 @@ namespace engine
 
         std::vector<DrawPacket> drawPackets = makeDrawPackets();
         vulkan.submitDrawPackets(drawPackets);
+        vulkan.submitLights(makeLightBuffer());
 
         vulkan.drawFrame(window, frameInfo);
     }

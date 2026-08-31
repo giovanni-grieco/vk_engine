@@ -3,7 +3,7 @@
 #include "geometry/vertex.hpp"
 #include "geometry/mesh.hpp"
 #include "texture/texture.hpp"
-#include "mesh/vk_uniform_buffer_object.hpp"
+#include "data/vk_uniform_buffer_object.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <chrono>
 
@@ -44,8 +44,9 @@ namespace engine
           bufferManager(device, commandPool, queues),
           textureManager(device, commandPool, queues, descriptorSetLayout.textureSetLayout),
           uniformBuffer(device, sizeof(UniformBufferObject), MAX_FRAMES_IN_FLIGHT),
+          lightBuffer(device, sizeof(LightBufferData), MAX_FRAMES_IN_FLIGHT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT),
           descriptorPool(device.device, MAX_FRAMES_IN_FLIGHT),
-          descriptorSets(device, descriptorSetLayout, descriptorPool, uniformBuffer, MAX_FRAMES_IN_FLIGHT)
+          descriptorSets(device, descriptorSetLayout, descriptorPool, uniformBuffer, lightBuffer, MAX_FRAMES_IN_FLIGHT)
     {
         Mesh triangle1Mesh{triangle1, {0, 1, 2}};
         Mesh triangle2Mesh{triangle2, {0, 1, 2}};
@@ -68,6 +69,11 @@ namespace engine
     void VulkanBackend::submitDrawPackets(const std::vector<DrawPacket> &drawPackets)
     {
         this->drawPackets_ = drawPackets;
+    }
+
+    void VulkanBackend::submitLights(const LightBufferData &lights)
+    {
+        this->lights_ = lights;
     }
 
     void VulkanBackend::removeMesh(MeshID mesh)
@@ -123,7 +129,9 @@ namespace engine
         // updateUbo(currentFrame);
 
         UniformBufferObject ubo{frameInfo.view, frameInfo.projection};
-        updateUbo(currentFrame, ubo);
+        
+        uniformBuffer.update(currentFrame, &ubo, sizeof(UniformBufferObject));
+        lightBuffer.update(currentFrame, &lights_, sizeof(LightBufferData));
 
         // Use the application's draw packets if any were submitted; otherwise
         // render the default demo scene.

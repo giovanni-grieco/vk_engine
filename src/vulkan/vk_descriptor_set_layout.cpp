@@ -16,18 +16,26 @@ namespace engine
     {
         this->device = device;
 
-        // Set 0: the per-frame uniform buffer object.
-        VkDescriptorSetLayoutBinding uboLayoutBinding{};
-        uboLayoutBinding.binding = 0;
-        uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        uboLayoutBinding.descriptorCount = 1;
-        uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-        uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
+        // Set 0: the per-frame uniform buffer object (binding 0) and the
+        // point-light storage buffer (binding 1).
+        VkDescriptorSetLayoutBinding bindings[2]{};
+
+        bindings[0].binding = 0;
+        bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        bindings[0].descriptorCount = 1;
+        bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        bindings[0].pImmutableSamplers = nullptr; // Optional
+
+        bindings[1].binding = 1;
+        bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        bindings[1].descriptorCount = 1;
+        bindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        bindings[1].pImmutableSamplers = nullptr; // Optional
 
         VkDescriptorSetLayoutCreateInfo uboLayoutInfo{};
         uboLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        uboLayoutInfo.bindingCount = 1;
-        uboLayoutInfo.pBindings = &uboLayoutBinding;
+        uboLayoutInfo.bindingCount = 2;
+        uboLayoutInfo.pBindings = bindings;
 
         if (vkCreateDescriptorSetLayout(device, &uboLayoutInfo, nullptr, &uboSetLayout) != VK_SUCCESS)
         {

@@ -1,8 +1,8 @@
 #include "vk_command_buffer.hpp"
 
 #include "geometry/vertex.hpp"
-#include "mesh/vk_uniform_buffer_object.hpp"
-#include "mesh/vk_push_constant.hpp"
+#include "data/vk_uniform_buffer_object.hpp"
+#include "data/vk_push_constant.hpp"
 
 namespace engine
 {

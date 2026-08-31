@@ -9,6 +9,7 @@
 #include "ecs/components/mesh.hpp"
 #include "ecs/components/camera.hpp"
 #include "ecs/components/texture.hpp"
+#include "ecs/components/point_light.hpp"
 
 #include "ecs/systems/transform_system.hpp"
 #include "ecs/systems/camera_system.hpp"
@@ -59,11 +60,19 @@ public:
         cm.registerComponent<MeshComponent>();
         cm.registerComponent<CameraComponent>();
         cm.registerComponent<TextureComponent>();
+        cm.registerComponent<PointLightComponent>();
         cm.registerComponent<ParentComponent>();
         cm.registerComponent<ChildrenComponent>();
 
         Entity camera = sm.createEntity();
         cm.addComponent<CameraComponent>(camera, CameraComponent{});
+
+        Entity pointLight = sm.createEntity();
+        LocalTransformComponent lightTransform{};
+        lightTransform.position = glm::vec3(2.0f, 3.0f, 2.0f);
+        cm.addComponent<WorldTransformComponent>(pointLight, WorldTransformComponent{});
+        cm.addComponent<LocalTransformComponent>(pointLight, lightTransform);
+        cm.addComponent<PointLightComponent>(pointLight, PointLightComponent{glm::vec3(1.0f, 0.9f, 0.8f), 2.0f});
 
         Entity floor = sm.createEntity();
         MeshID floorMeshHandle = backend.addMesh(createMeshFromFile("models/quad.obj"));

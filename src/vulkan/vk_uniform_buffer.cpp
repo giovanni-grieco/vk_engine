@@ -19,13 +19,14 @@ namespace engine
         throw std::runtime_error("failed to find suitable memory type!");
     }
 
-    VulkanUniformBuffer::VulkanUniformBuffer(VulkanDevice &device, VkDeviceSize size, uint32_t framesInFlight)
+    VulkanUniformBuffer::VulkanUniformBuffer(VulkanDevice &device, VkDeviceSize size, uint32_t framesInFlight,
+                                             VkBufferUsageFlags usage)
         : device_(device.device), size_(size), entries_(framesInFlight)
     {
         VkBufferCreateInfo bufferInfo{};
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         bufferInfo.size = size;
-        bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+        bufferInfo.usage = usage;
         bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
         for (auto &entry : entries_)

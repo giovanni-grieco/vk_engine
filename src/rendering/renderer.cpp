@@ -5,6 +5,8 @@
 #include "ecs/components/world_transform.hpp"
 #include "ecs/components/texture.hpp"
 #include "ecs/components/point_light.hpp"
+#include "ecs/components/ambient_light.hpp"
+#include "ecs/components/directional_light.hpp"
 #include "vulkan/data/vk_point_light.hpp"
 #include "frame_info.hpp"
 
@@ -48,14 +50,6 @@ namespace engine
         auto entitiesWithMesh = cm.getEntitiesWithComponent<MeshComponent>();
         for(auto entity : entitiesWithMesh){
             MeshComponent& mesh = cm.getComponent<MeshComponent>(entity);
-            
-            /*TransformComponent& transform = cm.getComponent<TransformComponent>(entity);
-
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), transform.position)
-                            * glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f))
-                            * glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f))
-                            * glm::rotate(glm::mat4(1.0f), glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f))
-                            * glm::scale(glm::mat4(1.0f), transform.scale);*/
 
             glm::mat4 model = cm.getComponent<WorldTransformComponent>(entity).matrix;
 
@@ -78,21 +72,38 @@ namespace engine
         return result;
     }
 
-    LightBufferData makeLightBuffer()
+    LightInfo makeLightInfo()
     {
         ComponentManager &cm = ComponentManager::getInstance();
-        LightBufferData data{};
+        LightInfo data{};
         for(auto entity : cm.getEntitiesWithComponent<PointLightComponent>()){
-            if(data.lightCount >= MAX_POINT_LIGHTS)
+            if(data.pointLights.size() >= MAX_POINT_LIGHTS)
                 break;
 
             PointLightComponent &light = cm.getComponent<PointLightComponent>(entity);
             glm::mat4 &world = cm.getComponent<WorldTransformComponent>(entity).matrix;
 
-            data.lights[data.lightCount++] = PointLightGPU{
-                glm::vec4(glm::vec3(world[3]), light.intensity),
-                glm::vec4(light.color, 0.0f)};
+            data.pointLights.push_back(PointLightInfo{glm::vec3(world[3]), light.color, light.intensity});
         }
+
+        const std::vector<Entity>& ambientLights = cm.getEntitiesWithComponent<AmbientLightComponent>();
+        if(ambientLights.size() > 0){
+            Entity ambientLight = ambientLights[0];
+            AmbientLightComponent& ambientLightComp = cm.getComponent<AmbientLightComponent>(ambientLight);
+            data.ambient.intensity = ambientLightComp.intensity;
+            data.ambient.color = ambientLightComp.color;
+        }
+
+        const std::vector<Entity>& directionaLights = cm.getEntitiesWithComponent<DirectionalLightComponent>();
+        if(directionaLights.size() > 0){
+            Entity directionalLight = directionaLights[0];
+            DirectionalLightComponent& directionalLightComp = cm.getComponent<DirectionalLightComponent>(directionalLight);
+            data.directional.direction = directionalLightComp.direction;
+            data.directional.color = directionalLightComp.color;
+            data.directional.intensity = directionalLightComp.intensity;
+        }
+
+
         return data;
     }
 
@@ -112,7 +123,7 @@ namespace engine
 
         std::vector<DrawPacket> drawPackets = makeDrawPackets();
         vulkan.submitDrawPackets(drawPackets);
-        vulkan.submitLights(makeLightBuffer());
+        vulkan.submitLights(makeLightInfo());
 
         vulkan.drawFrame(window, frameInfo);
     }

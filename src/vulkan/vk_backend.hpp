@@ -3,6 +3,7 @@
 #include "platform/window.hpp"
 #include "rendering/frame_info.hpp"
 #include "rendering/draw_packet.hpp"
+#include "rendering/light_info.hpp"
 
 #include "vk_instance.hpp"
 #include "vk_device.hpp"
@@ -112,7 +113,7 @@ namespace engine
         void submitDrawPackets(const std::vector<DrawPacket> &drawPackets);
 
         // Top-down API: queue the point-light list for the next frame.
-        void submitLights(const LightBufferData &lights);
+        void submitLights(const LightInfo &lightInfo);
 
 
         void recreateSwapChain(Window &window);

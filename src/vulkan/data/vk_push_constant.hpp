@@ -7,7 +7,7 @@ namespace engine
     // Per-draw transform, pushed via vkCmdPushConstants.
     struct ModelPushConstant
     {
-        glm::mat4 model;
-        glm::mat4 normal;
+        glm::mat4 model{};
+        glm::mat4 normal{};
     };
 }

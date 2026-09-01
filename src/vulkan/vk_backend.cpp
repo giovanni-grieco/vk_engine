@@ -71,9 +71,19 @@ namespace engine
         this->drawPackets_ = drawPackets;
     }
 
-    void VulkanBackend::submitLights(const LightBufferData &lights)
+    void VulkanBackend::submitLights(const LightInfo &lightInfo)
     {
-        this->lights_ = lights;
+        LightBufferData lightBuffer{};
+        lightBuffer.ambient.colorAndIntensity = {lightInfo.ambient.color, lightInfo.ambient.intensity};
+        lightBuffer.directional.directionAndIntensity = {lightInfo.directional.direction, lightInfo.directional.intensity};
+        lightBuffer.directional.colorAndRadius = {lightInfo.directional.color, 1};
+        
+        for(int i = 0; i<lightInfo.pointLights.size() && i < MAX_POINT_LIGHTS_VK; i++){
+            lightBuffer.lightCount++;
+            lightBuffer.lights[i].positionAndIntensity = {lightInfo.pointLights[i].position, lightInfo.pointLights[i].intensity};
+            lightBuffer.lights[i].colorAndRadius = {lightInfo.pointLights[i].color, 1};
+        }
+        this->lights_ = lightBuffer;
     }
 
     void VulkanBackend::removeMesh(MeshID mesh)

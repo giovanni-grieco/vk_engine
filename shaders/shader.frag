@@ -7,9 +7,21 @@ struct PointLight {
     vec4 colorAndRadius;
 };
 
+struct AmbientLight{
+    vec4 colorAndIntensity;
+};
+
+struct DirectionalLight{
+    vec4 directionAndIntensity;
+    vec4 colorAndRadius;
+};
+
 layout(std430, set = 0, binding = 1) readonly buffer LightBuffer {
     uint lightCount;
     PointLight lights[MAX_POINT_LIGHTS];
+    DirectionalLight directionalLight;
+    AmbientLight ambientLight;
+
 } lightBlock;
 
 layout(set = 1, binding = 0) uniform sampler2D texSampler;
@@ -24,8 +36,6 @@ layout(location = 3) in vec2 fragUV;
 void main() {
     vec3 N = normalize(fragNormal);
     vec3 baseColor = texture(texSampler, fragUV).rgb * fragColor;
-
-    const float ambient = 0.01;
 
     vec3 totalLight = vec3(0.0);
     for (uint i = 0; i < lightBlock.lightCount; ++i) {
@@ -42,6 +52,6 @@ void main() {
                     * attenuation;
     }
 
-    vec3 lit = baseColor * (ambient + totalLight);
+    vec3 lit = baseColor * (lightBlock.ambientLight.colorAndIntensity.w + totalLight);
     outColor = vec4(lit, 1.0);
 }

@@ -10,6 +10,8 @@
 #include "ecs/components/camera.hpp"
 #include "ecs/components/texture.hpp"
 #include "ecs/components/point_light.hpp"
+#include "ecs/components/ambient_light.hpp"
+#include "ecs/components/directional_light.hpp"
 
 #include "ecs/systems/transform_system.hpp"
 #include "ecs/systems/camera_system.hpp"
@@ -59,15 +61,30 @@ public:
 
         cm.registerComponent<LocalTransformComponent>();
         cm.registerComponent<WorldTransformComponent>();
+        cm.registerComponent<ParentComponent>();
+        cm.registerComponent<ChildrenComponent>();
+        cm.registerComponent<PointLightComponent>();
+        cm.registerComponent<AmbientLightComponent>();
+        cm.registerComponent<DirectionalLightComponent>();
         cm.registerComponent<MeshComponent>();
         cm.registerComponent<CameraComponent>();
         cm.registerComponent<TextureComponent>();
-        cm.registerComponent<PointLightComponent>();
-        cm.registerComponent<ParentComponent>();
-        cm.registerComponent<ChildrenComponent>();
 
         Entity camera = sm.createEntity();
         cm.addComponent<CameraComponent>(camera, CameraComponent{});
+
+        Entity ambientLight = sm.createEntity();
+        AmbientLightComponent alc = AmbientLightComponent{};
+        alc.color = {1.0f, 1.0f, 1.0f};
+        alc.intensity = 0.15f;
+        cm.addComponent<AmbientLightComponent>(ambientLight, alc);
+
+        Entity directionalLight = sm.createEntity();
+        DirectionalLightComponent dlc = DirectionalLightComponent{};
+        dlc.direction = {-1.0f, -1.0f, 1.0f};
+        dlc.color = {1.0f, 1.0f, 1.0f};
+        dlc.intensity = 0.1f;
+        cm.addComponent<DirectionalLightComponent>(directionalLight, dlc);
 
         Entity pointLight = sm.createEntity();
         LocalTransformComponent lightTransform{};

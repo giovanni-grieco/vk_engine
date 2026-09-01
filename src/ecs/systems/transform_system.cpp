@@ -2,6 +2,7 @@
 #include "ecs/components/local_transform.hpp"
 #include "ecs/components/world_transform.hpp"
 #include "ecs/components/parent.hpp"
+#include "ecs/components/children.hpp"
 #include "ecs/component_manager.hpp"
 #include "ecs/entity_manager.hpp"
 #include "ecs/entity/entity.hpp"
@@ -10,6 +11,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <vector>
+
 
 namespace engine{
     

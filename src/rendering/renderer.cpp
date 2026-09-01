@@ -7,7 +7,6 @@
 #include "ecs/components/point_light.hpp"
 #include "ecs/components/ambient_light.hpp"
 #include "ecs/components/directional_light.hpp"
-#include "vulkan/data/vk_point_light.hpp"
 #include "frame_info.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>

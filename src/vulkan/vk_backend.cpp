@@ -73,17 +73,17 @@ namespace engine
 
     void VulkanBackend::submitLights(const LightInfo &lightInfo)
     {
-        LightBufferData lightBuffer{};
-        lightBuffer.ambient.colorAndIntensity = {lightInfo.ambient.color, lightInfo.ambient.intensity};
-        lightBuffer.directional.directionAndIntensity = {lightInfo.directional.direction, lightInfo.directional.intensity};
-        lightBuffer.directional.colorAndRadius = {lightInfo.directional.color, 1};
+        LightBufferData lightBufferData{};
+        lightBufferData.ambient.colorAndIntensity = {lightInfo.ambient.color, lightInfo.ambient.intensity};
+        lightBufferData.directional.directionAndIntensity = {lightInfo.directional.direction, lightInfo.directional.intensity};
+        lightBufferData.directional.colorAndRadius = {lightInfo.directional.color, 1};
         
         for(int i = 0; i<lightInfo.pointLights.size() && i < MAX_POINT_LIGHTS_VK; i++){
-            lightBuffer.lightCount++;
-            lightBuffer.lights[i].positionAndIntensity = {lightInfo.pointLights[i].position, lightInfo.pointLights[i].intensity};
-            lightBuffer.lights[i].colorAndRadius = {lightInfo.pointLights[i].color, 1};
+            lightBufferData.lightCount++;
+            lightBufferData.lights[i].positionAndIntensity = {lightInfo.pointLights[i].position, lightInfo.pointLights[i].intensity};
+            lightBufferData.lights[i].colorAndRadius = {lightInfo.pointLights[i].color, 1};
         }
-        this->lights_ = lightBuffer;
+        this->lights_ = lightBufferData;
     }
 
     void VulkanBackend::removeMesh(MeshID mesh)

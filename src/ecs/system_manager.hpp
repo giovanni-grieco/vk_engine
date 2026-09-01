@@ -2,11 +2,9 @@
 
 #include "ecs/systems/system.hpp"
 #include "ecs/component_manager.hpp"
-#include "ecs/entity_manager.hpp"
 
 #include <memory>
 #include <vector>
-#include <iostream>
 
 namespace engine
 {
@@ -17,6 +15,9 @@ namespace engine
         static SystemManager &getInstance();
 
         SystemManager() = default;
+        // Prevent copying — unique_ptr members are non-copyable
+        SystemManager(const SystemManager &) = delete;
+        SystemManager &operator=(const SystemManager &) = delete;
 
         void start();
         void update();
@@ -25,10 +26,6 @@ namespace engine
 
     private:
         static std::unique_ptr<SystemManager> instance;
-        
-        // Prevent copying — unique_ptr members are non-copyable
-        SystemManager(const SystemManager &) = delete;
-        SystemManager &operator=(const SystemManager &) = delete;
         std::vector<std::unique_ptr<System>> systems;
     };
 }

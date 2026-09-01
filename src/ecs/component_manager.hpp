@@ -2,7 +2,6 @@
 
 #include "ecs/entity/entity.hpp"
 #include "ecs/components/component_array.hpp"
-#include "ecs/components/children.hpp"
 #include "utils/reflection.hpp"
 
 #include <vector>

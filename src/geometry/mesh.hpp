@@ -1,9 +1,8 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 
-#include <glm/glm.hpp>
 #include <string>
 
 #include "vertex.hpp"

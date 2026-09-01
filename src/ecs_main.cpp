@@ -74,13 +74,13 @@ public:
         cm.addComponent<CameraComponent>(camera, CameraComponent{});
 
         Entity ambientLight = sm.createEntity();
-        AmbientLightComponent alc = AmbientLightComponent{};
+        AmbientLightComponent alc {};
         alc.color = {1.0f, 1.0f, 1.0f};
         alc.intensity = 0.15f;
         cm.addComponent<AmbientLightComponent>(ambientLight, alc);
 
         Entity directionalLight = sm.createEntity();
-        DirectionalLightComponent dlc = DirectionalLightComponent{};
+        DirectionalLightComponent dlc {};
         dlc.direction = {-1.0f, -1.0f, 1.0f};
         dlc.color = {1.0f, 1.0f, 1.0f};
         dlc.intensity = 0.1f;

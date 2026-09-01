@@ -17,7 +17,7 @@ namespace engine
 
         if (!pixels)
         {
-            throw std::runtime_error("failed to load texture image!");
+            throw std::runtime_error("failed to load texture image \"" + filepath + "\"!");
         }
 
         size_t totalSize = texWidth * texHeight * 4;
@@ -44,7 +44,7 @@ namespace engine
 
         if (!pixels)
         {
-            throw std::runtime_error("failed to load texture image!");
+            throw std::runtime_error("failed to load texture image \"" + filepath + "\"!");
         }
 
         size_t totalSize = texWidth * texHeight * 4;

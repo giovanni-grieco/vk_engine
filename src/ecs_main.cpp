@@ -94,8 +94,8 @@ public:
         cm.addComponent<PointLightComponent>(pointLight, PointLightComponent{glm::vec3(1.0f, 0.9f, 0.8f), 2.0f});
 
         Entity floor = sm.createEntity();
-        MeshID floorMeshHandle = backend.addMesh(createMeshFromFile("models/quad.obj"));
-        TextureID floorTextureHandle = backend.addTexture(createTextureFromFile("textures/floor.jpg"));
+        MeshID floorMeshHandle = backend.addMesh(createMeshFromFile("../models/quad.obj"));
+        TextureID floorTextureHandle = backend.addTexture(createTextureFromFile("../textures/floor.jpg"));
 
         LocalTransformComponent floorTransform{};
         floorTransform.position.y = -1;
@@ -109,7 +109,7 @@ public:
         Mesh quadMesh {.vertices = quadVertices, .indices = quadIndices};
         MeshID meshHandle = backend.addMesh(quadMesh);
 
-        Texture tex = createTextureFromFile("textures/statue.jpg");
+        Texture tex = createTextureFromFile("../textures/statue.jpg");
         TextureID texHandle = backend.addTexture(tex);
 
         Entity quad = sm.createEntity();
@@ -125,10 +125,10 @@ public:
 
         Entity house = sm.createEntity();
 
-        Mesh houseMesh = createMeshFromFile("models/viking_room.obj");
+        Mesh houseMesh = createMeshFromFile("../models/viking_room.obj");
         MeshID houseMeshHandle = backend.addMesh(houseMesh);
 
-        Texture houseTexture = createTextureFromFile("textures/viking_room.png");
+        Texture houseTexture = createTextureFromFile("../textures/viking_room.png");
         TextureID houseTextureHandle = backend.addTexture(houseTexture);
 
         LocalTransformComponent houseTransform {};
@@ -144,7 +144,7 @@ public:
 
         Entity tieFighter = sm.createEntity();
 
-        Mesh tieMesh = createMeshFromFile("models/tie.obj");
+        Mesh tieMesh = createMeshFromFile("../models/tie.obj");
         tieMesh.dump();
         MeshID tieMeshHandle = backend.addMesh(tieMesh);
         LocalTransformComponent tieTransform {};
@@ -187,7 +187,7 @@ int main()
     const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
     const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-    const std::vector<std::string> shadersFilePaths = {"shaders/shader.vert.spv", "shaders/shader.frag.spv"};
+    const std::vector<std::string> shadersFilePaths = {"../shaders/shader.vert.spv", "../shaders/shader.frag.spv"};
     const std::vector<engine::VulkanShaderType> shaderTypes = {engine::VulkanShaderType::VERTEX, engine::VulkanShaderType::FRAGMENT};
 
     std::cout << "vk_engine started!\n"

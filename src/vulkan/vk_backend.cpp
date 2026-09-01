@@ -14,7 +14,7 @@ namespace engine
         Texture loadDefaultTexture()
         {
             Texture texture{};
-            createTextureFromFile(texture, "textures/default_texture.png");
+            createTextureFromFile(texture, "../textures/default_texture.png");
             return texture;
         }
     }

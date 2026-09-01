@@ -37,8 +37,11 @@ void main() {
     vec3 N = normalize(fragNormal);
     vec3 baseColor = texture(texSampler, fragUV).rgb * fragColor;
 
-    vec3 totalLight = vec3(0.0);
-    for (uint i = 0; i < lightBlock.lightCount; ++i) {
+    vec3 lighting = lightBlock.ambientLight.colorAndIntensity.rgb
+                    * lightBlock.ambientLight.colorAndIntensity.w;
+
+    uint count = min(lightBlock.lightCount, MAX_POINT_LIGHTS);
+    for (uint i = 0; i < count; ++i) {
         PointLight light = lightBlock.lights[i];
 
         vec3 toLight = light.positionAndIntensity.xyz - fragPos;
@@ -46,12 +49,20 @@ void main() {
         vec3 L = toLight / dist;
 
         float attenuation = 1.0 / (1.0 + 0.2 * dist * dist);
-        totalLight += light.colorAndRadius.rgb
-                    * light.positionAndIntensity.w
-                    * max(dot(N, L), 0.0)
-                    * attenuation;
+        float NdotL = max(dot(N, L), 0.0);
+
+        lighting += light.colorAndRadius.rgb
+                  * light.positionAndIntensity.w
+                  * NdotL
+                  * attenuation;
     }
 
-    vec3 lit = baseColor * (lightBlock.ambientLight.colorAndIntensity.w + totalLight);
-    outColor = vec4(lit, 1.0);
+    vec3 Ld = normalize(-lightBlock.directionalLight.directionAndIntensity.xyz);
+    float NdotLd = max(dot(N, Ld), 0.0);
+    lighting += lightBlock.directionalLight.colorAndRadius.rgb
+              * lightBlock.directionalLight.directionAndIntensity.w
+              * NdotLd;
+
+    vec3 finalColor = baseColor * lighting;
+    outColor = vec4(finalColor, 1.0);
 }

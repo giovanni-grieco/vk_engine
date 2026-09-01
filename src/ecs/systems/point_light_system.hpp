@@ -16,7 +16,7 @@ namespace engine
         float timeBetweenSwitchOfDirection = 1.0f;
         float timeElapsed = 0.0f;
         int direction = -1;
-        glm::vec3 pointA{}; 
-        glm::vec3 pointB{};
+        glm::vec3 pointA{2.0f, 1.0f, -2.0f}; 
+        glm::vec3 pointB{-2.0f, 1.0f, -2.0f};
     };
 }

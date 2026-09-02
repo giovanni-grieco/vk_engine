@@ -85,6 +85,8 @@ public:
         dlc.color = {1.0f, 1.0f, 1.0f};
         dlc.intensity = 0.1f;
         cm.addComponent<DirectionalLightComponent>(directionalLight, dlc);
+        
+
 
         Entity pointLight = sm.createEntity();
         LocalTransformComponent lightTransform{};
@@ -95,6 +97,16 @@ public:
         plc.color = glm::vec3(1.0f, 0.5f, 0.5f);
         plc.intensity = 0.5f;
         cm.addComponent<PointLightComponent>(pointLight, plc);
+
+        Entity pointLight1 = sm.createEntity();
+        LocalTransformComponent lightTransform1{};
+        lightTransform1.position = glm::vec3(-2.0f, 3.0f, -2.0f);
+        cm.addComponent<WorldTransformComponent>(pointLight1, WorldTransformComponent{});
+        cm.addComponent<LocalTransformComponent>(pointLight1, lightTransform1);
+        PointLightComponent plc1 {};
+        plc1.color = glm::vec3(0.5f, 2.0f, 2.0f);
+        plc1.intensity = 0.5f;
+        cm.addComponent<PointLightComponent>(pointLight1, plc1);
 
         Entity floor = sm.createEntity();
         MeshID floorMeshHandle = backend.addMesh(createMeshFromFile("../models/quad.obj"));

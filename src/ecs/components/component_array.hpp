@@ -40,7 +40,6 @@ namespace engine
                 std::cerr << "Warning: Entity already has this component — skipping add.\n";
                 return;
             }
-            std::cout << "Add Component v1 called\n";
             components.push_back(component);
             entities.push_back(entity);
             entityToIndex[entity] = components.size() - 1;
@@ -53,7 +52,6 @@ namespace engine
                 std::cerr << "Warning: Entity already has this component — skipping add.\n";
                 return;
             }
-            std::cout << "Add Component v2 called\n";
             components.push_back(std::move(component));
             entities.push_back(entity);
             entityToIndex[entity] = components.size() - 1;

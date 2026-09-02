@@ -58,7 +58,6 @@ public:
         sysmg.registerSystem(std::make_unique<PointLightSystem>());
     
         //sm.registerSystem(std::make_unique<Translator>(1.0f));
-
         cm.registerComponent<LocalTransformComponent>();
         cm.registerComponent<WorldTransformComponent>();
         cm.registerComponent<ParentComponent>();
@@ -85,8 +84,6 @@ public:
         dlc.color = {1.0f, 1.0f, 1.0f};
         dlc.intensity = 0.1f;
         cm.addComponent<DirectionalLightComponent>(directionalLight, dlc);
-        
-
 
         Entity pointLight = sm.createEntity();
         LocalTransformComponent lightTransform{};
@@ -110,8 +107,8 @@ public:
 
         Entity floor = sm.createEntity();
         MeshID floorMeshHandle = backend.addMesh(createMeshFromFile("../models/quad.obj"));
-        TextureID floorTextureHandle = backend.addTexture(createTextureFromFile("../textures/floor.jpg"));
-
+        Texture floorTex = createTextureFromFile("../textures/floor.jpg");
+        TextureID floorTextureHandle = backend.addTexture(floorTex);
         LocalTransformComponent floorTransform{};
         floorTransform.position.y = -1;
         floorTransform.rotation.z = 180;
@@ -123,53 +120,40 @@ public:
 
         Mesh quadMesh {.vertices = quadVertices, .indices = quadIndices};
         MeshID meshHandle = backend.addMesh(quadMesh);
-
         Texture tex = createTextureFromFile("../textures/statue.jpg");
         TextureID texHandle = backend.addTexture(tex);
-
         Entity quad = sm.createEntity();
-
         LocalTransformComponent quadTransform {};
         quadTransform.position.z = -2;
-
         cm.addComponent<WorldTransformComponent>(quad, WorldTransformComponent{});
         cm.addComponent<LocalTransformComponent>(quad, quadTransform);
         cm.addComponent<MeshComponent>(quad, MeshComponent{meshHandle});
         cm.addComponent<TextureComponent>(quad, TextureComponent{{texHandle}});
 
-
         Entity house = sm.createEntity();
-
         Mesh houseMesh = createMeshFromFile("../models/viking_room.obj");
         MeshID houseMeshHandle = backend.addMesh(houseMesh);
-
         Texture houseTexture = createTextureFromFile("../textures/viking_room.png");
         TextureID houseTextureHandle = backend.addTexture(houseTexture);
-
         LocalTransformComponent houseTransform {};
         houseTransform.position.y = -0.9f;
         houseTransform.rotation.x = -90;
         houseTransform.rotation.y = -90;
-
-
         cm.addComponent<WorldTransformComponent>(house, WorldTransformComponent{});
         cm.addComponent<LocalTransformComponent>(house, houseTransform);
         cm.addComponent<MeshComponent>(house, MeshComponent{houseMeshHandle});
         cm.addComponent<TextureComponent>(house, TextureComponent{backend.addSubMeshTextures(houseMesh, houseTextureHandle)});
 
         Entity tieFighter = sm.createEntity();
-
         Mesh tieMesh = createMeshFromFile("../models/tie.obj");
         MeshID tieMeshHandle = backend.addMesh(tieMesh);
         LocalTransformComponent tieTransform {};
         tieTransform.position.y = 10;
         tieTransform.position.z = -2;
-
+        tieTransform.scale = glm::vec3{0.25};
         cm.addComponent<WorldTransformComponent>(tieFighter, WorldTransformComponent{});
         cm.addComponent<LocalTransformComponent>(tieFighter, tieTransform);
         cm.addComponent<MeshComponent>(tieFighter, MeshComponent{tieMeshHandle});
-
-
 
         sysmg.start();
     }

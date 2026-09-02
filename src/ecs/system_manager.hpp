@@ -23,7 +23,7 @@ namespace engine
         void update();
 
         void registerSystem(std::unique_ptr<System> system);
-
+        
     private:
         static std::unique_ptr<SystemManager> instance;
         std::vector<std::unique_ptr<System>> systems;

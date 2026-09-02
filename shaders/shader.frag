@@ -32,15 +32,10 @@ layout(location = 0) in vec3 fragPos;
 layout(location = 1) in vec3 fragNormal;
 layout(location = 2) in vec3 fragColor;
 layout(location = 3) in vec2 fragUV;
-layout(location = 4) flat in int fragHasTexture;
 
 void main() {
     vec3 N = normalize(fragNormal);
-    vec3 texel = vec3(1.0);
-    if (fragHasTexture == 1) {
-        texel = texture(texSampler, fragUV).rgb;
-    }
-    vec3 baseColor = texel * fragColor;
+    vec3 baseColor = texture(texSampler, fragUV).rgb * fragColor;
 
     vec3 lighting = lightBlock.ambientLight.colorAndIntensity.rgb
                     * lightBlock.ambientLight.colorAndIntensity.w;

@@ -249,12 +249,10 @@ namespace engine
                 continue; // unknown mesh handle or submesh index — skip it
             }
 
-            // Set 1 (per draw): the texture requested by this packet. When the
-            // id is -1 or unknown we bind a 1x1 white dummy texture to satisfy
-            // the pipeline, but flag the shader to skip sampling (hasTexture=0)
-            // so the vertex color is used instead.
+            // Set 1 (per draw): the texture requested by this packet, falling
+            // back to a 1x1 white texture when the id is -1 or unknown. The
+            // white texture is sampled harmlessly (white * color == color).
             const TextureDrawInfo *texInfo = textureManager.getTextureInfo(packet.textureId);
-            const bool hasTexture = (texInfo != nullptr);
             if (texInfo == nullptr)
             {
                 texInfo = textureManager.getTextureInfo(whiteTextureId);
@@ -264,21 +262,15 @@ namespace engine
                 continue; // no usable descriptor set — skip it
             }
 
-            VkDescriptorSet textureSet = texInfo->descriptorSet;
-            vkCmdBindDescriptorSets(commandBuffer,
-                                    VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                    pipeline.layout,
-                                    1, 1, &textureSet,
-                                    0, nullptr);
+            VkDescriptorSet textureSet = texInfo->descriptorSet; 
+            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.layout, 1, 1, &textureSet, 0, nullptr);
 
             ModelPushConstant push{};
             push.model = packet.model;
-            push.normal = packet.normal;
+            push.normal[0] = glm::vec4(glm::vec3(packet.normal[0]), 0.0f);
+            push.normal[1] = glm::vec4(glm::vec3(packet.normal[1]), 0.0f);
+            push.normal[2] = glm::vec4(glm::vec3(packet.normal[2]), 0.0f);
             push.color = packet.color;
-            push.hasTexture = 0;
-            if (hasTexture) {
-                push.hasTexture = 1;
-            }
             vkCmdPushConstants(commandBuffer,
                                pipeline.layout,
                                VK_SHADER_STAGE_VERTEX_BIT,

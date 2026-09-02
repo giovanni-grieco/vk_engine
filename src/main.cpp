@@ -160,7 +160,6 @@ public:
         Entity tieFighter = sm.createEntity();
 
         Mesh tieMesh = createMeshFromFile("../models/tie.obj");
-        tieMesh.dump();
         MeshID tieMeshHandle = backend.addMesh(tieMesh);
         LocalTransformComponent tieTransform {};
         tieTransform.position.y = 10;

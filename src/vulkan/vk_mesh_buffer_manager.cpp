@@ -40,11 +40,7 @@ namespace engine
         else
         {
             // Fits in the existing buffers: just append this mesh.
-            MeshDrawInfo info;
-            info.vertexOffset = static_cast<int32_t>(vertexBase);
-            info.firstIndex = indexBase;
-            info.indexCount = static_cast<uint32_t>(mesh.indices.size());
-            id2drawInfo_[id] = info;
+            id2drawInfo_[id] = buildDrawInfos(mesh, vertexBase, indexBase);
 
             vertexBuffer_.upload(mesh.vertices.data(),
                                  mesh.vertices.size() * sizeof(Vertex),
@@ -98,10 +94,67 @@ namespace engine
         reallocateAndUpload(vertexBytes, indexBytes);
     }
 
-    const MeshDrawInfo *VulkanBufferManager::getDrawInfo(MeshID id) const
+    const MeshDrawInfo *VulkanBufferManager::getDrawInfo(MeshID id, uint32_t subMeshIndex) const
     {
         const auto it = id2drawInfo_.find(id);
-        return it == id2drawInfo_.end() ? nullptr : &it->second;
+        if (it == id2drawInfo_.end() || subMeshIndex >= it->second.size())
+        {
+            return nullptr;
+        }
+        return &it->second[subMeshIndex];
+    }
+
+    uint32_t VulkanBufferManager::getSubMeshCount(MeshID id) const
+    {
+        const auto it = id2drawInfo_.find(id);
+        if (it == id2drawInfo_.end())
+        {
+            return 0;
+        }
+        return static_cast<uint32_t>(it->second.size());
+    }
+
+    SubMesh VulkanBufferManager::getSubMesh(MeshID id, uint32_t subMeshIndex) const
+    {
+        const auto it = meshes_.find(id);
+        if (it == meshes_.end())
+        {
+            return SubMesh{};
+        }
+        const std::vector<SubMesh> &subs = it->second.subMeshes;
+        if (subMeshIndex >= subs.size())
+        {
+            return SubMesh{};
+        }
+        return subs[subMeshIndex];
+    }
+
+    std::vector<MeshDrawInfo> VulkanBufferManager::buildDrawInfos(const Mesh &mesh,
+                                                                  uint32_t vertexBase,
+                                                                  uint32_t indexBase)
+    {
+        std::vector<MeshDrawInfo> infos;
+
+        if (mesh.subMeshes.empty())
+        {
+            MeshDrawInfo info;
+            info.vertexOffset = static_cast<int32_t>(vertexBase);
+            info.firstIndex = indexBase;
+            info.indexCount = static_cast<uint32_t>(mesh.indices.size());
+            infos.push_back(info);
+            return infos;
+        }
+
+        infos.reserve(mesh.subMeshes.size());
+        for (const SubMesh &sub : mesh.subMeshes)
+        {
+            MeshDrawInfo info;
+            info.vertexOffset = static_cast<int32_t>(vertexBase);
+            info.firstIndex = indexBase + sub.firstIndex;
+            info.indexCount = sub.indexCount;
+            infos.push_back(info);
+        }
+        return infos;
     }
 
     void VulkanBufferManager::allocate(VkDeviceSize vertexCapacity, VkDeviceSize indexCapacity)
@@ -125,11 +178,7 @@ namespace engine
         {
             const Mesh &mesh = meshes_.at(id);
 
-            MeshDrawInfo info;
-            info.vertexOffset = static_cast<int32_t>(vertexBase);
-            info.firstIndex = indexBase;
-            info.indexCount = static_cast<uint32_t>(mesh.indices.size());
-            id2drawInfo_[id] = info;
+            id2drawInfo_[id] = buildDrawInfos(mesh, vertexBase, indexBase);
 
             vertexBuffer_.upload(mesh.vertices.data(),
                                  mesh.vertices.size() * sizeof(Vertex),

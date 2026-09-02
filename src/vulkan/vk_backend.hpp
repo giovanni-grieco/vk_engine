@@ -61,7 +61,7 @@ namespace engine
         MeshID meshTriangle3;
         MeshID meshQuad;
         VulkanTextureManager textureManager;
-        TextureID defaultTextureId = -1;
+        TextureID whiteTextureId = -1;
         VulkanHostBuffer uniformBuffer;
         VulkanHostBuffer lightBuffer;
         VulkanDescriptorPool descriptorPool;
@@ -92,10 +92,22 @@ namespace engine
         // until compactBuffers() is called).
         void removeMesh(MeshID mesh);
 
+        // Number of drawable submeshes (material groups) in a mesh; at least 1.
+        uint32_t getSubMeshCount(MeshID meshId) const;
+
+        // CPU-side material info for one submesh (diffuse color/texture path).
+        SubMesh getSubMesh(MeshID meshId, uint32_t subMeshIndex) const;
+
         // Top-down API: rebuild the unified buffers with only live meshes.
         // Stalls the device; call when no frames are in flight.
         // Top-down API: upload a CPU texture and get a handle back.
         TextureID addTexture(const Texture &texture);
+
+        // Convenience: upload one texture per material group of `mesh`,
+        // falling back to `fallback` for groups without a texture (or whose
+        // texture fails to load). The result is index-aligned with
+        // mesh.subMeshes and always has at least one entry.
+        std::vector<TextureID> addSubMeshTextures(const Mesh &mesh, TextureID fallback = -1);
 
         // Top-down API: mark a texture handle as deleted (its GPU image is
         // destroyed when compactTextures() is called).

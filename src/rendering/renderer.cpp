@@ -42,7 +42,7 @@ namespace engine
         return frameInfo;
     }
 
-    std::vector<DrawPacket> makeDrawPackets()
+    std::vector<DrawPacket> makeDrawPackets(VulkanBackend &vulkan)
     {
         ComponentManager &cm = ComponentManager::getInstance();
         std::vector<DrawPacket> result;
@@ -51,21 +51,32 @@ namespace engine
             MeshComponent& mesh = cm.getComponent<MeshComponent>(entity);
 
             glm::mat4 model = cm.getComponent<WorldTransformComponent>(entity).matrix;
-
             glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(model)));
 
-            TextureID textureHandle = -1;
-            if(cm.hasComponent<TextureComponent>(entity)){
-                TextureComponent& texComp = cm.getComponent<TextureComponent>(entity);
-                textureHandle = texComp.textureHandle;
+            std::vector<TextureID> handles;
+            if (cm.hasComponent<TextureComponent>(entity)) {
+                handles = cm.getComponent<TextureComponent>(entity).textureHandles;
             }
 
-            DrawPacket packet{};
-            packet.meshId = mesh.meshHandle;
-            packet.textureId=textureHandle;
-            packet.model = model;
-            packet.normal = glm::mat4(normalMat);
-            result.push_back(packet);
+            const uint32_t subMeshCount = vulkan.getSubMeshCount(mesh.meshHandle);
+            for (uint32_t i = 0; i < subMeshCount; ++i)
+            {
+                const SubMesh sub = vulkan.getSubMesh(mesh.meshHandle, i);
+
+                TextureID textureId = -1;
+                if (i < handles.size()) {
+                    textureId = handles[i];
+                }
+
+                DrawPacket packet{};
+                packet.meshId = mesh.meshHandle;
+                packet.subMeshIndex = i;
+                packet.textureId = textureId;
+                packet.color = glm::vec4(sub.diffuseColor, 1.0f);
+                packet.model = model;
+                packet.normal = glm::mat4(normalMat);
+                result.push_back(packet);
+            }
         }
 
         return result;
@@ -120,7 +131,7 @@ namespace engine
             frameInfo = demoFrameInfo();
         }
 
-        std::vector<DrawPacket> drawPackets = makeDrawPackets();
+        std::vector<DrawPacket> drawPackets = makeDrawPackets(vulkan);
         vulkan.submitDrawPackets(drawPackets);
         vulkan.submitLights(makeLightInfo());
 

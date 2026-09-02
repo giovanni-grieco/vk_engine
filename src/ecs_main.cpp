@@ -119,7 +119,7 @@ public:
         cm.addComponent<WorldTransformComponent>(floor, WorldTransformComponent{});
         cm.addComponent<LocalTransformComponent>(floor, floorTransform);
         cm.addComponent<MeshComponent>(floor, MeshComponent{floorMeshHandle});
-        cm.addComponent<TextureComponent>(floor, TextureComponent{floorTextureHandle});
+        cm.addComponent<TextureComponent>(floor, TextureComponent{{floorTextureHandle}});
 
         Mesh quadMesh {.vertices = quadVertices, .indices = quadIndices};
         MeshID meshHandle = backend.addMesh(quadMesh);
@@ -135,7 +135,7 @@ public:
         cm.addComponent<WorldTransformComponent>(quad, WorldTransformComponent{});
         cm.addComponent<LocalTransformComponent>(quad, quadTransform);
         cm.addComponent<MeshComponent>(quad, MeshComponent{meshHandle});
-        cm.addComponent<TextureComponent>(quad, TextureComponent{texHandle});
+        cm.addComponent<TextureComponent>(quad, TextureComponent{{texHandle}});
 
 
         Entity house = sm.createEntity();
@@ -155,7 +155,7 @@ public:
         cm.addComponent<WorldTransformComponent>(house, WorldTransformComponent{});
         cm.addComponent<LocalTransformComponent>(house, houseTransform);
         cm.addComponent<MeshComponent>(house, MeshComponent{houseMeshHandle});
-        cm.addComponent<TextureComponent>(house, TextureComponent{houseTextureHandle});
+        cm.addComponent<TextureComponent>(house, TextureComponent{backend.addSubMeshTextures(houseMesh, houseTextureHandle)});
 
         Entity tieFighter = sm.createEntity();
 

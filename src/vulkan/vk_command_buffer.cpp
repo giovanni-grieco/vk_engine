@@ -178,7 +178,7 @@ namespace engine
         VulkanFramebuffers &frameBuffers,
         VulkanBufferManager &bufferManager,
         VulkanTextureManager &textureManager,
-        TextureID defaultTextureId,
+        TextureID whiteTextureId,
         const std::vector<DrawPacket> &drawPackets,
         VulkanDescriptorSets &descriptorSets)
     {
@@ -243,22 +243,25 @@ namespace engine
 
         for (const DrawPacket &packet : drawPackets)
         {
-            const MeshDrawInfo *info = bufferManager.getDrawInfo(packet.meshId);
+            const MeshDrawInfo *info = bufferManager.getDrawInfo(packet.meshId, packet.subMeshIndex);
             if (info == nullptr)
             {
-                continue; // unknown mesh handle — skip it
+                continue; // unknown mesh handle or submesh index — skip it
             }
 
-            // Set 1 (per draw): the texture requested by this packet, falling
-            // back to the default texture when the id is unknown or -1.
+            // Set 1 (per draw): the texture requested by this packet. When the
+            // id is -1 or unknown we bind a 1x1 white dummy texture to satisfy
+            // the pipeline, but flag the shader to skip sampling (hasTexture=0)
+            // so the vertex color is used instead.
             const TextureDrawInfo *texInfo = textureManager.getTextureInfo(packet.textureId);
+            const bool hasTexture = (texInfo != nullptr);
             if (texInfo == nullptr)
             {
-                texInfo = textureManager.getTextureInfo(defaultTextureId);
+                texInfo = textureManager.getTextureInfo(whiteTextureId);
             }
             if (texInfo == nullptr)
             {
-                continue; // no usable texture — skip it
+                continue; // no usable descriptor set — skip it
             }
 
             VkDescriptorSet textureSet = texInfo->descriptorSet;
@@ -271,6 +274,11 @@ namespace engine
             ModelPushConstant push{};
             push.model = packet.model;
             push.normal = packet.normal;
+            push.color = packet.color;
+            push.hasTexture = 0;
+            if (hasTexture) {
+                push.hasTexture = 1;
+            }
             vkCmdPushConstants(commandBuffer,
                                pipeline.layout,
                                VK_SHADER_STAGE_VERTEX_BIT,

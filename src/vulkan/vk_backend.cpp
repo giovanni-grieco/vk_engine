@@ -6,15 +6,22 @@
 #include "data/vk_uniform_buffer_object.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <chrono>
+#include <exception>
 
 namespace engine
 {
     namespace
     {
-        Texture loadDefaultTexture()
+        // 1x1 white texture bound for untextured draws. Vulkan requires a
+        // descriptor set at (set = 1) for this pipeline, so we bind this dummy
+        // instead of a real texture; the shader never samples it (hasTexture=0).
+        Texture makeWhiteTexture()
         {
             Texture texture{};
-            createTextureFromFile(texture, "../textures/default_texture.png");
+            texture.texWidth = 1;
+            texture.texHeight = 1;
+            texture.texChannels = 4;
+            texture.pixels = {255, 255, 255, 255};
             return texture;
         }
     }
@@ -58,12 +65,23 @@ namespace engine
         meshTriangle3 = bufferManager.addMesh(triangle3Mesh);
         meshQuad = bufferManager.addMesh(quadMesh);
         
-        defaultTextureId = textureManager.addTexture(loadDefaultTexture());
+        whiteTextureId = textureManager.addTexture(makeWhiteTexture());
     }
 
     MeshID VulkanBackend::addMesh(const Mesh &mesh)
     {
         return bufferManager.addMesh(mesh);
+    }
+
+    uint32_t VulkanBackend::getSubMeshCount(MeshID meshId) const
+    {
+        const uint32_t count = bufferManager.getSubMeshCount(meshId);
+        return count == 0 ? 1 : count;
+    }
+
+    SubMesh VulkanBackend::getSubMesh(MeshID meshId, uint32_t subMeshIndex) const
+    {
+        return bufferManager.getSubMesh(meshId, subMeshIndex);
     }
 
     void VulkanBackend::submitDrawPackets(const std::vector<DrawPacket> &drawPackets)
@@ -99,6 +117,36 @@ namespace engine
     TextureID VulkanBackend::addTexture(const Texture &texture)
     {
         return textureManager.addTexture(texture);
+    }
+
+    std::vector<TextureID> VulkanBackend::addSubMeshTextures(const Mesh &mesh, TextureID fallback)
+    {
+        std::vector<TextureID> handles;
+        handles.reserve(mesh.subMeshes.empty() ? 1 : mesh.subMeshes.size());
+
+        for (const SubMesh &sub : mesh.subMeshes)
+        {
+            TextureID t = fallback;
+            if (!sub.diffuseTexturePath.empty())
+            {
+                try
+                {
+                    t = textureManager.addTexture(createTextureFromFile(sub.diffuseTexturePath));
+                }
+                catch (const std::exception &)
+                {
+                    t = fallback;
+                }
+            }
+            handles.push_back(t);
+        }
+
+        // Procedural meshes have no submeshes; still provide one texture slot.
+        if (handles.empty())
+        {
+            handles.push_back(fallback);
+        }
+        return handles;
     }
 
     void VulkanBackend::removeTexture(TextureID texture)
@@ -154,10 +202,10 @@ namespace engine
             glm::mat4 spin = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
             drawPackets = {
-                {meshTriangle1, defaultTextureId, glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, 0.0f, 0.0f))},
-                {meshTriangle2, defaultTextureId, spin},
-                {meshTriangle3, defaultTextureId, glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.0f, 0.0f))},
-                {meshQuad, defaultTextureId, glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.5f, 0.0f))},
+                DrawPacket{.meshId = meshTriangle1, .textureId = -1, .model = glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, 0.0f, 0.0f))},
+                DrawPacket{.meshId = meshTriangle2, .textureId = -1, .model = spin},
+                DrawPacket{.meshId = meshTriangle3, .textureId = -1, .model = glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 0.0f, 0.0f))},
+                DrawPacket{.meshId = meshQuad, .textureId = -1, .model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.5f, 0.0f))},
             };
         }
 
@@ -170,7 +218,7 @@ namespace engine
             frameBuffers,
             bufferManager,
             textureManager,
-            defaultTextureId,
+            whiteTextureId,
             drawPackets,
             descriptorSets);
 

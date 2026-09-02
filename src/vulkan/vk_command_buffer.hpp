@@ -58,7 +58,7 @@ namespace engine
             VulkanFramebuffers &frameBuffers,
             VulkanBufferManager &bufferManager,
             VulkanTextureManager &textureManager,
-            TextureID defaultTextureId,
+            TextureID whiteTextureId,
             const std::vector<DrawPacket> &drawPackets,
             VulkanDescriptorSets &descriptorSets);
     };

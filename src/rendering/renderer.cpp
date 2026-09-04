@@ -53,9 +53,9 @@ namespace engine
             glm::mat4 model = cm.getComponent<WorldTransformComponent>(entity).matrix;
             glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(model)));
 
-            std::vector<TextureID> handles;
+            std::vector<TextureID> texHandles;
             if (cm.hasComponent<TextureComponent>(entity)) {
-                handles = cm.getComponent<TextureComponent>(entity).textureHandles;
+                texHandles = cm.getComponent<TextureComponent>(entity).textureHandles;
             }
 
             const uint32_t subMeshCount = vulkan.getSubMeshCount(mesh.meshHandle);
@@ -63,15 +63,15 @@ namespace engine
             {
                 const SubMesh sub = vulkan.getSubMesh(mesh.meshHandle, i);
 
-                TextureID textureId = -1;
-                if (i < handles.size()) {
-                    textureId = handles[i];
+                TextureID texHandle = -1;
+                if (i < texHandles.size()) {
+                    texHandle = texHandles[i]; // the 
                 }
 
                 DrawPacket packet{};
                 packet.meshId = mesh.meshHandle;
                 packet.subMeshIndex = i;
-                packet.textureId = textureId;
+                packet.textureId = texHandle;
                 packet.color = glm::vec4(sub.diffuseColor, 1.0f);
                 packet.model = model;
                 packet.normal = glm::mat4(normalMat);

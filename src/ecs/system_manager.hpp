@@ -14,7 +14,7 @@ namespace engine
     public:
         static SystemManager &getInstance();
 
-        SystemManager() = default;
+        SystemManager();
         // Prevent copying — unique_ptr members are non-copyable
         SystemManager(const SystemManager &) = delete;
         SystemManager &operator=(const SystemManager &) = delete;
@@ -27,5 +27,6 @@ namespace engine
     private:
         static std::unique_ptr<SystemManager> instance;
         std::vector<std::unique_ptr<System>> systems;
+        std::unique_ptr<System> transformSystem;
     };
 }

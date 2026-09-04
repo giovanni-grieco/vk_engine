@@ -1,0 +1,57 @@
+# Blender 5.2.0 LTS MTL File: 'None'
+# www.blender.org
+
+newmtl Материал.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd DefaultMaterial_BaseColor.1001.png-DefaultMaterial_Opacity.1001.png
+map_d DefaultMaterial_BaseColor.1001.png-DefaultMaterial_Opacity.1001.png
+map_Bump -bm 1.000000 DefaultMaterial_Normal.1001.png
+
+newmtl Материал.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd DefaultMaterial_BaseColor.1002.png-DefaultMaterial_Opacity.1002.png
+map_d DefaultMaterial_BaseColor.1002.png-DefaultMaterial_Opacity.1002.png
+map_Bump -bm 1.000000 DefaultMaterial_Normal.1002.png
+
+newmtl Материал.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+illum 2
+map_Kd DefaultMaterial_BaseColor.1003.png-DefaultMaterial_Opacity.1003.png
+map_Ke DefaultMaterial_Emission.1003.jpg
+map_d DefaultMaterial_BaseColor.1003.png-DefaultMaterial_Opacity.1003.png
+map_Bump -bm 1.000000 DefaultMaterial_Normal.1003.png
+
+newmtl Материал.004
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd DefaultMaterial_BaseColor.1004.png-DefaultMaterial_Opacity.1004.png
+map_d DefaultMaterial_BaseColor.1004.png-DefaultMaterial_Opacity.1004.png
+map_Bump -bm 1.000000 DefaultMaterial_Normal.1004.png
+
+newmtl Материал.005
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd DefaultMaterial_BaseColor.1005.png
+map_Bump -bm 1.000000 DefaultMaterial_Normal.1005.png

@@ -1,23 +1,15 @@
 #pragma once
 #include "system.hpp"
-#include "ecs/entity/entity.hpp"
 
-namespace engine
-{
-    class CameraSystem : public System
-    {
-    public:
-        static constexpr float MAX_TRANS_SPEED = 50.0f;
-        static constexpr float MIN_TRANS_SPEED = 1.0f;
-
-        CameraSystem(float translationSpeed, float angularSpeed);
-
-        void start() override;
-        void update() override;
-
-    private:
-        float translationSpeed;
-        float angularSpeed;
-        void handleInputs(Entity camera);
+namespace engine{
+    class CameraSystem : public System{
+        public:
+            CameraSystem(float followDistance=5.0f, float followHeight=2.0f);
+            void start() override;
+            void update() override;
+            
+        private:
+            float followDistance = 8.0f;
+            float followHeight = 2.5f;
     };
 }

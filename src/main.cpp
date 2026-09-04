@@ -12,9 +12,12 @@
 #include "ecs/components/point_light.hpp"
 #include "ecs/components/ambient_light.hpp"
 #include "ecs/components/directional_light.hpp"
+#include "ecs/components/player_ship.hpp"
 
 #include "ecs/systems/transform_system.hpp"
+#include "ecs/systems/free_camera_system.hpp"
 #include "ecs/systems/camera_system.hpp"
+#include "ecs/systems/player_ship_system.hpp"
 #include "ecs/systems/point_light_system.hpp"
 
 #include "time/engine_time.hpp"
@@ -52,12 +55,16 @@ public:
         SceneManager &sm = SceneManager::getInstance();
         ComponentManager &cm = ComponentManager::getInstance();
         SystemManager &sysmg = SystemManager::getInstance();
+        
+        float followDistance = 5.0f;
+        float followHeight = 1.0f;
+        sysmg.registerSystem(std::make_unique<CameraSystem>(followDistance, followHeight));
 
-        sysmg.registerSystem(std::make_unique<TransformSystem>());
-        sysmg.registerSystem(std::make_unique<CameraSystem>(5.0f, 50.0f));
+        float minSpeed = 0.0f, maxSpeed = 10.0f, angularSpeed = 30.0f;
+        sysmg.registerSystem(std::make_unique<PlayerShipSystem>(minSpeed, maxSpeed, angularSpeed));
+
         sysmg.registerSystem(std::make_unique<PointLightSystem>());
     
-        //sm.registerSystem(std::make_unique<Translator>(1.0f));
         cm.registerComponent<LocalTransformComponent>();
         cm.registerComponent<WorldTransformComponent>();
         cm.registerComponent<ParentComponent>();
@@ -68,6 +75,7 @@ public:
         cm.registerComponent<MeshComponent>();
         cm.registerComponent<CameraComponent>();
         cm.registerComponent<TextureComponent>();
+        cm.registerComponent<PlayerShip>();
 
         Entity camera = sm.createEntity();
         cm.addComponent<CameraComponent>(camera, CameraComponent{});
@@ -75,14 +83,14 @@ public:
         Entity ambientLight = sm.createEntity();
         AmbientLightComponent alc {};
         alc.color = {1.0f, 1.0f, 1.0f};
-        alc.intensity = 0.01f;
+        alc.intensity = 0.05f;
         cm.addComponent<AmbientLightComponent>(ambientLight, alc);
 
         Entity directionalLight = sm.createEntity();
         DirectionalLightComponent dlc {};
         dlc.direction = {0.0f, -1.0f, 0.0f};
         dlc.color = {1.0f, 1.0f, 1.0f};
-        dlc.intensity = 0.1f;
+        dlc.intensity = 0.0f;
         cm.addComponent<DirectionalLightComponent>(directionalLight, dlc);
 
         Entity pointLight = sm.createEntity();
@@ -148,12 +156,13 @@ public:
         Mesh tieMesh = createMeshFromFile("../models/tie.obj");
         MeshID tieMeshHandle = backend.addMesh(tieMesh);
         LocalTransformComponent tieTransform {};
-        tieTransform.position.y = 10;
+        tieTransform.position.y = 1;
         tieTransform.position.z = -2;
         tieTransform.scale = glm::vec3{0.25};
         cm.addComponent<WorldTransformComponent>(tieFighter, WorldTransformComponent{});
         cm.addComponent<LocalTransformComponent>(tieFighter, tieTransform);
         cm.addComponent<MeshComponent>(tieFighter, MeshComponent{tieMeshHandle});
+        cm.addComponent<PlayerShip>(tieFighter, PlayerShip{1.0f});
 
         sysmg.start();
     }

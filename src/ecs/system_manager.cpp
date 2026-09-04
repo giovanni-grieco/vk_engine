@@ -1,6 +1,7 @@
 #include "system_manager.hpp"
 
 #include <algorithm>
+#include "systems/transform_system.hpp"
 
 namespace engine
 {
@@ -15,19 +16,27 @@ namespace engine
         return *instance;
     }
 
+    SystemManager::SystemManager(){
+        this->transformSystem = std::make_unique<TransformSystem>();
+    }
+
     void SystemManager::start()
     {
+        this->transformSystem->start();
         for (auto &system : systems)
         {
             system->start();
         }
+        this->transformSystem->update();
     }
     void SystemManager::update()
     {
+        this->transformSystem->update();
         for (auto &system : systems)
         {
             system->update();
         }
+        this->transformSystem->update();
     }
 
     void SystemManager::registerSystem(std::unique_ptr<System> system)

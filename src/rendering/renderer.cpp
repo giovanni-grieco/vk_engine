@@ -29,10 +29,13 @@ namespace engine
         return frameInfo;
     }
 
-    FrameInfo Renderer::frameInfoFromCamera(CameraComponent &camera)
+    FrameInfo Renderer::frameInfoFromCamera(const WorldTransformComponent &world, const CameraComponent &camera)
     {
         FrameInfo frameInfo{};
-        frameInfo.view = glm::lookAt(camera.position, camera.position + camera.forward, camera.up);
+        const glm::vec3 position = glm::vec3(world.matrix[3]);
+        const glm::vec3 forward = glm::normalize(glm::vec3(world.matrix[2]));
+        const glm::vec3 up = glm::normalize(glm::vec3(world.matrix[1]));
+        frameInfo.view = glm::lookAt(position, position + forward, up);
         frameInfo.projection = glm::perspective(
             glm::radians(camera.fov), 
             (vulkan.swapChain.extent.width) / (float)(vulkan.swapChain.extent.height), 
@@ -125,8 +128,10 @@ namespace engine
         FrameInfo frameInfo;
 
         if(!cameras.empty()){
-            auto camera = cm.getComponent<CameraComponent>(cameras[0]);
-            frameInfo = frameInfoFromCamera(camera);
+            Entity cameraEntity = cameras[0];
+            const CameraComponent &camera = cm.getComponent<CameraComponent>(cameraEntity);
+            const WorldTransformComponent &world = cm.getComponent<WorldTransformComponent>(cameraEntity);
+            frameInfo = frameInfoFromCamera(world, camera);
         }else{
             frameInfo = demoFrameInfo();
         }

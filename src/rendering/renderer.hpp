@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ecs/components/camera.hpp"
+#include "ecs/components/world_transform.hpp"
 #include "frame_info.hpp"
 #include "vulkan/vk_backend.hpp"
 #include "platform/window.hpp"
@@ -12,7 +13,7 @@ namespace engine
     public:
         Renderer(Window &window, VulkanBackend &vulkanBackend);
         void render();
-        FrameInfo frameInfoFromCamera(CameraComponent &camera);
+        FrameInfo frameInfoFromCamera(const WorldTransformComponent &world, const CameraComponent &camera);
 
     private:
         Window &window;

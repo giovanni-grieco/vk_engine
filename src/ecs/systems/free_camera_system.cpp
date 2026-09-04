@@ -1,12 +1,14 @@
 #include "free_camera_system.hpp"
 #include "ecs/component_manager.hpp"
 #include "ecs/components/camera.hpp"
+#include "ecs/components/local_transform.hpp"
+#include "ecs/components/world_transform.hpp"
 #include "input/input_system.hpp"
 #include "time/engine_time.hpp"
-#include "utils/angles.hpp"
 
 #include <glm/glm.hpp>
 
+#include <algorithm>
 #include <iostream>
 
 namespace engine
@@ -36,8 +38,15 @@ namespace engine
     {
         ComponentManager &cm = ComponentManager::getInstance();
 
-        CameraComponent &cameraComponent = cm.getComponent<CameraComponent>(camera);
+        LocalTransformComponent &local = cm.getComponent<LocalTransformComponent>(camera);
+        const WorldTransformComponent &world = cm.getComponent<WorldTransformComponent>(camera);
         Input &input = Input::getInstance();
+
+        // Camera basis from the previous frame's world matrix. The camera's
+        // local +Z is its forward direction, +Y is up, so right is forward x up.
+        const glm::vec3 forward = glm::normalize(glm::vec3(world.matrix[2]));
+        const glm::vec3 up = glm::normalize(glm::vec3(world.matrix[1]));
+        const glm::vec3 right = glm::normalize(glm::cross(forward, up));
 
         float dt = EngineTime::getInstance().deltaTime();
 
@@ -48,75 +57,58 @@ namespace engine
 
         if (input.isKeyDown(Key::W))
         {
-            cameraComponent.position += cameraComponent.forward * translationSpeed * dt;
+            local.position += forward * translationSpeed * dt;
         }
         if (input.isKeyDown(Key::S))
         {
-            cameraComponent.position -= cameraComponent.forward * translationSpeed * dt;
+            local.position -= forward * translationSpeed * dt;
         }
 
         if (input.isKeyDown(Key::A))
         {
             // go left
-            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
-            cameraComponent.position -= right * translationSpeed * dt;
+            local.position -= right * translationSpeed * dt;
         }
 
         if (input.isKeyDown(Key::D))
         {
             // go right
-            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
-            cameraComponent.position += right * translationSpeed * dt;
+            local.position += right * translationSpeed * dt;
         }
 
         if (input.isKeyDown(Key::Q))
         {
             // go up
-            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
-            glm::vec3 up = glm::normalize(glm::cross(right, cameraComponent.forward));
-            cameraComponent.position += up * translationSpeed * dt;
+            local.position += up * translationSpeed * dt;
         }
 
         if (input.isKeyDown(Key::E))
         {
-            glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
-            glm::vec3 up = glm::normalize(glm::cross(right, cameraComponent.forward));
-            cameraComponent.position -= up * translationSpeed * dt;
+            local.position -= up * translationSpeed * dt;
         }
 
-        // Rotation amount for this frame, in degrees.
+        // Rotation this frame, in degrees (LocalTransformComponent stores Euler degrees).
         const float angle = angularSpeed * dt;
 
-        // Camera right vector, recomputed every frame from the current basis.
-        const glm::vec3 right = glm::normalize(glm::cross(cameraComponent.forward, cameraComponent.up));
-
-        // Artificial clamp: keep forward within 1..179 degrees of the FIXED world
-        // up (i.e. pitch within +/-89 of horizontal) so `right` never degenerates.
-
+        // Pitch around the local X axis. Positive X-rotation drops the nose,
+        // so pitch up is negative.
         if (input.isKeyDown(Key::Up))
-        { // pitch up: rotate the whole basis around `right`
-            const glm::vec3 candidate = rotateVector(cameraComponent.forward, right, angle);
-            cameraComponent.forward = candidate;
-            cameraComponent.up = rotateVector(cameraComponent.up, right, angle);
+        {
+            local.rotation.x -= angle;
         }
-
         if (input.isKeyDown(Key::Down))
-        { // pitch down
-            const glm::vec3 candidate = rotateVector(cameraComponent.forward, right, -angle);
-            cameraComponent.forward = candidate;
-            cameraComponent.up = rotateVector(cameraComponent.up, right, -angle);
+        {
+            local.rotation.x += angle;
         }
 
+        // Yaw around the world Y axis. Positive Y-rotation steers left.
         if (input.isKeyDown(Key::Right))
-        { // yaw right: rotate the whole basis around world up
-            cameraComponent.forward = rotateVector(cameraComponent.forward, worldUp, -angle);
-            cameraComponent.up = rotateVector(cameraComponent.up, worldUp, -angle);
+        {
+            local.rotation.y -= angle;
         }
-
         if (input.isKeyDown(Key::Left))
-        { // yaw left
-            cameraComponent.forward = rotateVector(cameraComponent.forward, worldUp, angle);
-            cameraComponent.up = rotateVector(cameraComponent.up, worldUp, angle);
+        {
+            local.rotation.y += angle;
         }
     }
 

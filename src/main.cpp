@@ -16,7 +16,6 @@
 
 #include "ecs/systems/transform_system.hpp"
 #include "ecs/systems/free_camera_system.hpp"
-#include "ecs/systems/camera_system.hpp"
 #include "ecs/systems/player_ship_system.hpp"
 #include "ecs/systems/point_light_system.hpp"
 
@@ -56,13 +55,8 @@ public:
         ComponentManager &cm = ComponentManager::getInstance();
         SystemManager &sysmg = SystemManager::getInstance();
         
-        float followDistance = 5.0f;
-        float followHeight = 1.0f;
-        sysmg.registerSystem(std::make_unique<CameraSystem>(followDistance, followHeight));
-
         float minSpeed = 0.0f, maxSpeed = 10.0f, angularSpeed = 30.0f;
         sysmg.registerSystem(std::make_unique<PlayerShipSystem>(minSpeed, maxSpeed, angularSpeed));
-
         sysmg.registerSystem(std::make_unique<PointLightSystem>());
     
         cm.registerComponent<LocalTransformComponent>();
@@ -76,9 +70,6 @@ public:
         cm.registerComponent<CameraComponent>();
         cm.registerComponent<TextureComponent>();
         cm.registerComponent<PlayerShip>();
-
-        Entity camera = sm.createEntity();
-        cm.addComponent<CameraComponent>(camera, CameraComponent{});
 
         Entity ambientLight = sm.createEntity();
         AmbientLightComponent alc {};
@@ -163,6 +154,19 @@ public:
         cm.addComponent<LocalTransformComponent>(tieFighter, tieTransform);
         cm.addComponent<MeshComponent>(tieFighter, MeshComponent{tieMeshHandle});
         cm.addComponent<PlayerShip>(tieFighter, PlayerShip{1.0f});
+
+        float followDistance = 5.0f;
+        float followHeight = 1.0f;
+        Entity camera = sm.createEntity();
+        LocalTransformComponent cameraTransform{};
+        // The camera follows the ship by being its child. The offset is given
+        // in world space, so divide by the ship's (uniform) scale to express it
+        // in ship-local units.
+        cameraTransform.position = glm::vec3(0.0f, followHeight, -followDistance) / tieTransform.scale;
+        cm.addComponent<WorldTransformComponent>(camera, WorldTransformComponent{});
+        cm.addComponent<LocalTransformComponent>(camera, cameraTransform);
+        cm.addComponent<CameraComponent>(camera, CameraComponent{});
+        sm.parent(camera, tieFighter);
 
         sysmg.start();
     }

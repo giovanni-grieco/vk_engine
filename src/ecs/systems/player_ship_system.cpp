@@ -4,8 +4,11 @@
 #include "ecs/components/player_ship.hpp"
 #include "ecs/components/local_transform.hpp"
 #include "ecs/components/world_transform.hpp"
+#include "ecs/components/point_light.hpp"
+#include "ecs/components/laser_bolt.hpp"
 #include "ecs/entity/entity.hpp"
 #include "ecs/component_manager.hpp"
+#include "ecs/scene_manager.hpp"
 
 #include <glm/glm.hpp>
 
@@ -35,6 +38,24 @@ namespace engine
             candidateSpeed = std::max(candidateSpeed, minSpeed);
 
         return candidateSpeed;
+    }
+
+    void PlayerShipSystem::shootLaser(Entity ship){
+        auto& sm = SceneManager::getInstance();
+        auto& cm = ComponentManager::getInstance();
+        auto& time = EngineTime::getInstance();
+
+        if(time.totalTime() - this->lastTimeFired >= timeBetweenFires){
+            this->lastTimeFired = time.totalTime();
+            Entity laser = sm.createEntity();
+            LocalTransformComponent local{};
+            WorldTransformComponent world{};
+            cm.addComponent<LocalTransformComponent>(laser, local);
+            cm.addComponent<WorldTransformComponent>(laser, world);
+            cm.addComponent<PointLightComponent>(laser, PointLightComponent{{0.0f, 2.0f, 0.5f}, 1.0f});
+            cm.addComponent<LaserBoltComponent>(laser, LaserBoltComponent{});
+
+        }
     }
 
     void PlayerShipSystem::handleInputs(Entity ship)
@@ -81,6 +102,9 @@ namespace engine
             local.rotation.z -= angle;
         if (input.isKeyDown(Key::D))
             local.rotation.z += angle;
+
+        if (input.isKeyDown(Key::Space))
+            shootLaser(ship);
     }
 
     void PlayerShipSystem::update()

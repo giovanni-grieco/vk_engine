@@ -6,7 +6,7 @@
 namespace engine
 {
     // Upper bound on the light list; must match MAX_POINT_LIGHTS in shader.frag.
-    constexpr uint32_t MAX_POINT_LIGHTS_VK = 16;
+    constexpr uint32_t MAX_POINT_LIGHTS_VK = 2048;
 
     // Must match the PointLight struct in shader.frag (std430 layout).
     struct PointLightGPU

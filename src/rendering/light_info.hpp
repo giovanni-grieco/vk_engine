@@ -7,7 +7,7 @@
 namespace engine
 {
 
-    constexpr uint32_t MAX_POINT_LIGHTS = 16;
+    constexpr uint32_t MAX_POINT_LIGHTS = 2048;
 
     struct PointLightInfo
     {

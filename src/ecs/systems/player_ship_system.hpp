@@ -22,6 +22,10 @@ namespace engine{
             float maxSpeed = MAX_SPEED;
             float angularSpeed = DEFAULT_ANGULAR_SPEED;
 
+            float lastTimeFired = 0.0f;
+            float timeBetweenFires = 0.1f;
+
+            void shootLaser(Entity ship);
             void handleInputs(Entity ship);
     };  
 }

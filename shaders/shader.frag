@@ -1,6 +1,6 @@
 #version 450
 
-#define MAX_POINT_LIGHTS 16
+#define MAX_POINT_LIGHTS 2048
 
 struct PointLight {
     vec4 positionAndIntensity;

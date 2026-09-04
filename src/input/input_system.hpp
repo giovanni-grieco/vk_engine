@@ -14,7 +14,7 @@ namespace engine
         Unknown = -1,
         W, S, A, D, Q, E,
         Up, Down, Left, Right,
-        Count
+        Count, Space
     };
 
     enum class MouseButton : int

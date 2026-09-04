@@ -25,6 +25,7 @@ namespace engine
                 case Key::Down:  return GLFW_KEY_DOWN;
                 case Key::Left:  return GLFW_KEY_LEFT;
                 case Key::Right: return GLFW_KEY_RIGHT;
+                case Key::Space: return GLFW_KEY_SPACE;
                 default:         return GLFW_KEY_UNKNOWN;
             }
         }

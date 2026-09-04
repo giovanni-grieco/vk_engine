@@ -13,11 +13,13 @@
 #include "ecs/components/ambient_light.hpp"
 #include "ecs/components/directional_light.hpp"
 #include "ecs/components/player_ship.hpp"
+#include "ecs/components/laser_bolt.hpp"
 
 #include "ecs/systems/transform_system.hpp"
 #include "ecs/systems/free_camera_system.hpp"
 #include "ecs/systems/player_ship_system.hpp"
 #include "ecs/systems/point_light_system.hpp"
+#include "ecs/systems/laser_system.hpp"
 
 #include "time/engine_time.hpp"
 
@@ -55,9 +57,11 @@ public:
         ComponentManager &cm = ComponentManager::getInstance();
         SystemManager &sysmg = SystemManager::getInstance();
         
-        float minSpeed = 0.0f, maxSpeed = 10.0f, angularSpeed = 30.0f;
+        float minSpeed = 0.1f, maxSpeed = 10.0f, angularSpeed = 45.0f;
         sysmg.registerSystem(std::make_unique<PlayerShipSystem>(minSpeed, maxSpeed, angularSpeed));
-        sysmg.registerSystem(std::make_unique<PointLightSystem>());
+        sysmg.registerSystem(std::make_unique<LaserSystem>());
+        //sysmg.registerSystem(std::make_unique<PointLightSystem>());
+        //sysmg.registerSystem(std::make_unique<FreeCameraSystem>(10.0f, 10.0f));
     
         cm.registerComponent<LocalTransformComponent>();
         cm.registerComponent<WorldTransformComponent>();
@@ -70,6 +74,7 @@ public:
         cm.registerComponent<CameraComponent>();
         cm.registerComponent<TextureComponent>();
         cm.registerComponent<PlayerShip>();
+        cm.registerComponent<LaserBoltComponent>();
 
         Entity ambientLight = sm.createEntity();
         AmbientLightComponent alc {};
@@ -155,13 +160,10 @@ public:
         cm.addComponent<MeshComponent>(tieFighter, MeshComponent{tieMeshHandle});
         cm.addComponent<PlayerShip>(tieFighter, PlayerShip{1.0f});
 
-        float followDistance = 5.0f;
+        float followDistance = 6.0f;
         float followHeight = 1.0f;
         Entity camera = sm.createEntity();
         LocalTransformComponent cameraTransform{};
-        // The camera follows the ship by being its child. The offset is given
-        // in world space, so divide by the ship's (uniform) scale to express it
-        // in ship-local units.
         cameraTransform.position = glm::vec3(0.0f, followHeight, -followDistance) / tieTransform.scale;
         cm.addComponent<WorldTransformComponent>(camera, WorldTransformComponent{});
         cm.addComponent<LocalTransformComponent>(camera, cameraTransform);

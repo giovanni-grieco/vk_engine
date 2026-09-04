@@ -13,7 +13,7 @@ namespace engine
             void start() override;
             void update() override;
         private:
-            float maxAliveTime = 5.0f;
+            float maxAliveTime = 3.0f;
             std::unordered_map<Entity, float> laserbolt2spawntime;
     };
 }

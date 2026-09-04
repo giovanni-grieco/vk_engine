@@ -18,11 +18,11 @@ namespace engine{
     }
 
     VkPresentModeKHR VulkanSwapChainSupportDetails::choosePresentMode(){
-        for (const auto& availableMode : this->presentModes){
+        /*for (const auto& availableMode : this->presentModes){
             if(availableMode==VK_PRESENT_MODE_MAILBOX_KHR){
                 return availableMode;
             }
-        }
+        }*/
         //default garantueed to be always available
         return VK_PRESENT_MODE_FIFO_KHR;
     }

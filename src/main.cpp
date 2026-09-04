@@ -34,6 +34,7 @@
 #include "texture/texture.hpp"
 
 #include <memory>
+#include <glm/gtc/quaternion.hpp>
 
 using namespace engine;
 
@@ -57,12 +58,6 @@ public:
         ComponentManager &cm = ComponentManager::getInstance();
         SystemManager &sysmg = SystemManager::getInstance();
         
-        float minSpeed = 0.1f, maxSpeed = 10.0f, angularSpeed = 45.0f;
-        sysmg.registerSystem(std::make_unique<PlayerShipSystem>(minSpeed, maxSpeed, angularSpeed));
-        sysmg.registerSystem(std::make_unique<LaserSystem>());
-        //sysmg.registerSystem(std::make_unique<PointLightSystem>());
-        //sysmg.registerSystem(std::make_unique<FreeCameraSystem>(10.0f, 10.0f));
-    
         cm.registerComponent<LocalTransformComponent>();
         cm.registerComponent<WorldTransformComponent>();
         cm.registerComponent<ParentComponent>();
@@ -79,25 +74,15 @@ public:
         Entity ambientLight = sm.createEntity();
         AmbientLightComponent alc {};
         alc.color = {1.0f, 1.0f, 1.0f};
-        alc.intensity = 0.05f;
+        alc.intensity = 0.15f;
         cm.addComponent<AmbientLightComponent>(ambientLight, alc);
 
         Entity directionalLight = sm.createEntity();
         DirectionalLightComponent dlc {};
         dlc.direction = {0.0f, -1.0f, 0.0f};
         dlc.color = {1.0f, 1.0f, 1.0f};
-        dlc.intensity = 0.0f;
+        dlc.intensity = 0.15f;
         cm.addComponent<DirectionalLightComponent>(directionalLight, dlc);
-
-        Entity pointLight = sm.createEntity();
-        LocalTransformComponent lightTransform{};
-        lightTransform.position = glm::vec3(2.0f, 3.0f, 2.0f);
-        cm.addComponent<WorldTransformComponent>(pointLight, WorldTransformComponent{});
-        cm.addComponent<LocalTransformComponent>(pointLight, lightTransform);
-        PointLightComponent plc {};
-        plc.color = glm::vec3(1.0f, 0.5f, 0.5f);
-        plc.intensity = 0.5f;
-        cm.addComponent<PointLightComponent>(pointLight, plc);
 
         Entity pointLight1 = sm.createEntity();
         LocalTransformComponent lightTransform1{};
@@ -114,9 +99,9 @@ public:
         Texture floorTex = createTextureFromFile("../textures/floor.jpg");
         TextureID floorTextureHandle = backend.addTexture(floorTex);
         LocalTransformComponent floorTransform{};
-        floorTransform.position.y = -1;
-        floorTransform.rotation.z = 180;
-        floorTransform.scale = glm::vec3(10.0f);
+        floorTransform.position.y = -2;
+        floorTransform.rotation = glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        floorTransform.scale = glm::vec3(20.0f);
         cm.addComponent<WorldTransformComponent>(floor, WorldTransformComponent{});
         cm.addComponent<LocalTransformComponent>(floor, floorTransform);
         cm.addComponent<MeshComponent>(floor, MeshComponent{floorMeshHandle});
@@ -140,9 +125,9 @@ public:
         Texture houseTexture = createTextureFromFile("../textures/viking_room.png");
         TextureID houseTextureHandle = backend.addTexture(houseTexture);
         LocalTransformComponent houseTransform {};
-        houseTransform.position.y = -0.9f;
-        houseTransform.rotation.x = -90;
-        houseTransform.rotation.y = -90;
+        houseTransform.position.y = -1.9f;
+        houseTransform.rotation = glm::angleAxis(glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f))
+                                  * glm::angleAxis(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         cm.addComponent<WorldTransformComponent>(house, WorldTransformComponent{});
         cm.addComponent<LocalTransformComponent>(house, houseTransform);
         cm.addComponent<MeshComponent>(house, MeshComponent{houseMeshHandle});
@@ -169,6 +154,17 @@ public:
         cm.addComponent<LocalTransformComponent>(camera, cameraTransform);
         cm.addComponent<CameraComponent>(camera, CameraComponent{});
         sm.parent(camera, tieFighter);
+
+
+        Mesh laserMesh = createMeshFromFile("../models/laserbolt.obj");
+        MeshID laserMeshHandle = backend.addMesh(laserMesh);
+        Texture laserTexture = createTextureFromFile("../textures/Solid_green.png");
+        TextureID laserTexHandle = backend.addTexture(laserTexture);
+
+        float minSpeed = 0.0f, maxSpeed = 10.0f, angularSpeed = 55.0f;
+        sysmg.registerSystem(std::make_unique<PlayerShipSystem>(minSpeed, maxSpeed, angularSpeed, PlayerShipSystem::Ctx{laserMeshHandle, laserTexHandle}));
+        sysmg.registerSystem(std::make_unique<LaserSystem>());
+        //sysmg.registerSystem(std::make_unique<FreeCameraSystem>(10.0f, 10.0f));
 
         sysmg.start();
     }

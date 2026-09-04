@@ -7,6 +7,7 @@
 #include "time/engine_time.hpp"
 
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -42,8 +43,6 @@ namespace engine
         const WorldTransformComponent &world = cm.getComponent<WorldTransformComponent>(camera);
         Input &input = Input::getInstance();
 
-        // Camera basis from the previous frame's world matrix. The camera's
-        // local +Z is its forward direction, +Y is up, so right is forward x up.
         const glm::vec3 forward = glm::normalize(glm::vec3(world.matrix[2]));
         const glm::vec3 up = glm::normalize(glm::vec3(world.matrix[1]));
         const glm::vec3 right = glm::normalize(glm::cross(forward, up));
@@ -87,29 +86,28 @@ namespace engine
             local.position -= up * translationSpeed * dt;
         }
 
-        // Rotation this frame, in degrees (LocalTransformComponent stores Euler degrees).
-        const float angle = angularSpeed * dt;
+        const float angle = glm::radians(angularSpeed * dt);
 
-        // Pitch around the local X axis. Positive X-rotation drops the nose,
-        // so pitch up is negative.
         if (input.isKeyDown(Key::Up))
         {
-            local.rotation.x -= angle;
+            local.rotation = local.rotation * glm::angleAxis(-angle, glm::vec3(1.0f, 0.0f, 0.0f));
         }
         if (input.isKeyDown(Key::Down))
         {
-            local.rotation.x += angle;
+            local.rotation = local.rotation * glm::angleAxis(angle, glm::vec3(1.0f, 0.0f, 0.0f));
         }
 
-        // Yaw around the world Y axis. Positive Y-rotation steers left.
+        // Yaw around the local Y axis. Positive Y-rotation steers left.
         if (input.isKeyDown(Key::Right))
         {
-            local.rotation.y -= angle;
+            local.rotation = local.rotation * glm::angleAxis(-angle, glm::vec3(0.0f, 1.0f, 0.0f));
         }
         if (input.isKeyDown(Key::Left))
         {
-            local.rotation.y += angle;
+            local.rotation = local.rotation * glm::angleAxis(angle, glm::vec3(0.0f, 1.0f, 0.0f));
         }
+
+        local.rotation = glm::normalize(local.rotation);
     }
 
     void FreeCameraSystem::update()

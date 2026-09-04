@@ -31,12 +31,11 @@ namespace engine
     }
     void SystemManager::update()
     {
-        this->transformSystem->update();
         for (auto &system : systems)
         {
             system->update();
         }
-        //this->transformSystem->update();
+        this->transformSystem->update();
     }
 
     void SystemManager::registerSystem(std::unique_ptr<System> system)

@@ -6,26 +6,35 @@
 #include "ecs/components/world_transform.hpp"
 #include "ecs/components/point_light.hpp"
 #include "ecs/components/laser_bolt.hpp"
+#include "ecs/components/mesh.hpp"
+#include "ecs/components/texture.hpp"
 #include "ecs/entity/entity.hpp"
 #include "ecs/component_manager.hpp"
 #include "ecs/scene_manager.hpp"
 
+#include "utils/angles.hpp"
+
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include <algorithm>
 #include <iostream>
 
 namespace engine
 {
-    PlayerShipSystem::PlayerShipSystem(float minSpeed, float maxSpeed, float angularSpeed)
+    PlayerShipSystem::PlayerShipSystem(float minSpeed, float maxSpeed, float angularSpeed, Ctx context)
     {
         this->minSpeed = minSpeed;
         this->maxSpeed = maxSpeed;
         this->angularSpeed = angularSpeed;
         this->currentSpeed = minSpeed;
+        this->laserBoltMeshHandle = context.laserBoltMeshHandle;
+        this->laserBoltTexHandle = context.laserBoltTexHandle;
     }
 
-    void PlayerShipSystem::start() {}
+    void PlayerShipSystem::start()
+    {
+    }
 
     // Clamps a throttle change, mirroring how the free camera clamps its speed.
     float updateSpeed(float currentSpeed, float delta, float minSpeed, float maxSpeed)
@@ -40,21 +49,49 @@ namespace engine
         return candidateSpeed;
     }
 
-    void PlayerShipSystem::shootLaser(Entity ship){
-        auto& sm = SceneManager::getInstance();
-        auto& cm = ComponentManager::getInstance();
-        auto& time = EngineTime::getInstance();
+    void PlayerShipSystem::shootLaser(Entity ship)
+    {
+        auto &sm = SceneManager::getInstance();
+        auto &cm = ComponentManager::getInstance();
+        auto &time = EngineTime::getInstance();
 
-        if(time.totalTime() - this->lastTimeFired >= timeBetweenFires){
+        if (time.totalTime() - this->lastTimeFired >= timeBetweenFires)
+        {
             this->lastTimeFired = time.totalTime();
-            Entity laser = sm.createEntity();
-            LocalTransformComponent local{};
-            WorldTransformComponent world{};
-            cm.addComponent<LocalTransformComponent>(laser, local);
-            cm.addComponent<WorldTransformComponent>(laser, world);
-            cm.addComponent<PointLightComponent>(laser, PointLightComponent{{0.0f, 2.0f, 0.5f}, 1.0f});
-            cm.addComponent<LaserBoltComponent>(laser, LaserBoltComponent{});
+            for (int i = 0; i < 2; i++)
+            {
+                Entity laser = sm.createEntity();
+                LocalTransformComponent local{};
+                WorldTransformComponent world{};
+                const LocalTransformComponent& shipLocal = cm.getComponent<LocalTransformComponent>(ship);
+                const WorldTransformComponent& shipWorld = cm.getComponent<WorldTransformComponent>(ship);
+                const glm::vec3 forward = glm::normalize(glm::vec3(shipWorld.matrix[2]));
+                const glm::vec3 up = glm::normalize(glm::vec3(shipWorld.matrix[1]));
+                const glm::vec3 right = glm::normalize(glm::cross(forward, up));
 
+                float forwardCoefficient = 0.3f;
+                float lateralDistanceCoeff = 0.1f;
+                float verticalDistanceCoeff = -0.1f;
+
+
+                local = shipLocal;
+                world = shipWorld;
+                local.position += forward * forwardCoefficient;
+                if(i==0){
+                    local.position += right * lateralDistanceCoeff;
+                }else{
+                    local.position -= right * lateralDistanceCoeff;
+                }
+
+                local.position += up * verticalDistanceCoeff;
+
+                cm.addComponent<LocalTransformComponent>(laser, local);
+                cm.addComponent<WorldTransformComponent>(laser, world);
+                cm.addComponent<PointLightComponent>(laser, PointLightComponent{{0.0f, 2.0f, 0.5f}, 1.0f});
+                cm.addComponent<LaserBoltComponent>(laser, LaserBoltComponent{});
+                cm.addComponent<MeshComponent>(laser, MeshComponent{this->laserBoltMeshHandle});
+                cm.addComponent<TextureComponent>(laser, TextureComponent{{this->laserBoltTexHandle}});
+            }
         }
     }
 
@@ -68,40 +105,38 @@ namespace engine
         LocalTransformComponent &local = cm.getComponent<LocalTransformComponent>(ship);
         const WorldTransformComponent &world = cm.getComponent<WorldTransformComponent>(ship);
 
-        // Basis from the PREVIOUS frame's world matrix. The transform system runs
-        // before us, so edits to the local transform show up one frame later.
         const glm::vec3 forward = glm::normalize(glm::vec3(world.matrix[2]));
+        const glm::vec3 up = glm::normalize(glm::vec3(world.matrix[1]));
+        const glm::vec3 right = glm::normalize(glm::cross(forward, up));
 
-        // Throttle: W accelerates, S decelerates (clamped to [min, max]).
+
         if (input.isKeyDown(Key::W))
             currentSpeed = updateSpeed(currentSpeed, THROTTLE_RATE * dt, minSpeed, maxSpeed);
         if (input.isKeyDown(Key::S))
             currentSpeed = updateSpeed(currentSpeed, -THROTTLE_RATE * dt, minSpeed, maxSpeed);
 
-        // Always fly along the nose.
         local.position += forward * currentSpeed * dt;
 
-        // Rotation this frame, in degrees (LocalTransformComponent stores Euler degrees).
-        const float angle = angularSpeed * dt;
+        const float angle = glm::radians(angularSpeed * dt);
 
-        // Yaw around the world up axis. The nose is local +Z, so a positive
-        // Y-rotation steers toward +X (the ship's left) — hence the flipped signs.
+
         if (input.isKeyDown(Key::Left))
-            local.rotation.y += angle;
+            local.rotation = local.rotation * glm::angleAxis(angle, glm::vec3(0.0f, 1.0f, 0.0f));
         if (input.isKeyDown(Key::Right))
-            local.rotation.y -= angle;
+            local.rotation = local.rotation * glm::angleAxis(-angle, glm::vec3(0.0f, 1.0f, 0.0f));
 
-        // Pitch around the local X axis. Positive X-rotation drops the nose.
-        if (input.isKeyDown(Key::Up))
-            local.rotation.x -= angle;
+
         if (input.isKeyDown(Key::Down))
-            local.rotation.x += angle;
+            local.rotation = local.rotation * glm::angleAxis(-angle, glm::vec3(1.0f, 0.0f, 0.0f));
+        if (input.isKeyDown(Key::Up))
+            local.rotation = local.rotation * glm::angleAxis(angle, glm::vec3(1.0f, 0.0f, 0.0f));
 
-        // Roll around the nose (local +Z). D banks right, A banks left.
         if (input.isKeyDown(Key::A))
-            local.rotation.z -= angle;
+            local.rotation = local.rotation * glm::angleAxis(-angle, glm::vec3(0.0f, 0.0f, 1.0f));
         if (input.isKeyDown(Key::D))
-            local.rotation.z += angle;
+            local.rotation = local.rotation * glm::angleAxis(angle, glm::vec3(0.0f, 0.0f, 1.0f));
+
+        local.rotation = glm::normalize(local.rotation);
 
         if (input.isKeyDown(Key::Space))
             shootLaser(ship);

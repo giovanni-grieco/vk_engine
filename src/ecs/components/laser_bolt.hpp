@@ -2,6 +2,6 @@
 
 namespace engine{
     struct LaserBoltComponent{
-        float speed = 40.0f;
+        float speed = 150.0f;
     };
 }

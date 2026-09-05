@@ -1,0 +1,21 @@
+Una piccola demo di un caccia stellare in grado di sparare laser realizzata con un motore di gioco custom. Il motore di gioco utilizza l'API Vulkan per il rendering.
+
+L'architettura scelta per il motore è l'Entity Component System. Questo ci permette di interagire con qualsiasi parte dello stato del gioco da qualsiasi angolazione o punto.
+
+Le entità sono semplicemente degli ID, i componenti sono dati e i sistemi sono la logica che agisce su quei dati.
+
+I relativi Manager memorizzano i dati pertinenti.
+
+Il Scene Manager memorizza le entità presenti in una scena e le loro relazioni padre/figlio. Ad esempio, l’Entità b ha come entità padre l’Entità a;
+
+Il Component Manager memorizza le informazioni sui componenti relative a qualsiasi entità esistente a runtime. Ad esempio, è in grado di recuperare il “LocalTransformComponent” di una determinata Entità e.
+
+Il System Manager gestisce tutti i sistemi.
+
+Tutti questi gestori sono singleton accessibili da qualsiasi punto del codice e, pertanto, ogni singola entità e componente può essere manipolata da qualsiasi punto durante l’esecuzione.
+
+Un altro pattern architetturale utilizzato è Layers. Il motore è strutturato in livelli: in cima abbiamo l’ECS, in fondo un “backend” Vulkan e al centro un Renderer che traduce gli elementi dal livello ECS al livello Vulkan.
+
+Questa comunicazione avviene sotto forma di Draw Packet. Prima di ogni render pass, viene emesso un batch di Draw Packet contenente tutte le informazioni rilevanti che il backend Vulkan dovrà utilizzare. Pertanto, per un singolo fotogramma, possono esserci più Draw Packet. Ciascun Draw Packet contiene i dati relativi alle mesh, alle texture e alle trasformazioni matriciali calcolate dalla CPU per eseguire correttamente il rendering. Ulteriori informazioni relative a ciascun fotogramma vengono trasmesse tramite le Frame Info. Attualmente contengono le matrici di vista e di proiezione da utilizzare nello shader.
+
+Risorse come le mesh e le texture sono gestite dal backend Vulkan. Una volta che una risorsa viene caricata nella memoria della GPU, viene restituito un handle per farvi riferimento nei livelli superiori.

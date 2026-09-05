@@ -1,5 +1,5 @@
 # Starfighter 
-A small space ship games to learn Vulkan API
+A small space ship demo made with a Custom Engine
 
 # Fedora packages
 ```
@@ -37,3 +37,4 @@ brew install glm glfw
 
 [Game Loop Article 2](https://gafferongames.com/post/fix_your_timestep/)
 
+[A Simple Entity Component System (ECS) \[C++\]](https://austinmorlan.com/posts/entity_component_system/)

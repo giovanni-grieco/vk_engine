@@ -158,7 +158,7 @@ public:
 
         Mesh laserMesh = createMeshFromFile("../models/laserbolt.obj");
         MeshID laserMeshHandle = backend.addMesh(laserMesh);
-        Texture laserTexture = createTextureFromFile("../textures/Solid_green.png");
+        Texture laserTexture = createBrightGreenLaserTexture(64, 64);
         TextureID laserTexHandle = backend.addTexture(laserTexture);
 
         float minSpeed = 0.0f, maxSpeed = 10.0f, angularSpeed = 55.0f;

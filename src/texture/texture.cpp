@@ -5,6 +5,8 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <cmath>
+#include <algorithm>
 
 namespace engine
 {
@@ -61,6 +63,46 @@ namespace engine
         stbi_image_free(pixels);
 
         return result;
+    }
+
+    Texture createBrightGreenLaserTexture(int width, int height)
+    {
+        Texture texture{};
+        texture.texWidth = width;
+        texture.texHeight = height;
+        texture.texChannels = 4;
+        texture.pixels.resize(static_cast<size_t>(width) * height * 4);
+
+        const float cx = static_cast<float>(width - 1) * 0.5f;
+        const float cy = static_cast<float>(height - 1) * 0.5f;
+        const float maxDist = std::sqrt(cx * cx + cy * cy);
+
+        for (int y = 0; y < height; ++y)
+        {
+            for (int x = 0; x < width; ++x)
+            {
+                const float dx = static_cast<float>(x) - cx;
+                const float dy = static_cast<float>(y) - cy;
+                const float dist = std::sqrt(dx * dx + dy * dy) / maxDist; // 0 at center, 1 at corner
+
+                // White-hot core in the middle, fading into a bright green glow,
+                // then down to black toward the edges.
+                const float core = std::max(0.0f, 1.0f - dist * 2.5f);
+                const float glow = std::max(0.0f, 1.0f - dist);
+
+                const float r = 255.0f * (glow * 0.10f + core);
+                const float g = 255.0f * (glow * 1.00f + core);
+                const float b = 255.0f * (glow * 0.10f + core);
+
+                const size_t idx = (static_cast<size_t>(y) * width + x) * 4;
+                texture.pixels[idx + 0] = static_cast<unsigned char>(std::min(r, 255.0f));
+                texture.pixels[idx + 1] = static_cast<unsigned char>(std::min(g, 255.0f));
+                texture.pixels[idx + 2] = static_cast<unsigned char>(std::min(b, 255.0f));
+                texture.pixels[idx + 3] = 255; // opaque; the shader samples RGB only
+            }
+        }
+
+        return texture;
     }
 
     int Texture::size()

@@ -85,6 +85,8 @@ namespace engine
 
                 local.position += up * verticalDistanceCoeff;
 
+                local.scale = glm::vec3(1.0f);
+
                 cm.addComponent<LocalTransformComponent>(laser, local);
                 cm.addComponent<WorldTransformComponent>(laser, world);
                 cm.addComponent<PointLightComponent>(laser, PointLightComponent{{0.0f, 2.0f, 0.5f}, 1.0f});

@@ -34,6 +34,7 @@
 #include "texture/texture.hpp"
 
 #include <memory>
+#include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 using namespace engine;
@@ -66,80 +67,40 @@ public:
         cm.registerComponent<AmbientLightComponent>();
         cm.registerComponent<DirectionalLightComponent>();
         cm.registerComponent<MeshComponent>();
-        cm.registerComponent<CameraComponent>();
         cm.registerComponent<TextureComponent>();
-        cm.registerComponent<PlayerShip>();
-        cm.registerComponent<LaserBoltComponent>();
+        cm.registerComponent<CameraComponent>();
 
-        Entity ambientLight = sm.createEntity();
-        AmbientLightComponent alc {};
-        alc.color = {1.0f, 1.0f, 1.0f};
-        alc.intensity = 0.15f;
-        cm.addComponent<AmbientLightComponent>(ambientLight, alc);
+        /*Entity camera = sm.createEntity();
+        LocalTransformComponent cameraLocal {};
+        cameraLocal.position = glm::vec3(0.0f, 0.25f, 0.0f);
+        cm.addComponent<LocalTransformComponent>(camera, cameraLocal);
+        cm.addComponent<WorldTransformComponent>(camera, WorldTransformComponent{});
+        cm.addComponent<CameraComponent>(camera, CameraComponent{});
 
-        Entity directionalLight = sm.createEntity();
-        DirectionalLightComponent dlc {};
-        dlc.direction = {0.0f, -1.0f, 0.0f};
-        dlc.color = {1.0f, 1.0f, 1.0f};
-        dlc.intensity = 0.15f;
-        cm.addComponent<DirectionalLightComponent>(directionalLight, dlc);
-
-        Entity pointLight1 = sm.createEntity();
-        LocalTransformComponent lightTransform1{};
-        lightTransform1.position = glm::vec3(-2.0f, 3.0f, -2.0f);
-        cm.addComponent<WorldTransformComponent>(pointLight1, WorldTransformComponent{});
-        cm.addComponent<LocalTransformComponent>(pointLight1, lightTransform1);
-        PointLightComponent plc1 {};
-        plc1.color = glm::vec3(0.5f, 2.0f, 2.0f);
-        plc1.intensity = 0.5f;
-        cm.addComponent<PointLightComponent>(pointLight1, plc1);
+        sysmg.registerSystem(std::make_unique<FreeCameraSystem>());*/
 
         Entity floor = sm.createEntity();
-        MeshID floorMeshHandle = backend.addMesh(createMeshFromFile("../models/quad.obj"));
-        Texture floorTex = createTextureFromFile("../textures/floor.jpg");
-        TextureID floorTextureHandle = backend.addTexture(floorTex);
-        LocalTransformComponent floorTransform{};
-        floorTransform.position.y = -2;
-        floorTransform.rotation = glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        floorTransform.scale = glm::vec3(20.0f);
+        LocalTransformComponent floorLocal {};
+        floorLocal.rotation *= glm::angleAxis(glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        floorLocal.scale = glm::vec3(100.0f);
+        cm.addComponent<LocalTransformComponent>(floor, floorLocal);
         cm.addComponent<WorldTransformComponent>(floor, WorldTransformComponent{});
-        cm.addComponent<LocalTransformComponent>(floor, floorTransform);
-        cm.addComponent<MeshComponent>(floor, MeshComponent{floorMeshHandle});
-        cm.addComponent<TextureComponent>(floor, TextureComponent{{floorTextureHandle}});
+        cm.addComponent<MeshComponent>(floor, MeshComponent{backend.addMesh(createMeshFromFile("../models/quad.obj"))});
+        cm.addComponent<TextureComponent>(floor, TextureComponent{{backend.addTexture(createTextureFromFile("../textures/floor.jpg"))}});
 
-        Mesh quadMesh {.vertices = quadVertices, .indices = quadIndices};
-        MeshID meshHandle = backend.addMesh(quadMesh);
-        Texture tex = createTextureFromFile("../textures/statue.jpg");
-        TextureID texHandle = backend.addTexture(tex);
-        Entity quad = sm.createEntity();
-        LocalTransformComponent quadTransform {};
-        quadTransform.position.z = -2;
-        cm.addComponent<WorldTransformComponent>(quad, WorldTransformComponent{});
-        cm.addComponent<LocalTransformComponent>(quad, quadTransform);
-        cm.addComponent<MeshComponent>(quad, MeshComponent{meshHandle});
-        cm.addComponent<TextureComponent>(quad, TextureComponent{{texHandle}});
 
-        Entity house = sm.createEntity();
-        Mesh houseMesh = createMeshFromFile("../models/viking_room.obj");
-        MeshID houseMeshHandle = backend.addMesh(houseMesh);
-        Texture houseTexture = createTextureFromFile("../textures/viking_room.png");
-        TextureID houseTextureHandle = backend.addTexture(houseTexture);
-        LocalTransformComponent houseTransform {};
-        houseTransform.position.y = -1.9f;
-        houseTransform.rotation = glm::angleAxis(glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f))
-                                  * glm::angleAxis(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        cm.addComponent<WorldTransformComponent>(house, WorldTransformComponent{});
-        cm.addComponent<LocalTransformComponent>(house, houseTransform);
-        cm.addComponent<MeshComponent>(house, MeshComponent{houseMeshHandle});
-        cm.addComponent<TextureComponent>(house, TextureComponent{backend.addSubMeshTextures(houseMesh, houseTextureHandle)});
+        Entity ambientlight = sm.createEntity();
+        cm.addComponent<AmbientLightComponent>(ambientlight, AmbientLightComponent{});
 
+        cm.registerComponent<PlayerShip>();
+        
         Entity tieFighter = sm.createEntity();
         Mesh tieMesh = createMeshFromFile("../models/tie.obj");
         MeshID tieMeshHandle = backend.addMesh(tieMesh);
         LocalTransformComponent tieTransform {};
         tieTransform.position.y = 1;
         tieTransform.position.z = -2;
-        tieTransform.scale = glm::vec3{0.25};
+        tieTransform.scale = glm::vec3{0.25f};
         cm.addComponent<WorldTransformComponent>(tieFighter, WorldTransformComponent{});
         cm.addComponent<LocalTransformComponent>(tieFighter, tieTransform);
         cm.addComponent<MeshComponent>(tieFighter, MeshComponent{tieMeshHandle});
@@ -153,9 +114,9 @@ public:
         cm.addComponent<WorldTransformComponent>(camera, WorldTransformComponent{});
         cm.addComponent<LocalTransformComponent>(camera, cameraTransform);
         cm.addComponent<CameraComponent>(camera, CameraComponent{});
-        sm.parent(camera, tieFighter);
+        sm.parent(camera, tieFighter); // Camera is child of tieFighter!!
 
-
+        cm.registerComponent<LaserBoltComponent>();
         Mesh laserMesh = createMeshFromFile("../models/laserbolt.obj");
         MeshID laserMeshHandle = backend.addMesh(laserMesh);
         Texture laserTexture = createBrightGreenLaserTexture(64, 64);
@@ -164,7 +125,13 @@ public:
         float minSpeed = 0.0f, maxSpeed = 10.0f, angularSpeed = 55.0f;
         sysmg.registerSystem(std::make_unique<PlayerShipSystem>(minSpeed, maxSpeed, angularSpeed, PlayerShipSystem::Ctx{laserMeshHandle, laserTexHandle}));
         sysmg.registerSystem(std::make_unique<LaserSystem>());
-        //sysmg.registerSystem(std::make_unique<FreeCameraSystem>(10.0f, 10.0f));
+
+        Entity directionalLight = sm.createEntity();
+        DirectionalLightComponent dlc {};
+        dlc.direction = {0.0f, -1.0f, 0.0f};
+        dlc.color = {1.0f, 1.0f, 1.0f};
+        dlc.intensity = 0.15f;
+        cm.addComponent<DirectionalLightComponent>(directionalLight, dlc);
 
         sysmg.start();
     }
@@ -176,8 +143,8 @@ public:
         SystemManager &sysmg = SystemManager::getInstance();
         while (!window.shouldWindowClose())
         {
-            window.pollEvents();
             time.beginFrame();
+            window.pollEvents();
             sysmg.update();
             renderer.render();
             Input::getInstance().endFrame();

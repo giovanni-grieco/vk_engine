@@ -10,7 +10,7 @@ namespace engine
         static constexpr float MAX_TRANS_SPEED = 50.0f;
         static constexpr float MIN_TRANS_SPEED = 1.0f;
 
-        FreeCameraSystem(float translationSpeed, float angularSpeed);
+        FreeCameraSystem(float translationSpeed = 1.0f, float angularSpeed = 30.0f);
 
         void start() override;
         void update() override;
